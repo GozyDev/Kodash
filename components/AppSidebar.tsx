@@ -25,25 +25,23 @@ import {
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 
-const navItems = [
-  { title: "Tasks", icon: ListTodo, url: "/tasks" },
-  { title: "Notes", icon: StickyNote, url: "/notes" },
-  { title: "Projects", icon: FolderKanban, url: "/projects" },
-  { title: "Clients", icon: Users, url: "/clients" },
-];
+const toolItems = [{ title: "Settings", icon: Settings, url: "/settings" }];
 
-const toolItems = [
-  { title: "Search", icon: Search, url: "/search" },
-  { title: "Settings", icon: Settings, url: "/settings" },
-];
-
-export function AppSidebar() {
+export function AppSidebar({ project_id }: { project_id: string }) {
   const pathname = usePathname();
+  const basePath = `/dashboard/project/${project_id}`;
+
+  const navItems = [
+    { title: "Tasks", icon: ListTodo, url: `${basePath}/tasks` },
+    { title: "Notes", icon: StickyNote, url: `${basePath}/notes` },
+    { title: "Projects", icon: FolderKanban, url: `${basePath}/projects` },
+    { title: "Clients", icon: Users, url: `${basePath}/clients` },
+  ];
 
   return (
     <Sidebar
       className={cn(
-        "bg-bgPrimary border-border/60",
+        "bg-bgPrimary border-cardCB",
         "transition-all duration-300 ease-in-out",
         "shadow-sm backdrop-blur-sm",
         "top-[65px] h-[calc(100vh-65px)]"
@@ -98,25 +96,23 @@ export function AppSidebar() {
                 const isActive = pathname === item.url;
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={isActive}>
+                    <SidebarMenuButton
+                      className=" hover:bg-transparent"
+                      asChild
+                    >
                       <a
                         href={item.url}
                         className={cn(
                           "flex items-center gap-3",
                           "rounded-xl px-3 py-2.5",
                           "text-sm transition-all duration-200",
-                          "group relative",
-                          "hover:bg-accent/5 hover:text-accent",
-                          isActive && [
-                            "bg-gradient-to-r from-accent/10 to-accent/5",
-                            "text-accent font-medium",
-                            "shadow-xs border border-accent/20",
-                          ]
+                          "group relative hover:text-textNb",
+                          isActive ? "text-textNb" : "text-muted-foreground"
                         )}
                       >
                         {/* Active indicator */}
                         {isActive && (
-                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-accent rounded-r-full" />
+                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-full  rounded-r-full bg-gradient-to-r from-accent/5 to-transparent" />
                         )}
 
                         <item.icon
@@ -127,21 +123,14 @@ export function AppSidebar() {
                           )}
                         />
 
-                        <span
-                          className={cn(
-                            "transition-all duration-300",
-                            "sidebar:opacity-0 sidebar:w-0 sidebar:min-w-0"
-                          )}
-                        >
-                          {item.title}
-                        </span>
+                        <span className={cn()}>{item.title}</span>
 
                         {/* Hover gradient effect */}
                         <div
                           className={cn(
                             "absolute inset-0 rounded-xl",
                             "bg-gradient-to-r from-accent/5 to-transparent",
-                            "opacity-0 group-hover:opacity-100",
+                            "opacity-0 hover:opacity-100",
                             "transition-opacity duration-200",
                             "pointer-events-none"
                           )}
@@ -158,7 +147,10 @@ export function AppSidebar() {
                 const isActive = pathname === item.url;
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={isActive}>
+                    <SidebarMenuButton
+                      asChild
+                      className=" hover:bg-transparent hover:text-white text-muted-foreground"
+                    >
                       <a
                         href={item.url}
                         className={cn(
@@ -166,10 +158,9 @@ export function AppSidebar() {
                           "rounded-xl px-3 py-2.5",
                           "text-sm transition-all duration-200",
                           "group relative",
-                          "hover:bg-accent/5 hover:text-accent",
+                          "text-foreground-muted",
                           isActive && [
-                            "bg-gradient-to-r from-accent/10 to-accent/5",
-                            "text-accent font-medium",
+                            "text-white font-medium",
                             "shadow-xs border border-accent/20",
                           ]
                         )}
@@ -203,17 +194,6 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {/* Subtle divider */}
-        <div
-          className={cn(
-            "border-t border-border/30 mx-3",
-            "transition-all duration-300",
-            "sidebar:opacity-0"
-          )}
-        />
-
-        <div className="flex-1" />
       </SidebarContent>
     </Sidebar>
   );

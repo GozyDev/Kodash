@@ -2,12 +2,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Task, TaskInsert, TaskUpdate } from "@/lib/superbase/type";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -15,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X, Save, Trash2, Calendar } from "lucide-react";
+import { X, Save, Trash2, Maximize2, Minimize2, Circle, Minus } from "lucide-react";
 
 interface TaskDrawerProps {
   task: Task | null;
@@ -35,12 +34,13 @@ export default function TaskDrawer({
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    priority: "Medium" as Task["priority"],
-    status: "To-do" as Task["status"],
+    priority: "medium" as Task["priority"],
+    status: "to-do" as Task["status"],
     due_date: "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     if (task) {
@@ -60,7 +60,22 @@ export default function TaskDrawer({
         due_date: "",
       });
     }
-  }, [task]);
+    // Reset expand state when modal opens/closes
+    if (!isOpen) {
+      setIsExpanded(false);
+    }
+  }, [task, isOpen]);
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [isOpen, onClose]);
 
   const handleSave = () => {
     setIsSaving(true);
@@ -87,157 +102,215 @@ export default function TaskDrawer({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const getStatusIcon = (status: Task["status"]) => {
+    switch (status) {
+      case "to-do":
+        return <Circle className="w-3.5 h-3.5" />;
+      case "in-progress":
+        return <Minus className="w-3.5 h-3.5 rotate-90" />;
+      case "done":
+        return <Circle className="w-3.5 h-3.5 fill-current" />;
+    }
+  };
+
+  const getStatusColor = (status: Task["status"]) => {
+    switch (status) {
+      case "to-do":
+        return "bg-gray-500/10 text-gray-400 border-gray-500/20 hover:bg-gray-500/20";
+      case "in-progress":
+        return "bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20";
+      case "done":
+        return "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20";
+    }
+  };
+
+  const getPriorityColor = (priority: Task["priority"]) => {
+    switch (priority) {
+      case "high":
+        return "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20";
+      case "medium":
+        return "bg-yellow-500/10 text-yellow-400 border-yellow-500/20 hover:bg-yellow-500/20";
+      case "low":
+        return "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20";
+    }
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <>
-      {/* Backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/60 backdrop-blur z-40"
-        onClick={onClose}
-      />
-
-      {/* Drawer */}
-      <motion.div
-        initial={{ x: "100%" }}
-        animate={{ x: 0 }}
-        exit={{ x: "100%" }}
-        transition={{ type: "spring", damping: 30, stiffness: 300 }}
-        className="fixed right-0 top-0 h-full w-96 max-w-full bg-cardCB/70 shadow-xl z-50 flex flex-col"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-cardCB">
-          <h2 className="text-lg font-semibold">
-            {task ? "Edit Task" : "New Task"}
-          </h2>
-          <Button
-            variant="ghost"
-            size="sm"
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
             onClick={onClose}
-            className="h-8 w-8 p-0"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
+          />
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 px-4 space-y-6">
-          {/* Title */}
-          <div className="space-y-3">
-            <Label htmlFor="title" className="text-textNc">
-              Title{" "}
-            </Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => handleChange("title", e.target.value)}
-              placeholder="Enter task title"
-              className="border-b rounded-none border-b-primaryC bg-bgPrimary/50 outline-none"
-            />
-          </div>
-
-          {/* Description */}
-          <div className="space-y-3">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => handleChange("description", e.target.value)}
-              placeholder="Enter task description"
-              rows={4}
-              className="mt-1 h-[100] resize-none bg-bgPrimary/50 border-cardCB"
-            />
-          </div>
-
-          {/* Priority & Status */}
-          <div className="grid gap-4">
-            <div className="flex items-center gap-2">
-              <Label htmlFor="priority">Priority</Label>
-              <Select
-                value={formData.priority}
-                onValueChange={(value: Task["priority"]) =>
-                  handleChange("priority", value)
-                }
-              >
-                <SelectTrigger className="border-cardCB bg-bgPrimary/50">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-cardCB text-textNb border-cardCB">
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value: Task["status"]) =>
-                  handleChange("status", value)
-                }
-              >
-                <SelectTrigger className="border-cardCB bg-bgPrimary/50">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="to-do">To-do</SelectItem>
-                  <SelectItem value="in-progress">In progress</SelectItem>
-                  <SelectItem value="done">Done</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Due Date */}
-          <div>
-            <Label htmlFor="due_date">Due Date</Label>
-            <div className="relative mt-1">
-              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                id="due_date"
-                type="date"
-                value={formData.due_date}
-                onChange={(e) => handleChange("due_date", e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-cardCB">
-          <div>
-            {onDelete && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDelete}
-                className="text-red-800 border-red-200 bg-red-50"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                {isDeleting ? "Deleting..." : "Delete"}
-              </Button>
-            )}
-          </div>
-
-          <div className="flex space-x-2">
-            <Button variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={!formData.title.trim() || isSaving}
-              className="butt"
+          {/* Centered Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ 
+                opacity: 1, 
+                scale: 1, 
+                y: 0,
+                height: isExpanded ? "90vh" : "auto"
+              }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className={`relative w-full max-w-2xl bg-cardC  rounded-lg shadow-2xl pointer-events-auto border border-cardCB flex flex-col relative ${
+                isExpanded ? "h-[90vh]" : "max-h-[85vh]"
+              }`}
+              onClick={(e) => e.stopPropagation()}
             >
-              <Save className="w-4 h-4 mr-2" />
-              {isSaving ? "Saving..." : "Save"}
-            </Button>
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-cardCB/80">
+                <div className="flex items-center gap-2 text-sm text-textNd">
+                  <span className="text-textNb">{task ? "Edit" : "New"} issue</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="h-7 w-7 p-0 text-textNd hover:text-textNb hover:bg-bgPrimary/30"
+                  >
+                    {isExpanded ? (
+                      <Minimize2 className="w-3.5 h-3.5" />
+                    ) : (
+                      <Maximize2 className="w-3.5 h-3.5" />
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onClose}
+                    className="h-7 w-7 p-0 text-textNd hover:text-textNb hover:bg-bgPrimary/30"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className={`flex-1 overflow-y-auto px-5 py-4 ${isExpanded ? "min-h-0" : ""}`}>
+                {/* Title - No border, just placeholder */}
+                <div className="mb-4">
+                  <Input
+                    value={formData.title}
+                    onChange={(e) => handleChange("title", e.target.value)}
+                    placeholder="Issue title"
+                    className="text-base font-medium border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-0 py-1 placeholder:text-textNd h-auto"
+                    autoFocus
+                  />
+                </div>
+
+                {/* Description - No border */}
+                <div className="mb-6">
+                  <Textarea
+                    value={formData.description}
+                    onChange={(e) => handleChange("description", e.target.value)}
+                    placeholder="Add description..."
+                    rows={isExpanded ? 20 : 6}
+                    className="resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-0 py-1 placeholder:text-textNd text-sm min-h-[100px]"
+                  />
+                </div>
+
+                {/* Status & Priority Row - Button style like Linear */}
+                <div className="flex items-center gap-2 flex-wrap border-t border-cardCB/80 pt-4 abosolute bottom-0 w-full">
+                  {/* Status */}
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value: Task["status"]) =>
+                      handleChange("status", value)
+                    }
+                  >
+                    <SelectTrigger className={`h-7 px-2.5 border rounded-md text-xs font-medium transition-colors ${getStatusColor(formData.status)} focus:ring-0 focus:ring-offset-0`}>
+                      <div className="flex items-center gap-1.5">
+                        {getStatusIcon(formData.status)}
+                        <span className="capitalize">
+                          {formData.status === "to-do" ? "Todo" : formData.status === "in-progress" ? "In Progress" : "Done"}
+                        </span>
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="bg-cardCB text-textNb border-cardCB">
+                      <SelectItem value="to-do" className="flex items-center gap-2">
+                        <Circle className="w-3.5 h-3.5 text-gray-400" />
+                        <span>Todo</span>
+                      </SelectItem>
+                      <SelectItem value="in-progress" className="flex items-center gap-2">
+                        <Minus className="w-3.5 h-3.5 rotate-90 text-blue-400" />
+                        <span>In Progress</span>
+                      </SelectItem>
+                      <SelectItem value="done" className="flex items-center gap-2">
+                        <Circle className="w-3.5 h-3.5 fill-current text-green-400" />
+                        <span>Done</span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {/* Priority */}
+                  <Select
+                    value={formData.priority}
+                    onValueChange={(value: Task["priority"]) =>
+                      handleChange("priority", value)
+                    }
+                  >
+                    <SelectTrigger className={`h-7 px-2.5 border rounded-md text-xs font-medium transition-colors capitalize ${getPriorityColor(formData.priority)} focus:ring-0 focus:ring-offset-0`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-cardCB text-textNb border-cardCB">
+                      <SelectItem value="high" className="capitalize">High</SelectItem>
+                      <SelectItem value="medium" className="capitalize">Medium</SelectItem>
+                      <SelectItem value="low" className="capitalize">Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-between px-5 py-3 border-t border-cardCB/50 bg-bgPrimary/10">
+                <div>
+                  {onDelete && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                      className="h-7 text-xs text-red-400 border-red-800/30 hover:bg-red-950/20 hover:text-red-300"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                      {isDeleting ? "Deleting..." : "Delete"}
+                    </Button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onClose}
+                    className="h-7 px-3 text-xs text-textNd hover:text-textNb hover:bg-bgPrimary/30"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSave}
+                    disabled={!formData.title.trim() || isSaving}
+                    className="h-7 px-3 text-xs butt"
+                  >
+                    {task ? (isSaving ? "Saving..." : "Save") : (isSaving ? "Creating..." : "Create issue")}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      </motion.div>
-    </>
+        </>
+      )}
+    </AnimatePresence>
   );
 }

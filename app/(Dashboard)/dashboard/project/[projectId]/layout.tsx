@@ -39,7 +39,7 @@ const ProjectLayout = async ({
       <ProjectHeader orgs={orgs ?? []} project={project} />
       <div className="text-textNa flex w-full">
         <aside>
-          <AppSidebar />
+          <AppSidebar project_id ={projectId} />
         </aside>
         <main className=" flex-1 pt-[74px]">
           <div className="flex w-full">
