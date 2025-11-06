@@ -165,3 +165,6 @@ border: #3278444e solid 0.5px ;
 cursor:pointer;
 }
 
+*{
+  outline-color: none;
+}

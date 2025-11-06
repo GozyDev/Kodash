@@ -20,10 +20,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 const toolItems = [{ title: "Settings", icon: Settings, url: "/settings" }];
 
@@ -100,7 +100,7 @@ export function AppSidebar({ project_id }: { project_id: string }) {
                       className=" hover:bg-transparent"
                       asChild
                     >
-                      <a
+                      <Link
                         href={item.url}
                         className={cn(
                           "flex items-center gap-3",
@@ -135,7 +135,7 @@ export function AppSidebar({ project_id }: { project_id: string }) {
                             "pointer-events-none"
                           )}
                         />
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );

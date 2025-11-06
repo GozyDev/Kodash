@@ -16,6 +16,7 @@ export default function TaskClient({ project_id }: { project_id: string }) {
   const [loading, setLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [createInitialStatus, setCreateInitialStatus] = useState<Task["status"] | null>(null);
   const [filters, setFilters] = useState({
     status: "All" as "All" | Task["status"],
     priority: "All" as "All" | Task["priority"],
@@ -78,6 +79,7 @@ export default function TaskClient({ project_id }: { project_id: string }) {
 
     setTasks((prev) => [data, ...prev]);
     setIsDrawerOpen(false);
+    setCreateInitialStatus(null);
   };
 
   const handleUpdateTask = async (id: string, updates: TaskUpdate) => {
@@ -111,6 +113,7 @@ export default function TaskClient({ project_id }: { project_id: string }) {
     setTasks((prev) => prev.filter((task) => task.id !== id));
     setIsDrawerOpen(false);
     setSelectedTask(null);
+    setCreateInitialStatus(null);
   };
 
   // Keyboard shortcut
@@ -154,11 +157,12 @@ export default function TaskClient({ project_id }: { project_id: string }) {
       <div className="border-b border-cardCB px-6 pb-4 py-[30px] ">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-semibold ">Tasks</h1>
-            <p className="text-sm  mt-1">
-              {tasks.filter((t) => t.status === "done").length} of{" "}
-              {tasks.length} tasks completed
-            </p>
+            <h1 className="text-4xl font-semibold ">Issues</h1>
+            <div className="flex items-center gap-2 mt-1 text-xs">
+              <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">Todo: {tasks.filter((t) => t.status === "to-do").length}</span>
+              <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">In Progress: {tasks.filter((t) => t.status === "in-progress").length}</span>
+              <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">Done: {tasks.filter((t) => t.status === "done").length}</span>
+            </div>
           </div>
 
           <Button
@@ -197,6 +201,11 @@ export default function TaskClient({ project_id }: { project_id: string }) {
             setSelectedTask(task);
             setIsDrawerOpen(true);
           }}
+          onCreateWithStatus={(status) => {
+            setSelectedTask(null);
+            setCreateInitialStatus(status);
+            setIsDrawerOpen(true);
+          }}
         />
       </div>
 
@@ -209,15 +218,19 @@ export default function TaskClient({ project_id }: { project_id: string }) {
             onClose={() => {
               setIsDrawerOpen(false);
               setSelectedTask(null);
+              setCreateInitialStatus(null);
             }}
-            onSave={
-              selectedTask
-                ? (updates) => handleUpdateTask(selectedTask.id, updates)
-                : (inserts) => handleCreateTask(inserts)
-            }   
+            onSave={(payload) => {
+              if (selectedTask) {
+                handleUpdateTask(selectedTask.id, payload as TaskUpdate);
+              } else {
+                handleCreateTask(payload as Omit<TaskInsert, "project_id">);
+              }
+            }}   
             onDelete={
               selectedTask ? () => handleDeleteTask(selectedTask.id) : undefined
             }
+            initialStatus={createInitialStatus ?? undefined}
           />
         )}
       </AnimatePresence>

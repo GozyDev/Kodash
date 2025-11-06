@@ -35,10 +35,12 @@ export async function POST(
   const body = await req.json();
   const { title, description, priority, status, due_date } = body;
   const duecheck = due_date ? due_date : null;
-  console.log('check',duecheck)
+  console.log("check", duecheck);
   const { data, error } = await supabase
     .from("tasks")
-    .insert([{ project_id, title, description, priority, status, due_date:duecheck }])
+    .insert([
+      { project_id, title, description, priority, status, due_date: duecheck },
+    ])
     .select()
     .single();
 
@@ -55,10 +57,12 @@ export async function PATCH(req: Request) {
   const supabase = await createClient();
   const body = await req.json();
   const { id, ...updates } = body;
+  const duecheck = updates.due_date ? updates.due_date : null;
+  console.log("body", body);
 
   const { data, error } = await supabase
     .from("tasks")
-    .update(updates)
+    .update({ ...updates, due_date: duecheck })
     .eq("id", id)
     .select()
     .single();
