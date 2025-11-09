@@ -1,7 +1,12 @@
 // components/OrgSidebar.tsx
 "use client";
 
-import { FolderKanban, Users, Settings, LayoutGrid } from "lucide-react";
+import {
+  FolderKanban,
+  Users,
+  Settings,
+  LayoutGrid,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -24,7 +29,8 @@ export function OrgSidebar({ orgId }: { orgId: string }) {
 
   const navItems = [
     { title: "Projects", icon: FolderKanban, url: basePath },
-    { title: "Teams", icon: Users, url: `${basePath}/teams` },
+    { title: "Teams", icon: Users, url: `${basePath}/team` },
+    { title: "Overview", icon: LayoutGrid, url: `${basePath}/overview` },
   ];
 
   return (
@@ -46,11 +52,7 @@ export function OrgSidebar({ orgId }: { orgId: string }) {
           <SidebarGroupContent className="mt-3">
             <SidebarMenu>
               {navItems.map((item) => {
-                const isActive =
-                  pathname === item.url ||
-                  (item.url === basePath &&
-                    pathname.startsWith(basePath) &&
-                    pathname === basePath);
+                const isActive = pathname === item.url || (item.url === basePath && pathname.startsWith(basePath) && pathname === basePath);
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton

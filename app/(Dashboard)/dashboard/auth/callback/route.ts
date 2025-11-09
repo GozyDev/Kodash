@@ -1,34 +1,52 @@
 import { NextResponse } from "next/server";
-// The client you created from the Server-Side Auth instructions
-import { createClient } from "@/lib/superbase/superbase-server";
+import { createClient } from "@/lib/superbase/superbase-server"; // your Supabase server client
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  // if "next" is in param, use it as the redirect URL
-  let next = searchParams.get("next") ?? "/";
-  if (!next.startsWith("/")) {
-    // if "next" is not a relative URL, use the default
-    next = "/";
-  }
+
+  let next = searchParams.get("next") ?? "/dashboard/organizations";
+  if (!next.startsWith("/")) next = "/";
 
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    // ✅ if login successful, create/update profile
     if (!error) {
-      const forwardedHost = request.headers.get("x-forwarded-host"); // original origin before load balancer
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      console.log("User", user);
+      if (user) {
+        const { error: profileError, data: profileData } = await supabase
+          .from("profiles")
+          .upsert({
+            id: user.id,
+            email: user.email,
+            full_name:
+              user.user_metadata.full_name || user.user_metadata.name || "",
+            avatar_url: user.user_metadata.avatar_url || "",
+          });
+
+        console.log("Profile upsert error:", profileError);
+        console.log("Profile upsert data:", profileData);
+      }
+
+      // ✅ handle redirects depending on environment
+      const forwardedHost = request.headers.get("x-forwarded-host");
       const isLocalEnv = process.env.NODE_ENV === "development";
+
       if (isLocalEnv) {
-        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
         return NextResponse.redirect(`${origin}${next}`);
       } else if (forwardedHost) {
         return NextResponse.redirect(`https://${forwardedHost}${next}`);
       } else {
-        return NextResponse.redirect(`${origin}${next}  `);
+        return NextResponse.redirect(`${origin}${next}`);
       }
     }
   }
 
-  // return the user to an error page with instructions
+  // ❌ if something went wrong
   return NextResponse.redirect(`${origin}/auth/auth-code-error`);
 }

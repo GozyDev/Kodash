@@ -15,7 +15,7 @@ export default function OrgHeader({
   orgId?: string;
 }) {
   return (
-    <header className="fixed top-0 left-0 w-full flex justify-between items-center  text-neutral-100 px-2 py-3 border-b border-cardCB/80 backdrop-blur-sm">
+    <header className="fixed top-0 left-0 w-full flex justify-between items-center  text-neutral-100 px-2 py-3 border-b border-cardCB/80 backdrop-blur-sm ">
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <Image
