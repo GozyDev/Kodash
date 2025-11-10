@@ -1,35 +1,36 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/superbase/superbase-server";
 
-const svc = await createClient();
-
+// GET: fetch tenants + projects count
 export async function GET() {
-  const { data, error } = await svc
+  const svc = await createClient(); // inside request scope
+
+  const { data: tenants, error: getError } = await svc
     .from("tenants")
-    .select("id, name, plan, created_at")
+    .select(`id, name, plan, created_at, projects(count)`)
     .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("Error:", error.message);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (getError) {
+    console.error("Error fetching tenants:", getError.message);
+    return NextResponse.json({ error: getError.message }, { status: 500 });
   }
 
-  return NextResponse.json({ organizations: data ?? [] });
+  return NextResponse.json({ organizations: tenants ?? [] });
 }
 
+// POST: create a new tenant + membership
 export async function POST(request: Request) {
-  try {
-    // get user session if you’re using client tokens
-    const {
-      data: { user },
-      error: userError,
-    } = await svc.auth.getUser();
+  const svc = await createClient(); // inside request scope
 
-    if (userError) {
-      console.error("User fetch error:", userError.message);
-      return NextResponse.json({ error: userError.message }, { status: 401 });
+  try {
+    const { data: authData, error: authError } = await svc.auth.getUser();
+
+    if (authError) {
+      console.error("User fetch error:", authError.message);
+      return NextResponse.json({ error: authError.message }, { status: 401 });
     }
 
+    const user = authData?.user;
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 401 });
     }
@@ -38,21 +39,36 @@ export async function POST(request: Request) {
     const { name, plan, type } = body;
 
     if (!name) {
-      return NextResponse.json({ error: "Name required" }, { status: 400 });
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
-    const { data, error } = await svc
+    // Create tenant
+    const { data: tenantData, error: tenantError } = await svc
       .from("tenants")
       .insert({ name, plan, type, created_by: user.id })
-      .select()
+      .select("id")
       .single();
 
-    if (error) {
-      console.error("Insert error:", error.message);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (tenantError || !tenantData) {
+      console.error("Tenant insert error:", tenantError?.message);
+      return NextResponse.json({ error: tenantError?.message ?? "Failed to create tenant" }, { status: 500 });
     }
 
-    return NextResponse.json({ organization: data }, { status: 201 });
+    // Create membership
+    const { data: membershipData, error: membershipError } = await svc
+      .from("memberships")
+      .insert({
+        user_id: user.id,
+        tenant_id: tenantData.id,
+        role: "member",
+      });
+
+    if (membershipError) {
+      console.error("Membership insert error:", membershipError.message);
+      return NextResponse.json({ error: membershipError.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ organization: tenantData }, { status: 201 });
   } catch (err: any) {
     console.error("Unexpected error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
