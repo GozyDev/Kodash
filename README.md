@@ -1,118 +1,44 @@
 Kodash
 
-Kodash is a multi-tenant, workspace-based productivity system built with Next.js + Supabase.
-Each workspace acts as its own isolated environment (ideal for client work or personal projects).
-Inside a workspace, you create issues first—then optionally group them into projects when you need structure.
+Kodash is a multi-tenant, workspace-based productivity system built with Next.js and Supabase. Each workspace acts as its own isolated environment, making it ideal for client work, product management, or personal projects. You begin by creating issues, and only when you need structure do you group them into projects. The workflow stays clean, fast, and flexible.
 
-Still in active development. Core flows are being refined.
+What Makes Kodash Different
 
-🔥 What Makes Kodash Different
+Traditional tools like Linear and Asana are built for internal teams. Kodash flips the model. Every workspace represents a client, a product, or a personal environment. You are never forced into project-first workflows. You capture issues immediately and structure them later when it matters.
 
-Most tools are team-centric (Linear, Asana, ClickUp).
-Kodash flips this by being workspace-centric — every workspace represents a client, a product, or a personal environment.
+Core Features
 
-You don’t start with projects.
-You start with issues → then organize them later into goals/projects when you actually need the structure.
+Multi-Tenant Architecture
+Every workspace is fully isolated using Supabase Row-Level Security. Perfect for freelancers, agencies, or builders managing multiple clients or products.
 
-✨ Core Features
-🔐 Multi-Tenant Architecture
+Issue-First Workflow
+Issues come first. They can be tasks, bugs, ideas, or notes. Add statuses, priorities, tags, and descriptions. Assign them to a project only when you want organization.
 
-Every workspace = fully isolated data silo
+Projects as Optional Structure
+Projects start empty. When you are ready, you can group specific issues under goals, releases, features, or milestones. Issues live independently and projects simply act as containers.
 
-Supabase Row-Level Security ensures user + workspace separation
+Workspace-Level Membership
+Users are added to specific workspaces, not globally. Boundaries stay clean and controlled.
 
-Designed for agencies, freelancers, and builders managing multiple clients/products
+Dashboard Overview
+A simple view of recent issues, statuses, and active projects inside each workspace. Light analytics planned.
 
-📝 Issue-First Workflow
+Responsive Interface
+Designed with TailwindCSS for a clean, modern, and accessible interface across all devices.
 
-Create issues instantly without needing a project
-
-Perfect for quick tasks, bugs, ideas, or to-do items
-
-Add metadata: status, priority, description, tags
-
-Convert or assign issues to a project later when you’re ready to group them
-
-📁 Optional Projects Layer
-
-Projects are empty containers until you add issues
-
-Organize related issues under goals, features, releases, etc.
-
-Clean separation:
-
-/issues → all issues
-
-/projects → project-level organization
-
-No forced structure, no bloated overhead
-
-👥 Workspace-Level Membership
-
-Invite users per workspace, not globally
-
-Clean boundaries for agencies or multi-product devs
-
-📊 Dashboard Overview
-
-Quick view of issues, statuses, and active projects
-
-Per-workspace analytics (WIP)
-
-📱 Responsive UI
-
-Built with TailwindCSS
-
-Works on desktop, tablet, and mobile
-
-Smooth, minimal interface
-
-🛠️ Tech Stack
+Tech Stack
 
 Next.js (App Router)
-
 Supabase (Auth, Postgres, RLS)
-
-TypeScript
-
 TailwindCSS
-
+TypeScript
 ShadCN UI (planned)
-
 Framer Motion (planned)
 
-🚧 Status
+Current Status
 
-Kodash is currently:
+Kodash is actively under development. Multi-tenant routing is being refined, workspace isolation is being strengthened with RLS, issue and project flows are being polished, and the UI is undergoing continuous iteration.
 
-Structuring multi-tenant flows
+Vision
 
-Solidifying issue → project assignment logic
-
-Setting up RLS for workspace isolation
-
-Building clean routes for /issues and /projects
-
-Polishing UI patterns
-
-🎯 Vision
-
-Kodash aims to be the simplest way to manage:
-
-Client projects
-
-Freelance tasks
-
-Multi-product pipelines
-
-Personal ideas + work
-
-Small team workflows
-
-All in one workspace-first system—without the bloated complexity other tools force on you.
-
-📦 Installation (Dev)
-git clone https://github.com/yourusername/kodash
-cd kodash
-npm install
-npm run dev
+Kodash aims to be the simplest workspace-first productivity system for managing client projects, personal tools, multi-product pipelines, or small teams. No forced structure. No clutter. Just a flexible issue-first environment you can shape around your work.
