@@ -4,15 +4,14 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ project_id: string }> }
+  { params }: { params: Promise<{ orgId: string }> }
 ) {
-  const { project_id } = await params;
+  const { orgId } = await params;
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("tasks")
     .select("*")
-    .eq("project_id", project_id)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -28,9 +27,9 @@ export async function GET(
 // Create Task (POST)
 export async function POST(
   req: Request,
-  { params }: { params: Promise<{ project_id: string }> }
+  { params }: { params: Promise<{ orgId: string }> }
 ) {
-  const { project_id } = await params;
+  const { orgId } = await params;
   const supabase = await createClient();
   const body = await req.json();
   const { title, description, priority, status, due_date } = body;
@@ -39,7 +38,14 @@ export async function POST(
   const { data, error } = await supabase
     .from("tasks")
     .insert([
-      { project_id, title, description, priority, status, due_date: duecheck },
+      {
+        title,
+        description,
+        priority,
+        status,
+        due_date: duecheck,
+        tenant_id: orgId,
+      },
     ])
     .select()
     .single();
@@ -56,18 +62,25 @@ export async function POST(
 export async function PATCH(req: Request) {
   const supabase = await createClient();
   const body = await req.json();
-  const { id, ...updates } = body;
-  const duecheck = updates.due_date ? updates.due_date : null;
+  const { id, priority } = body;
+  // const duecheck = updates.due_date ? updates.due_date : null;
+  let updateObj = {};
+  if (priority !== undefined) {
+    updateObj = { priority };
+  }
   console.log("body", body);
+  console.log(updateObj);
 
   const { data, error } = await supabase
     .from("tasks")
-    .update({ ...updates, due_date: duecheck })
+    .update(updateObj)
     .eq("id", id)
     .select()
     .single();
 
   if (error) {
+    console.log(error?.message);
+
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 

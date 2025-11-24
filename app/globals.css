@@ -159,12 +159,13 @@
   }
 }
 
-.butt{
-background:linear-gradient(35deg,#327844,#0a0a0a);
-border: #3278444e solid 0.5px ;
-cursor:pointer;
+.butt {
+  background: linear-gradient(35deg, #327844, #0a0a0a);
+  border: #3278444e solid 0.5px;
+  cursor: pointer;
 }
 
-*{
-  outline-color: none;
+* {
+  outline: none;
+
 }

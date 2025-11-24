@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import TeamClient from "@/components/TeamClient";
 
-const TeamPage = () => {
-  return (
-    <div>TeamPage</div>
-  )
+export default async function TeamPage({
+  params,
+}: {
+  params: Promise<{ orgId: string }>;
+}) {
+  const { orgId } = await params;
+
+  return <TeamClient orgId={orgId} />;
 }
-
-export default TeamPage

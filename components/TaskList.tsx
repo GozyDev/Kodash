@@ -9,28 +9,42 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface TaskListProps {
   tasks: Task[];
+  handleOptimisticPriority: (id: string, newPriority: Task["priority"]) => void;
   onTaskClick: (task: Task) => void;
   onCreateWithStatus?: (status: Task["status"]) => void;
 }
 
-export default function TaskList({ tasks, onTaskClick, onCreateWithStatus }: TaskListProps) {
-    const groups = useMemo(() => {
-      const byStatus: Record<Task["status"], Task[]> = {
-        "to-do": [],
-        "in-progress": [],
-        "done": [],
-      } as Record<Task["status"], Task[]>;
+export default function TaskList({
+  tasks,
+  onTaskClick,
+  onCreateWithStatus,
+  handleOptimisticPriority,
+}: TaskListProps) {
+  const groups = useMemo(() => {
+    const byStatus: Record<Task["status"], Task[]> = {
+      "to-do": [],
+      "in-progress": [],
+      done: [],
+    } as Record<Task["status"], Task[]>;
 
-      for (const t of tasks) {
-        if (byStatus[t.status]) byStatus[t.status].push(t);
-      }
+    for (const t of tasks) {
+      if (byStatus[t.status]) byStatus[t.status].push(t);
+    }
 
-      return [
-        { key: "to-do" as Task["status"], label: "Todo", items: byStatus["to-do"] },
-        { key: "in-progress" as Task["status"], label: "In Progress", items: byStatus["in-progress"] },
-        { key: "done" as Task["status"], label: "Done", items: byStatus["done"] },
-      ];
-    }, [tasks]);
+    return [
+      {
+        key: "to-do" as Task["status"],
+        label: "Todo",
+        items: byStatus["to-do"],
+      },
+      {
+        key: "in-progress" as Task["status"],
+        label: "In Progress",
+        items: byStatus["in-progress"],
+      },
+      { key: "done" as Task["status"], label: "Done", items: byStatus["done"] },
+    ];
+  }, [tasks]);
 
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const toggle = useCallback((key: string) => {
@@ -56,7 +70,10 @@ export default function TaskList({ tasks, onTaskClick, onCreateWithStatus }: Tas
         if (group.items.length === 0) return null; // render section only if it has tasks
         const isCollapsed = !!collapsed[group.key];
         return (
-          <div key={group.key} className="border border-cardCB rounded-md overflow-hidden">
+          <div
+            key={group.key}
+            className="border border-cardCB rounded-md overflow-hidden"
+          >
             <button
               className="w-full flex items-center justify-between px-3 py-2 bg-cardC/60 hover:bg-cardC text-textNb"
               onClick={() => toggle(group.key)}
@@ -70,7 +87,9 @@ export default function TaskList({ tasks, onTaskClick, onCreateWithStatus }: Tas
                 <span className="text-sm font-medium">{group.label}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-textNd">{group.items.length}</span>
+                <span className="text-xs text-textNd">
+                  {group.items.length}
+                </span>
                 {!!onCreateWithStatus && (
                   <span
                     onClick={(e) => {
@@ -80,8 +99,17 @@ export default function TaskList({ tasks, onTaskClick, onCreateWithStatus }: Tas
                     className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded border border-cardCB bg-white/90 text-black hover:bg-white cursor-pointer select-none"
                     title="Create task in this section"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
-                      <path fillRule="evenodd" d="M12 4.5a.75.75 0 0 1 .75.75v6h6a.75.75 0 0 1 0 1.5h-6v6a.75.75 0 0 1-1.5 0v-6h-6a.75.75 0 0 1 0-1.5h6v-6A.75.75 0 0 1 12 4.5Z" clipRule="evenodd" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="w-3.5 h-3.5"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12 4.5a.75.75 0 0 1 .75.75v6h6a.75.75 0 0 1 0 1.5h-6v6a.75.75 0 0 1-1.5 0v-6h-6a.75.75 0 0 1 0-1.5h6v-6A.75.75 0 0 1 12 4.5Z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     New
                   </span>
@@ -104,7 +132,11 @@ export default function TaskList({ tasks, onTaskClick, onCreateWithStatus }: Tas
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.04 }}
                     >
-                      <TaskCard task={task} onClick={() => onTaskClick(task)} />
+                      <TaskCard
+                        handleOptimisticPriority={handleOptimisticPriority}
+                        task={task}
+                        onClick={() => onTaskClick(task)}
+                      />
                     </motion.div>
                   ))}
                 </motion.div>

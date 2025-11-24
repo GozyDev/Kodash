@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/superbase/superbase-server"; // your Supabase server client
-
+import { createClient } from "@/lib/superbase/superbase-server"; 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");

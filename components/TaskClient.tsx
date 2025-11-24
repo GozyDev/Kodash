@@ -10,22 +10,24 @@ import TaskDrawer from "@/components/TaskDrawer";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
 
-export default function TaskClient({ project_id }: { project_id: string }) {
+export default function TaskClient({ orgId }: { orgId: string }) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [createInitialStatus, setCreateInitialStatus] = useState<Task["status"] | null>(null);
+  const [createInitialStatus, setCreateInitialStatus] = useState<
+    Task["status"] | null
+  >(null);
   const [filters, setFilters] = useState({
     status: "All" as "All" | Task["status"],
     priority: "All" as "All" | Task["priority"],
   });
-
+  console.log("Task", tasks);
   //   // Fetch tasks
   const fetchTasks = useCallback(async () => {
     try {
-      const res = await fetch(`/api/task/${project_id}`);
+      const res = await fetch(`/api/task/${orgId}`);
 
       if (!res.ok) {
         const errorMessage = await res.json();
@@ -40,7 +42,7 @@ export default function TaskClient({ project_id }: { project_id: string }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [orgId]);
 
   useEffect(() => {
     fetchTasks();
@@ -65,7 +67,7 @@ export default function TaskClient({ project_id }: { project_id: string }) {
   // Client-side methods now use fetch()
 
   const handleCreateTask = async (taskData: Omit<TaskInsert, "project_id">) => {
-    const res = await fetch(`/api/task/${project_id}`, {
+    const res = await fetch(`/api/task/${orgId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(taskData),
@@ -82,25 +84,48 @@ export default function TaskClient({ project_id }: { project_id: string }) {
     setCreateInitialStatus(null);
   };
 
-  const handleUpdateTask = async (id: string, updates: TaskUpdate) => {
-    const res = await fetch(`/api/task/${project_id}`, {
+  const handleOptimisticPriority = (
+    id: string,
+    newPriority: Task["priority"]
+  ) => {
+    const old = tasks;
+
+    setTasks((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, priority: newPriority } : t))
+    );
+
+    // send update to DB
+    fetch(`/api/task/${orgId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, ...updates }),
+      body: JSON.stringify({ id, priority: newPriority }),
+    }).then(async (res) => {
+      if (!res.ok) {
+        console.error("DB failed. Reverting.");
+        setTasks(old); // revert
+      }
     });
-
-    const data = await res.json();
-    if (!res.ok) {
-      console.error("Error updating task:", data.error);
-      return;
-    }
-    console.log(selectedTask);
-    setTasks((prev) => prev.map((task) => (task.id === id ? data : task)));
-    setSelectedTask(data);
   };
 
+  // const handleUpdateTask = async (id: string, updatesFields: TaskUpdate) => {
+  //   const res = await fetch(`/api/task/${orgId}`, {
+  //     method: "PATCH",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({ id, updatesFields }),
+  //   });
+
+  //   const data = await res.json();
+  //   if (!res.ok) {
+  //     console.error("Error updating task:", data.error);
+  //     return;
+  //   }
+  //   console.log(selectedTask);
+  //   setTasks((prev) => prev.map((task) => (task.id === id ? data : task)));
+  //   setSelectedTask(data);
+  // };
+
   const handleDeleteTask = async (id: string) => {
-    const res = await fetch(`/api/task/${project_id}?id=${id}`, {
+    const res = await fetch(`/api/task/${orgId}?id=${id}`, {
       method: "DELETE",
     });
     const data = await res.json();
@@ -157,11 +182,17 @@ export default function TaskClient({ project_id }: { project_id: string }) {
       <div className="border-b border-cardCB px-6 pb-4 py-[30px] ">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-semibold ">Issues</h1>
             <div className="flex items-center gap-2 mt-1 text-xs">
-              <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">Todo: {tasks.filter((t) => t.status === "to-do").length}</span>
-              <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">In Progress: {tasks.filter((t) => t.status === "in-progress").length}</span>
-              <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">Done: {tasks.filter((t) => t.status === "done").length}</span>
+              <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
+                Todo: {tasks.filter((t) => t.status === "to-do").length}
+              </span>
+              <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
+                In Progress:{" "}
+                {tasks.filter((t) => t.status === "in-progress").length}
+              </span>
+              <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
+                Done: {tasks.filter((t) => t.status === "done").length}
+              </span>
             </div>
           </div>
 
@@ -178,28 +209,30 @@ export default function TaskClient({ project_id }: { project_id: string }) {
         </div>
 
         {/* Progress Bar */}
-        <div className="mt-4">
-          <div className="w-full bg-cardC rounded-full h-2">
-            <motion.div
-              className="bg-green-500 h-2 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.5 }}
-            />
+        {
+          <div className="mt-4">
+            <div className="w-full bg-cardC rounded-full h-2">
+              <motion.div
+                className="bg-green-500 h-2 rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
           </div>
-        </div>
+        }
       </div>
 
       {/* Filters */}
-      <TaskFilters filters={filters} onFiltersChange={setFilters} />
+      {<TaskFilters filters={filters} onFiltersChange={setFilters} />}
 
       {/* Task List */}
       <div className="px-6 py-4">
         <TaskList
           tasks={filteredTasks}
+          handleOptimisticPriority={handleOptimisticPriority}
           onTaskClick={(task) => {
             setSelectedTask(task);
-            setIsDrawerOpen(true);
           }}
           onCreateWithStatus={(status) => {
             setSelectedTask(null);
@@ -226,7 +259,7 @@ export default function TaskClient({ project_id }: { project_id: string }) {
               } else {
                 handleCreateTask(payload as Omit<TaskInsert, "project_id">);
               }
-            }}   
+            }}
             onDelete={
               selectedTask ? () => handleDeleteTask(selectedTask.id) : undefined
             }

@@ -43,7 +43,7 @@ function DropdownMenuContent({
         sideOffset={sideOffset}
         className={cn(
           // changed background + border + text color
-          "bg-neutral-900 text-neutral-100 border border-gray-800 shadow-lg rounded-md p-1 z-50 " +
+          "bg-neutral-900 text-neutral-100 border  shadow-lg rounded-md p-1 z-50 " +
             "data-[state=open]:animate-in data-[state=closed]:animate-out " +
             "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 " +
             "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 " +
@@ -54,9 +54,8 @@ function DropdownMenuContent({
         {...props}
       />
     </DropdownMenuPrimitive.Portal>
-  )
+  );
 }
-
 
 function DropdownMenuGroup({
   ...props
@@ -72,8 +71,8 @@ function DropdownMenuItem({
   variant = "default",
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
-  inset?: boolean
-  variant?: "default" | "destructive"
+  inset?: boolean;
+  variant?: "default" | "destructive";
 }) {
   return (
     <DropdownMenuPrimitive.Item
@@ -89,9 +88,8 @@ function DropdownMenuItem({
       )}
       {...props}
     />
-  )
+  );
 }
-
 
 function DropdownMenuCheckboxItem({
   className,

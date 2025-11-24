@@ -4,11 +4,15 @@ import { Boxes, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+type projects = {
+  count: number;
+};
+
 type Org = {
   id: string;
   name: string;
   plan?: string;
-  projects_count?: number;
+  projects: projects[]; 
   created_at?: string;
 };
 
@@ -36,7 +40,7 @@ export default function OrganizationsPage() {
     loadOrgs();
   }, []);
 
-  console.log(orgs)
+  console.log(orgs);
   const filtered = orgs.filter((o) =>
     o.name.toLowerCase().includes(query.trim().toLowerCase())
   );
@@ -109,7 +113,8 @@ export default function OrganizationsPage() {
                 <div className="flex-1">
                   <div className="text-sm font-medium">{org.name}</div>
                   <div className="text-sm text-textNd">
-                    {org.plan ?? "Free Plan"} • {org.projects[0].count ?? 0} projects
+                    {org.plan ?? "Free Plan"} • {org.projects[0].count ?? 0}{" "}
+                    projects
                   </div>
                 </div>
 

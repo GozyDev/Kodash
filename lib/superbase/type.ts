@@ -4,7 +4,7 @@ export type Task = {
   project_id: string;
   title: string;
   description: string | null;
-  priority: "high" | "medium" | "low";
+  priority: "high" | "medium" | "low" | "ugency" | "no priority";
   status: "to-do" | "in-progress" | "done";
   due_date: string | null;
   created_at: string;

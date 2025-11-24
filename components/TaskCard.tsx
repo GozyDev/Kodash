@@ -4,13 +4,24 @@
 import { Task } from "@/lib/superbase/type";
 import { motion } from "framer-motion";
 import { Calendar, MoreHorizontal } from "lucide-react";
+import PriorityCard from "./piortyCard";
+import { useState } from "react";
 
 interface TaskCardProps {
   task: Task;
   onClick: () => void;
+  handleOptimisticPriority: (id: string, newPriority: Task["priority"]) => void;
 }
 
-export default function TaskCard({ task, onClick }: TaskCardProps) {
+export default function TaskCard({
+  task,
+  onClick,
+  handleOptimisticPriority,
+}: TaskCardProps) {
+  const [activePriority, setAcivePriority] = useState<Task["priority"]>(
+    task.priority
+  );
+
   const getPriorityColor = (priority: Task["priority"]) => {
     switch (priority) {
       case "high":
@@ -37,10 +48,12 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
     }
   };
 
+  const onstatusChange = (newPriority: Task["priority"]) => {
+    setAcivePriority(newPriority);
+  };
+
   return (
     <motion.div
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
       className={`
         border rounded-lg p-4 cursor-pointer transition-all duration-200
         hover:shadow-md ${getStatusColor(task.status)}
@@ -50,8 +63,13 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-2">
-            <div className={`p-1 rounded ${getPriorityColor(task.priority)}`}>
-              <p className="text-[10px] tracking-widest">{task.priority}</p>
+            <div className={``}>
+              <PriorityCard
+                task={task}
+                priority={activePriority}
+                onstatusChange={onstatusChange}
+                handleOptimisticPriority={handleOptimisticPriority}
+              ></PriorityCard>
             </div>
             <span className="text-sm font-medium text-textNc capitalize">
               {task.status.toLowerCase()}

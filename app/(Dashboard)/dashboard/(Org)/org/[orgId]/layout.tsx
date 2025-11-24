@@ -38,7 +38,7 @@ export default async function OrgLayout({
         </aside>
         <main className="flex-1 pt-[74px]">
           <div className="flex w-full">
-            <SidebarTrigger />
+            {/* <SidebarTrigger /> */}
             <div className="flex-1">{children}</div>
           </div>
         </main>

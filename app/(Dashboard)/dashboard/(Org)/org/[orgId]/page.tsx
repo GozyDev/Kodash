@@ -93,7 +93,7 @@ export default function OrgProjectsPage() {
 
   const filtered = projects.filter((p) => {
     if (filter === "active" && p.status !== "active") return false;
-    if (filter === "archived" && p.status === "active") return false;
+    if (filter === "archived" && p.status !== "active") return false;
     if (!query) return true;
     return p.title.toLowerCase().includes(query.trim().toLowerCase());
   });
@@ -253,32 +253,6 @@ export default function OrgProjectsPage() {
                     </p>
                   </div>
                 </div>
-
-                {/* Project type & status (small) */}
-                {/* <div className="grid sm:grid-cols-3 gap-3 items-center">
-                  <label className="text-sm text-neutral-300">Type</label>
-                  <div className="sm:col-span-2 flex gap-2">
-                    <select
-                      value={ptype}
-                      onChange={(e) => setPtype(e.target.value)}
-                      className="flex-1 px-3 py-2 bg-cardC border border-cardCB rounded-md outline-none text-neutral-100"
-                    >
-                      <option>Feature</option>
-                      <option>Bugfix</option>
-                      <option>Research</option>
-                      <option>Chore</option>
-                    </select>
-
-                    <select
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
-                      className="w-36 px-3 py-2 bg-cardC border border-cardCB rounded-md outline-none text-neutral-100"
-                    >
-                      <option value="active">Active</option>
-                      <option value="archived">Archived</option>
-                    </select>
-                  </div>
-                </div> */}
 
                 {error && <div className="text-sm text-red-400">{error}</div>}
 
