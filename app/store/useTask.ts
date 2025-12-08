@@ -66,11 +66,23 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   },
 
   handleOptimisticStatus: async (id, newStatus) => {
+    const orgId = useOrgIdStore.getState().orgId;
     const backupRevert = [...get().task];
     set((state) => ({
       task: state.task.map((t) =>
         t.id === id ? { ...t, status: newStatus } : t
       ),
     }));
+
+    const res = await fetch(`/api/task/${orgId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status: newStatus }),
+    });
+
+    if (!res.ok) {
+      console.error("DB failed. Reverting.");
+      set({ task: backupRevert });
+    }
   },
 }));
