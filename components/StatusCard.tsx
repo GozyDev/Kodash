@@ -37,7 +37,7 @@ const priorityData: PriorityData[] = [
           height="12"
           rx="6"
           stroke="#e2e2e2"
-          stroke-width="1.5"
+          strokeWidth="1.5"
           fill="none"
         ></rect>
         <path
