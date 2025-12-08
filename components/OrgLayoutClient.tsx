@@ -2,17 +2,14 @@
 
 import { ReactNode, useEffect } from "react";
 import { useOrgIdStore } from "@/app/store/useOrgId";
-import OrgHeader from "@/components/OrgHeader";
 import { OrgSidebar } from "@/components/OrgSidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
 
 export default function OrgLayoutClient({
   orgId,
-  orgs,
   children,
 }: {
   orgId: string;
-  orgs: any;
+
   children: ReactNode;
 }) {
   const setOrgId = useOrgIdStore((s) => s.setOrgId);
@@ -21,9 +18,10 @@ export default function OrgLayoutClient({
     setOrgId(orgId);
   }, [orgId]);
 
+  alert(orgId)
+
   return (
-    <SidebarProvider>
-      <OrgHeader orgs={orgs} orgId={orgId} />
+    <>
       <div className="text-textNa flex w-full">
         <aside>
           <OrgSidebar orgId={orgId} />
@@ -34,6 +32,6 @@ export default function OrgLayoutClient({
           </div>
         </main>
       </div>
-    </SidebarProvider>
+    </>
   );
 }
