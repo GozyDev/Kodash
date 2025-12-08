@@ -1,9 +1,8 @@
 // app/dashboard/organization/[orgId]/layout.tsx
 import type { ReactNode } from "react";
-import OrgHeader from "@/components/OrgHeader";
-import { OrgSidebar } from "@/components/OrgSidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+
 import { createClient } from "@/lib/superbase/superbase-server";
+import OrgLayoutClient from "@/components/OrgLayoutClient";
 
 export default async function OrgLayout({
   children,
@@ -30,19 +29,10 @@ export default async function OrgLayout({
   }
 
   return (
-    <SidebarProvider>
-      <OrgHeader orgs={orgs} orgId={orgId} />
-      <div className="text-textNa flex w-full">
-        <aside>
-          <OrgSidebar orgId={orgId} />
-        </aside>
-        <main className="flex-1 pt-[74px]">
-          <div className="flex w-full">
-            {/* <SidebarTrigger /> */}
-            <div className="flex-1">{children}</div>
-          </div>
-        </main>
-      </div>
-    </SidebarProvider>
+    <OrgLayoutClient
+      orgId={orgId}
+      orgs={orgs}
+      children={children}
+    ></OrgLayoutClient>
   );
 }

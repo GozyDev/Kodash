@@ -46,16 +46,16 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       ),
     }));
 
-       // send update to DB
-        fetch(`/api/task/${orgId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id, priority: newPriority }),
-        }).then(async (res) => {
-          if (!res.ok) {
-            console.error("DB failed. Reverting.");
-            set({ ...task }); // revert
-          }
-        });
+    // send update to DB
+    fetch(`/api/task/${orgId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, priority: newPriority }),
+    }).then(async (res) => {
+      if (!res.ok) {
+        console.error("DB failed. Reverting.");
+        set({ ...task }); // revert
+      }
+    });
   },
 }));
