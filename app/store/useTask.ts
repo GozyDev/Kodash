@@ -10,6 +10,11 @@ interface TaskStore {
     id: string,
     newPriority: Task["priority"]
   ) => Promise<void>;
+
+  handleOptimisticStatus: (
+    id: string,
+    newStatus: Task["status"]
+  ) => Promise<void>;
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
@@ -58,5 +63,14 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       console.error("DB failed. Reverting.");
       set({ task: backup });
     }
+  },
+
+  handleOptimisticStatus: async (id, newStatus) => {
+    const backupRevert = [...get().task];
+    set((state) => ({
+      task: state.task.map((t) =>
+        t.id === id ? { ...t, status: newStatus } : t
+      ),
+    }));
   },
 }));
