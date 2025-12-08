@@ -9,7 +9,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface TaskListProps {
   tasks: Task[];
-  handleOptimisticPriority: (id: string, newPriority: Task["priority"]) => void;
+
   onTaskClick: (task: Task) => void;
   onCreateWithStatus?: (status: Task["status"]) => void;
 }
@@ -18,7 +18,6 @@ export default function TaskList({
   tasks,
   onTaskClick,
   onCreateWithStatus,
-  handleOptimisticPriority,
 }: TaskListProps) {
   const groups = useMemo(() => {
     const byStatus: Record<Task["status"], Task[]> = {
@@ -132,11 +131,7 @@ export default function TaskList({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.04 }}
                     >
-                      <TaskCard
-                        handleOptimisticPriority={handleOptimisticPriority}
-                        task={task}
-                        onClick={() => onTaskClick(task)}
-                      />
+                      <TaskCard task={task} onClick={() => onTaskClick(task)} />
                     </motion.div>
                   ))}
                 </motion.div>

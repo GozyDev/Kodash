@@ -1,6 +1,6 @@
 // app/tasks/page.tsx
 "use client";
-
+import { useTaskStore } from "@/app/store/useTask";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Task, TaskInsert, TaskUpdate } from "@/lib/superbase/type";
@@ -11,7 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
 
 export default function TaskClient({ orgId }: { orgId: string }) {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const task = useTaskStore((state) => state.task);
+  const setTask = useTaskStore((state) => state.setTask);
+
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -23,7 +25,7 @@ export default function TaskClient({ orgId }: { orgId: string }) {
     status: "All" as "All" | Task["status"],
     priority: "All" as "All" | Task["priority"],
   });
-  console.log("Task", tasks);
+  console.log("Task", task);
   //   // Fetch tasks
   const fetchTasks = useCallback(async () => {
     try {
@@ -35,7 +37,7 @@ export default function TaskClient({ orgId }: { orgId: string }) {
       } else {
         const data = await res.json();
         console.log("Data", data);
-        setTasks(data || []);
+        setTask(data || []);
       }
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -50,7 +52,7 @@ export default function TaskClient({ orgId }: { orgId: string }) {
 
   // Apply filters
   useEffect(() => {
-    let result = tasks;
+    let result = task;
 
     if (filters.status !== "All") {
       result = result.filter((task) => task.status === filters.status);
@@ -59,53 +61,53 @@ export default function TaskClient({ orgId }: { orgId: string }) {
     if (filters.priority !== "All") {
       result = result.filter((task) => task.priority === filters.priority);
     }
-
+    console.log("changed");
     setFilteredTasks(result);
-  }, [tasks, filters]);
+  }, [task, filters]);
 
   // Create task
   // Client-side methods now use fetch()
 
-  const handleCreateTask = async (taskData: Omit<TaskInsert, "project_id">) => {
-    const res = await fetch(`/api/task/${orgId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(taskData),
-    });
+  // const handleCreateTask = async (taskData: Omit<TaskInsert, "project_id">) => {
+  //   const res = await fetch(`/api/task/${orgId}`, {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify(taskData),
+  //   });
 
-    const data = await res.json();
-    if (!res.ok) {
-      console.error("Error creating task:", data.error);
-      return;
-    }
+  //   const data = await res.json();
+  //   if (!res.ok) {
+  //     console.error("Error creating task:", data.error);
+  //     return;
+  //   }
 
-    setTasks((prev) => [data, ...prev]);
-    setIsDrawerOpen(false);
-    setCreateInitialStatus(null);
-  };
+  //   setTasks((prev) => [data, ...prev]);
+  //   setIsDrawerOpen(false);
+  //   setCreateInitialStatus(null);
+  // };
 
-  const handleOptimisticPriority = (
-    id: string,
-    newPriority: Task["priority"]
-  ) => {
-    const old = tasks;
+  // const handleOptimisticPriority = (
+  //   id: string,
+  //   newPriority: Task["priority"]
+  // ) => {
+  //   const old = tasks;
 
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, priority: newPriority } : t))
-    );
+  //   setTasks((prev) =>
+  //     prev.map((t) => (t.id === id ? { ...t, priority: newPriority } : t))
+  //   );
 
-    // send update to DB
-    fetch(`/api/task/${orgId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, priority: newPriority }),
-    }).then(async (res) => {
-      if (!res.ok) {
-        console.error("DB failed. Reverting.");
-        setTasks(old); // revert
-      }
-    });
-  };
+  //   // send update to DB
+  //   fetch(`/api/task/${orgId}`, {
+  //     method: "PATCH",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({ id, priority: newPriority }),
+  //   }).then(async (res) => {
+  //     if (!res.ok) {
+  //       console.error("DB failed. Reverting.");
+  //       setTasks(old); // revert
+  //     }
+  //   });
+  // };
 
   // const handleUpdateTask = async (id: string, updatesFields: TaskUpdate) => {
   //   const res = await fetch(`/api/task/${orgId}`, {
@@ -124,22 +126,22 @@ export default function TaskClient({ orgId }: { orgId: string }) {
   //   setSelectedTask(data);
   // };
 
-  const handleDeleteTask = async (id: string) => {
-    const res = await fetch(`/api/task/${orgId}?id=${id}`, {
-      method: "DELETE",
-    });
-    const data = await res.json();
+  // const handleDeleteTask = async (id: string) => {
+  //   const res = await fetch(`/api/task/${orgId}?id=${id}`, {
+  //     method: "DELETE",
+  //   });
+  //   const data = await res.json();
 
-    if (!res.ok) {
-      console.error("Error deleting task:", data.error);
-      return;
-    }
+  //   if (!res.ok) {
+  //     console.error("Error deleting task:", data.error);
+  //     return;
+  //   }
 
-    setTasks((prev) => prev.filter((task) => task.id !== id));
-    setIsDrawerOpen(false);
-    setSelectedTask(null);
-    setCreateInitialStatus(null);
-  };
+  //   setTasks((prev) => prev.filter((task) => task.id !== id));
+  //   setIsDrawerOpen(false);
+  //   setSelectedTask(null);
+  //   setCreateInitialStatus(null);
+  // };
 
   // Keyboard shortcut
   useEffect(() => {
@@ -164,8 +166,8 @@ export default function TaskClient({ orgId }: { orgId: string }) {
   }, []);
 
   const progress =
-    tasks.length > 0
-      ? (tasks.filter((t) => t.status === "done").length / tasks.length) * 100
+    task.length > 0
+      ? (task.filter((t) => t.status === "done").length / task.length) * 100
       : 0;
 
   if (loading) {
@@ -184,14 +186,14 @@ export default function TaskClient({ orgId }: { orgId: string }) {
           <div>
             <div className="flex items-center gap-2 mt-1 text-xs">
               <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
-                Todo: {tasks.filter((t) => t.status === "to-do").length}
+                Todo: {task.filter((t) => t.status === "to-do").length}
               </span>
               <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
                 In Progress:{" "}
-                {tasks.filter((t) => t.status === "in-progress").length}
+                {task.filter((t) => t.status === "in-progress").length}
               </span>
               <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
-                Done: {tasks.filter((t) => t.status === "done").length}
+                Done: {task.filter((t) => t.status === "done").length}
               </span>
             </div>
           </div>
@@ -230,7 +232,6 @@ export default function TaskClient({ orgId }: { orgId: string }) {
       <div className="px-6 py-4">
         <TaskList
           tasks={filteredTasks}
-          handleOptimisticPriority={handleOptimisticPriority}
           onTaskClick={(task) => {
             setSelectedTask(task);
           }}
@@ -252,13 +253,6 @@ export default function TaskClient({ orgId }: { orgId: string }) {
               setIsDrawerOpen(false);
               setSelectedTask(null);
               setCreateInitialStatus(null);
-            }}
-            onSave={(payload) => {
-              if (selectedTask) {
-                handleUpdateTask(selectedTask.id, payload as TaskUpdate);
-              } else {
-                handleCreateTask(payload as Omit<TaskInsert, "project_id">);
-              }
             }}
             onDelete={
               selectedTask ? () => handleDeleteTask(selectedTask.id) : undefined

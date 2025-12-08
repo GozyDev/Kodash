@@ -26,12 +26,12 @@ import {
   MoveUp,
   Check,
 } from "lucide-react";
+import { useTaskStore } from "@/app/store/useTask";
 
 interface TaskDrawerProps {
   task: Task | null;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (taskData: TaskUpdate | Omit<TaskInsert, "project_id">) => void;
   onDelete?: () => void;
   initialStatus?: Task["status"]; // optional preset when creating
 }
@@ -40,7 +40,6 @@ export default function TaskDrawer({
   task,
   isOpen,
   onClose,
-  onSave,
   onDelete,
   initialStatus,
 }: TaskDrawerProps) {
@@ -51,6 +50,7 @@ export default function TaskDrawer({
     status: "to-do" as Task["status"],
     due_date: "",
   });
+  const handleCreateTask = useTaskStore((state) => state.handleCreateTask);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -128,7 +128,7 @@ export default function TaskDrawer({
 
   const handleAcceptAI = () => {
     if (!aiParsedData) return;
-    
+
     // Merge AI-generated data into formData
     setFormData((prev) => ({
       ...prev,
@@ -138,7 +138,7 @@ export default function TaskDrawer({
       status: (aiParsedData.status as Task["status"]) || prev.status,
       due_date: aiParsedData.due_date || prev.due_date,
     }));
-    
+
     // Clear the AI parsed data after accepting
     setAiParsedData(null);
   };
@@ -148,7 +148,7 @@ export default function TaskDrawer({
 
     setIsSending(true);
     setAiParsedData(null);
-    
+
     try {
       const response = await fetch("/api/openai", {
         method: "POST",
@@ -159,31 +159,38 @@ export default function TaskDrawer({
       });
 
       const data = await response.json();
-      
+
       if (response.ok && data.data) {
         try {
           // Parse the JSON response
           const parsed = JSON.parse(data.data);
-          
+
           // Normalize the values to match formData format
           let normalizedStatus = parsed.status?.toLowerCase().trim() || "to-do";
           // Handle various status formats: "to-do", "todo", "in progress", "in-progress", "done"
-          if (normalizedStatus.includes("todo") || normalizedStatus === "to-do") {
+          if (
+            normalizedStatus.includes("todo") ||
+            normalizedStatus === "to-do"
+          ) {
             normalizedStatus = "to-do";
-          } else if (normalizedStatus.includes("progress") || normalizedStatus === "in-progress") {
+          } else if (
+            normalizedStatus.includes("progress") ||
+            normalizedStatus === "in-progress"
+          ) {
             normalizedStatus = "in-progress";
           } else if (normalizedStatus === "done") {
             normalizedStatus = "done";
           } else {
             normalizedStatus = "to-do";
           }
-          
-          let normalizedPriority = parsed.priority?.toLowerCase().trim() || "medium";
+
+          let normalizedPriority =
+            parsed.priority?.toLowerCase().trim() || "medium";
           // Ensure priority is one of: high, medium, low
           if (!["high", "medium", "low"].includes(normalizedPriority)) {
             normalizedPriority = "medium";
           }
-          
+
           const normalizedData = {
             title: parsed.title || "",
             description: parsed.description || "",
@@ -191,17 +198,23 @@ export default function TaskDrawer({
             status: normalizedStatus,
             due_date: parsed.due_date || "",
           };
-          
+
           setAiParsedData(normalizedData);
         } catch (parseError) {
           console.error("Failed to parse AI response:", parseError);
           setAiParsedData({ title: "Error: Failed to parse response" });
         }
       } else {
-        setAiParsedData({ title: `Error: ${data.error || "Failed to get response"}` });
+        setAiParsedData({
+          title: `Error: ${data.error || "Failed to get response"}`,
+        });
       }
     } catch (error) {
-      setAiParsedData({ title: `Error: ${error instanceof Error ? error.message : "Failed to send request"}` });
+      setAiParsedData({
+        title: `Error: ${
+          error instanceof Error ? error.message : "Failed to send request"
+        }`,
+      });
     } finally {
       setIsSending(false);
     }
@@ -275,9 +288,7 @@ export default function TaskDrawer({
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-cardCB/80">
                 <div className="flex items-center gap-2 text-sm text-textNd">
-                  <span className="text-textNb">
-                    {task ? "Edit" : "New"} issue
-                  </span>
+                  <span className="text-textNb">New issue</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Button
@@ -361,17 +372,19 @@ export default function TaskDrawer({
                       </button>
                     </div>
                   </div>
-                  
+
                   {isSending && (
                     <div className="mt-3 p-3 bg-cardCB/50 border border-cardCB rounded-md">
                       <div className="text-sm text-textNd">Sending...</div>
                     </div>
                   )}
-                  
+
                   {aiParsedData && !isSending && (
                     <div className="mt-3 p-4 bg-cardCB/50 border border-cardCB rounded-md space-y-3">
                       <div className="flex items-center justify-between mb-2">
-                        <div className="text-xs text-textNd font-medium">AI Generated Task:</div>
+                        <div className="text-xs text-textNd font-medium">
+                          AI Generated Task:
+                        </div>
                         <Button
                           onClick={handleAcceptAI}
                           size="sm"
@@ -381,48 +394,62 @@ export default function TaskDrawer({
                           Accept
                         </Button>
                       </div>
-                      
+
                       {aiParsedData.title && (
                         <div>
-                          <label className="text-xs text-textNd mb-1 block">Title</label>
+                          <label className="text-xs text-textNd mb-1 block">
+                            Title
+                          </label>
                           <div className="text-sm text-textNb bg-cardC/50 border border-cardCB rounded px-3 py-2">
                             {aiParsedData.title}
                           </div>
                         </div>
                       )}
-                      
+
                       {aiParsedData.description && (
                         <div>
-                          <label className="text-xs text-textNd mb-1 block">Description</label>
+                          <label className="text-xs text-textNd mb-1 block">
+                            Description
+                          </label>
                           <div className="text-sm text-textNb bg-cardC/50 border border-cardCB rounded px-3 py-2 min-h-[60px] whitespace-pre-wrap">
                             {aiParsedData.description}
                           </div>
                         </div>
                       )}
-                      
+
                       <div className="grid grid-cols-2 gap-3">
                         {aiParsedData.priority && (
                           <div>
-                            <label className="text-xs text-textNd mb-1 block">Priority</label>
+                            <label className="text-xs text-textNd mb-1 block">
+                              Priority
+                            </label>
                             <div className="text-sm text-textNb bg-cardC/50 border border-cardCB rounded px-3 py-2 capitalize">
                               {aiParsedData.priority}
                             </div>
                           </div>
                         )}
-                        
+
                         {aiParsedData.status && (
                           <div>
-                            <label className="text-xs text-textNd mb-1 block">Status</label>
+                            <label className="text-xs text-textNd mb-1 block">
+                              Status
+                            </label>
                             <div className="text-sm text-textNb bg-cardC/50 border border-cardCB rounded px-3 py-2 capitalize">
-                              {aiParsedData.status === "to-do" ? "Todo" : aiParsedData.status === "in-progress" ? "In Progress" : "Done"}
+                              {aiParsedData.status === "to-do"
+                                ? "Todo"
+                                : aiParsedData.status === "in-progress"
+                                ? "In Progress"
+                                : "Done"}
                             </div>
                           </div>
                         )}
                       </div>
-                      
+
                       {aiParsedData.due_date && (
                         <div>
-                          <label className="text-xs text-textNd mb-1 block">Due Date</label>
+                          <label className="text-xs text-textNd mb-1 block">
+                            Due Date
+                          </label>
                           <div className="text-sm text-textNb bg-cardC/50 border border-cardCB rounded px-3 py-2">
                             {aiParsedData.due_date}
                           </div>
@@ -537,7 +564,12 @@ export default function TaskDrawer({
                     Cancel
                   </Button>
                   <Button
-                    onClick={handleSave}
+                    onClick={() =>
+                      handleCreateTask(
+                        formData,
+                        "9284994c-9801-4205-ba35-6936a69071fc"
+                      )
+                    }
                     disabled={!formData.title.trim() || isSaving}
                     className="h-7 px-3 text-xs butt"
                   >

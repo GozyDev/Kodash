@@ -10,18 +10,9 @@ import { useState } from "react";
 interface TaskCardProps {
   task: Task;
   onClick: () => void;
-  handleOptimisticPriority: (id: string, newPriority: Task["priority"]) => void;
 }
 
-export default function TaskCard({
-  task,
-  onClick,
-  handleOptimisticPriority,
-}: TaskCardProps) {
-  const [activePriority, setAcivePriority] = useState<Task["priority"]>(
-    task.priority
-  );
-
+export default function TaskCard({ task, onClick }: TaskCardProps) {
   const getPriorityColor = (priority: Task["priority"]) => {
     switch (priority) {
       case "high":
@@ -48,10 +39,6 @@ export default function TaskCard({
     }
   };
 
-  const onstatusChange = (newPriority: Task["priority"]) => {
-    setAcivePriority(newPriority);
-  };
-
   return (
     <motion.div
       className={`
@@ -64,12 +51,7 @@ export default function TaskCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-2">
             <div className={``}>
-              <PriorityCard
-                task={task}
-                priority={activePriority}
-                onstatusChange={onstatusChange}
-                handleOptimisticPriority={handleOptimisticPriority}
-              ></PriorityCard>
+              <PriorityCard task={task} priority={task.priority}></PriorityCard>
             </div>
             <span className="text-sm font-medium text-textNc capitalize">
               {task.status.toLowerCase()}

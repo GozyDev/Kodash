@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Task } from "@/lib/superbase/type";
+import { useTaskStore } from "@/app/store/useTask";
 
 interface PriorityData {
   name: Task["priority"];
@@ -306,14 +307,13 @@ const getPriorityImage = (priority: Task["priority"]) => {
 const PriorityCard = ({
   task,
   priority,
-  onstatusChange,
-  handleOptimisticPriority,
 }: {
   task: Task;
   priority: Task["priority"];
-  onstatusChange: (newPriority: Task["priority"]) => void;
-  handleOptimisticPriority: (id: string, newPriority: Task["priority"]) => void;
 }) => {
+  const handleOptimisticPriority = useTaskStore(
+    (state) => state.handleOptimisticPriority
+  );
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="p-1 rounded cursor-pointer text-[10px] tracking-widest">
