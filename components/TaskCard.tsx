@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Calendar, MoreHorizontal } from "lucide-react";
 import PriorityCard from "./piortyCard";
 import { useState } from "react";
+import StatusCard from "./StatusCard";
 
 interface TaskCardProps {
   task: Task;
@@ -53,9 +54,13 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
             <div className={``}>
               <PriorityCard task={task} priority={task.priority}></PriorityCard>
             </div>
-            <span className="text-sm font-medium text-textNc capitalize">
-              {task.status.toLowerCase()}
-            </span>
+
+            <div className="flex items-center">
+              <span className="text-sm font-medium text-textNc capitalize">
+                {task.status.toLowerCase()}
+              </span>
+              <StatusCard task={task} status={task.status}></StatusCard>
+            </div>
           </div>
 
           <h3 className="font-semibold  truncate">{task.title}</h3>
