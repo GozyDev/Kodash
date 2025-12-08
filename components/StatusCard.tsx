@@ -240,8 +240,8 @@ const StatusCard = ({
   task: Task;
   status: Task["status"];
 }) => {
-  const handleOptimisticPriority = useTaskStore(
-    (state) => state.handleOptimisticPriority
+  const handleOptimisticStatus = useTaskStore(
+    (state) => state.handleOptimisticStatus
   );
   const orgId = useOrgIdStore((state) => state.orgId);
   return (
@@ -256,7 +256,7 @@ const StatusCard = ({
           <DropdownMenuItem
             key={idx}
             className="text-[12px] tracking-widest text-textNc"
-            onClick={() => handleOptimisticPriority(task.id, data.name)}
+            onClick={() => handleOptimisticStatus(task.id, data.name)}
           >
             <span>{data.svg}</span> {data.name}
           </DropdownMenuItem>
