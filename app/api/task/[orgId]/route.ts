@@ -62,11 +62,15 @@ export async function POST(
 export async function PATCH(req: Request) {
   const supabase = await createClient();
   const body = await req.json();
-  const { id, priority } = body;
+  const { id, priority, status } = body;
   // const duecheck = updates.due_date ? updates.due_date : null;
   let updateObj = {};
   if (priority !== undefined) {
     updateObj = { priority };
+  }
+
+  if (status !== undefined) {
+    updateObj = { status };
   }
   console.log("body", body);
   console.log(updateObj);
