@@ -1,3 +1,4 @@
+import IndivisualIssuepageClient from "@/components/IndivisualIssuepageClient";
 import React from "react";
 
 async function IndivisualIssuepage({
@@ -6,7 +7,8 @@ async function IndivisualIssuepage({
   params: Promise<{ orgId: string }>;
 }) {
   const { orgId } = await params;
-  return <div>IndivisualIssuepage</div>;
+
+    return <IndivisualIssuepageClient orgId={orgId} ></IndivisualIssuepageClient>;
 }
 
 export default IndivisualIssuepage;
