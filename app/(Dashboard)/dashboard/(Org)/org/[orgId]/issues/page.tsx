@@ -7,9 +7,7 @@ export default async function Taskpage({
   params: Promise<{ orgId: string }>;
 }) {
   const { orgId } = await params;
-  console.log("tenant_ID", orgId);
 
-  console.log("project", orgId);
   return (
     <div>
       <TaskClient orgId={orgId} />

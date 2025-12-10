@@ -181,7 +181,7 @@ export default function TaskClient({ orgId }: { orgId: string }) {
   return (
     <div className="text-textNb p">
       {/* Header */}
-      <div className="border-b border-cardCB px-6 pb-4 py-[30px] ">
+      <div className="border-b border-cardCB px-6 pb-4 py-[5px] ">
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mt-1 text-xs">
