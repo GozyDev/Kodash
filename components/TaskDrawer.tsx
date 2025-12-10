@@ -456,16 +456,20 @@ export default function TaskDrawer({
                 {/* Status & Priority Row - Button style like Linear */}
                 <div className="flex items-center gap-2 flex-wrap border-t border-cardCB/80 pt-4 abosolute bottom-0 w-full">
                   {/* Status */}
-                  <StatusCardCreate
-                    handleChange={handleChange}
-                    status={formData.status}
-                  ></StatusCardCreate>
+                  <div>
+                    <StatusCardCreate
+                      handleChange={handleChange}
+                      status={formData.status}
+                    ></StatusCardCreate>
+                  </div>
 
                   {/* Priority */}
-                  <PriorityCardCreate
-                    handleChange={handleChange}
-                    priority={formData.priority}
-                  ></PriorityCardCreate>
+                  <div>
+                    <PriorityCardCreate
+                      handleChange={handleChange}
+                      priority={formData.priority}
+                    ></PriorityCardCreate>
+                  </div>
                 </div>
               </div>
 
