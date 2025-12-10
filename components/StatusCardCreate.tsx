@@ -239,12 +239,13 @@ const StatusCardCreate = ({
   handleChange: (field: string, value: string) => void;
   status: Task["status"];
 }) => {
-
   const orgId = useOrgIdStore((state) => state.orgId);
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="p-1 rounded cursor-pointer text-[10px] tracking-widest">
-        <div className=" flex items-center justify-center gap-2 bg-cardICB/50 p-2 rounded-xl">{getStatusImage(status)} <p className=" capitalize ">{status}</p></div>
+      <DropdownMenuTrigger className="p-1 rounded text-[10px] tracking-widest">
+        <div className=" flex items-center justify-center gap-2 bg-cardICB/50 p-2 rounded-xl">
+          {getStatusImage(status)} <p className=" capitalize ">{status}</p>
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="outline-0 border-none w-[200px]">
         {/* <DropdownMenuLabel>My Account</DropdownMenuLabel> */}

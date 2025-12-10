@@ -312,7 +312,7 @@ const PriorityCardCreate = ({
   const orgId = useOrgIdStore((state) => state.orgId);
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="p-1 rounded cursor-pointer text-[10px] tracking-widest">
+      <DropdownMenuTrigger className="p-1 rounded  text-[10px] tracking-widest">
         <div className=" flex items-center justify-center gap-2 bg-cardICB/50 p-2 rounded-xl">
           {getPriorityImage(priority)}{" "}
           <p className=" capitalize ">{priority}</p>

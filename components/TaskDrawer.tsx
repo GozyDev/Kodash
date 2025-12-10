@@ -48,7 +48,7 @@ export default function TaskDrawer({
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    priority: "medium" as Task["priority"],
+    priority: "no priority" as Task["priority"],
     status: "to-do" as Task["status"],
     due_date: "",
   });
@@ -81,7 +81,7 @@ export default function TaskDrawer({
       setFormData({
         title: "",
         description: "",
-        priority: "medium",
+        priority: "no priority",
         status: initialStatus || "to-do",
         due_date: "",
       });

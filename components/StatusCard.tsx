@@ -11,12 +11,12 @@ import { Task } from "@/lib/superbase/type";
 import { useTaskStore } from "@/app/store/useTask";
 import { useOrgIdStore } from "@/app/store/useOrgId";
 
-interface PriorityData {
+interface StatusData {
   name: Task["status"];
   svg?: React.ReactNode;
 }
 
-const priorityData: PriorityData[] = [
+const statusData: StatusData[] = [
   {
     name: "to-do",
     svg: (
@@ -69,7 +69,7 @@ const priorityData: PriorityData[] = [
           height="12"
           rx="6"
           stroke="lch(80% 90 85)"
-          stroke-width="1.5"
+          strokeWidth="1.5"
           fill="none"
         ></rect>
         <path
@@ -97,8 +97,8 @@ const priorityData: PriorityData[] = [
         //   style="--icon-color: lch(48% 59.31 288.43);"
       >
         <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
+          fillRule="evenodd"
+          clipRule="evenodd"
           d="M7 0C3.13401 0 0 3.13401 0 7C0 10.866 3.13401 14 7 14C10.866 14 14 10.866 14 7C14 3.13401 10.866 0 7 0ZM11.101 5.10104C11.433 4.76909 11.433 4.23091 11.101 3.89896C10.7691 3.56701 10.2309 3.56701 9.89896 3.89896L5.5 8.29792L4.10104 6.89896C3.7691 6.56701 3.2309 6.56701 2.89896 6.89896C2.56701 7.2309 2.56701 7.7691 2.89896 8.10104L4.89896 10.101C5.2309 10.433 5.7691 10.433 6.10104 10.101L11.101 5.10104Z"
         ></path>
       </svg>
@@ -106,8 +106,8 @@ const priorityData: PriorityData[] = [
   },
 ];
 
-const getPriorityImage = (priority: Task["status"]) => {
-  switch (priority) {
+const getStatusImage = (status: Task["status"]) => {
+  switch (status) {
     case "to-do":
       return (
         <svg
@@ -247,12 +247,12 @@ const StatusCard = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="p-1 rounded cursor-pointer text-[10px] tracking-widest">
-        {getPriorityImage(status)}
+        {getStatusImage(status)}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="outline-0 border-none w-[200px]">
         {/* <DropdownMenuLabel>My Account</DropdownMenuLabel> */}
         <DropdownMenuSeparator className="bg-cardCB/50" />
-        {priorityData.map((data, idx) => (
+        {statusData.map((data, idx) => (
           <DropdownMenuItem
             key={idx}
             className="text-[12px] tracking-widest text-textNc"
