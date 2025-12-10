@@ -27,6 +27,8 @@ import {
   Check,
 } from "lucide-react";
 import { useTaskStore } from "@/app/store/useTask";
+import StatusCardCreate from "./StatusCardCreate";
+import PriorityCardCreate from "./StatusCardCreate";
 
 interface TaskDrawerProps {
   task: Task | null;
@@ -50,6 +52,8 @@ export default function TaskDrawer({
     status: "to-do" as Task["status"],
     due_date: "",
   });
+
+  console.log(formData)
   const handleCreateTask = useTaskStore((state) => state.handleCreateTask);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -100,15 +104,6 @@ export default function TaskDrawer({
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, [isOpen, onClose]);
-
-  const handleSave = () => {
-    setIsSaving(true);
-    try {
-      onSave(formData);
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   const handleDelete = () => {
     setIsDeleting(true);
@@ -461,52 +456,10 @@ export default function TaskDrawer({
                 {/* Status & Priority Row - Button style like Linear */}
                 <div className="flex items-center gap-2 flex-wrap border-t border-cardCB/80 pt-4 abosolute bottom-0 w-full">
                   {/* Status */}
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value: Task["status"]) =>
-                      handleChange("status", value)
-                    }
-                  >
-                    <SelectTrigger
-                      className={`h-7 px-2.5 border rounded-md text-xs font-medium transition-colors ${getStatusColor(
-                        formData.status
-                      )} focus:ring-0 focus:ring-offset-0`}
-                    >
-                      <div className="flex items-center gap-1.5">
-                        {getStatusIcon(formData.status)}
-                        <span className="capitalize">
-                          {formData.status === "to-do"
-                            ? "Todo"
-                            : formData.status === "in-progress"
-                            ? "In Progress"
-                            : "Done"}
-                        </span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="bg-cardCB text-textNb border-cardCB">
-                      <SelectItem
-                        value="to-do"
-                        className="flex items-center gap-2"
-                      >
-                        <Circle className="w-3.5 h-3.5 text-gray-400" />
-                        <span>Todo</span>
-                      </SelectItem>
-                      <SelectItem
-                        value="in-progress"
-                        className="flex items-center gap-2"
-                      >
-                        <Minus className="w-3.5 h-3.5 rotate-90 text-blue-400" />
-                        <span>In Progress</span>
-                      </SelectItem>
-                      <SelectItem
-                        value="done"
-                        className="flex items-center gap-2"
-                      >
-                        <Circle className="w-3.5 h-3.5 fill-current text-green-400" />
-                        <span>Done</span>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <StatusCardCreate
+                    handleChange={handleChange}
+                    status={formData.status}
+                  ></StatusCardCreate>
 
                   {/* Priority */}
                   <Select
