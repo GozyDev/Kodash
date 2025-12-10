@@ -1,6 +1,11 @@
 import React from "react";
 
-function IndivisualIssuepage() {
+async function IndivisualIssuepage({
+  params,
+}: {
+  params: Promise<{ orgId: string }>;
+}) {
+  const { orgId } = await params;
   return <div>IndivisualIssuepage</div>;
 }
 
