@@ -8,7 +8,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Task } from "@/lib/superbase/type";
-import { useTaskStore } from "@/app/store/useTask";
 import { useOrgIdStore } from "@/app/store/useOrgId";
 
 interface StatusData {
@@ -16,7 +15,7 @@ interface StatusData {
   svg?: React.ReactNode;
 }
 
-const priorityData: StatusData[] = [
+const statusData: StatusData[] = [
   {
     name: "to-do",
     svg: (
@@ -240,9 +239,7 @@ const StatusCardCreate = ({
   handleChange: (field: string, value: string) => void;
   status: Task["status"];
 }) => {
-  const handleOptimisticStatus = useTaskStore(
-    (state) => state.handleOptimisticStatus
-  );
+
   const orgId = useOrgIdStore((state) => state.orgId);
   return (
     <DropdownMenu>
@@ -252,7 +249,7 @@ const StatusCardCreate = ({
       <DropdownMenuContent className="outline-0 border-none w-[200px]">
         {/* <DropdownMenuLabel>My Account</DropdownMenuLabel> */}
         <DropdownMenuSeparator className="bg-cardCB/50" />
-        {priorityData.map((data, idx) => (
+        {statusData.map((data, idx) => (
           <DropdownMenuItem
             key={idx}
             className="text-[12px] tracking-widest text-textNc"

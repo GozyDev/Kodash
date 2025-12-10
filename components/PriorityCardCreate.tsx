@@ -325,7 +325,7 @@ const PriorityCardCreate = ({
           <DropdownMenuItem
             key={idx}
             className="text-[12px] tracking-widest text-textNc"
-            onClick={() => handleChange("status", data.name)}
+            onClick={() => handleChange("priority", data.name)}
           >
             <span>{data.svg}</span> {data.name}
           </DropdownMenuItem>

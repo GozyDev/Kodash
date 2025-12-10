@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import { useTaskStore } from "@/app/store/useTask";
 import StatusCardCreate from "./StatusCardCreate";
-import PriorityCardCreate from "./StatusCardCreate";
+import PriorityCardCreate from "./PriorityCardCreate";
 
 interface TaskDrawerProps {
   task: Task | null;
@@ -53,7 +53,7 @@ export default function TaskDrawer({
     due_date: "",
   });
 
-  console.log(formData)
+  console.log(formData);
   const handleCreateTask = useTaskStore((state) => state.handleCreateTask);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -462,31 +462,10 @@ export default function TaskDrawer({
                   ></StatusCardCreate>
 
                   {/* Priority */}
-                  <Select
-                    value={formData.priority}
-                    onValueChange={(value: Task["priority"]) =>
-                      handleChange("priority", value)
-                    }
-                  >
-                    <SelectTrigger
-                      className={`h-7 px-2.5 border rounded-md text-xs font-medium transition-colors capitalize ${getPriorityColor(
-                        formData.priority
-                      )} focus:ring-0 focus:ring-offset-0`}
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-cardCB text-textNb border-cardCB">
-                      <SelectItem value="high" className="capitalize">
-                        High
-                      </SelectItem>
-                      <SelectItem value="medium" className="capitalize">
-                        Medium
-                      </SelectItem>
-                      <SelectItem value="low" className="capitalize">
-                        Low
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <PriorityCardCreate
+                    handleChange={handleChange}
+                    priority={formData.priority}
+                  ></PriorityCardCreate>
                 </div>
               </div>
 
