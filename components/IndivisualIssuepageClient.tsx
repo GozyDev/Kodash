@@ -10,6 +10,7 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { LinkIcon, Loader2, MessageSquare, Plus } from "lucide-react";
 import { Task } from "@/lib/superbase/type";
+import useDebounce from "@/app/hooks/useDebounce";
 
 type Props = {
   orgId: string;
@@ -29,9 +30,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
   const [links, setLinks] = useState<string[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [isEditingDescription, setIsEditingDescription] = useState(false);
-  
+
   const handleOptimisticTitle = useTaskStore(
     (state) => state.handleOptimisticTitle
   );
@@ -40,24 +39,26 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
   );
 
   // Debounce refs
-  const titleDebounceRef = useRef<NodeJS.Timeout | null>(null);
-  const descriptionDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const debouncedTitle = useDebounce(title, 500);
+  const debouncedDescription = useDebounce(description, 500);
 
   useEffect(() => {
     setOrgId(orgId);
   }, [orgId, setOrgId]);
 
   useEffect(() => {
-    console.log("Am loading");
     const existing = tasks.find((t) => t.id === issueId);
     if (existing) {
       setIssue(existing);
+      console.log('runnunug')
+
       if (!title && !description) {
+        console.log('ri')
         setTitle(existing.title);
         setDescription(existing.description || "");
       }
       setLoading(false);
-      return;
+      return; 
     }
 
     const fetchIssue = async () => {
@@ -96,73 +97,35 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     const refreshedIssue = tasks.find((t) => t.id === issueId);
     if (refreshedIssue) {
       setIssue(refreshedIssue);
-      
+
       // Only sync local state if user is not actively editing
-      if (!isEditingTitle && refreshedIssue.title !== title) {
+      if (refreshedIssue.title !== title) {
         setTitle(refreshedIssue.title);
+        console.log("setting title");
       }
-      if (!isEditingDescription && (refreshedIssue.description || "") !== description) {
+      if ((refreshedIssue.description || "") !== description) {
         setDescription(refreshedIssue.description || "");
       }
     }
-
-    console.log("Am loading");
-  }, [issueId, tasks, isEditingTitle, isEditingDescription]);
+  }, [issueId, tasks]);
 
   // Debounced title update
   useEffect(() => {
-    if (!issue || title === issue.title) {
-      setIsEditingTitle(false);
-      return; 
-    }
-
-    setIsEditingTitle(true);
-    if (titleDebounceRef.current) {
-      clearTimeout(titleDebounceRef.current);
-    }
-
-    titleDebounceRef.current = setTimeout(() => {
-      if (issue && title.trim() && title !== issue.title) {
-        handleOptimisticTitle(issue.id, title.trim());
-      }
-      setIsEditingTitle(false);
-    }, 500); // 500ms debounce
-
-    return () => {
-      if (titleDebounceRef.current) {
-        clearTimeout(titleDebounceRef.current);
-      }
-    };
-  }, [title, issue, handleOptimisticTitle]);
+    if (!issue) return;
+    if (!debouncedTitle.trim()) return;
+    if (issue.title === debouncedTitle) return;
+    handleOptimisticTitle(issue.id, debouncedTitle.trim());
+  }, [debouncedTitle, issue]);
 
   // Debounced description update
   useEffect(() => {
-    if (!issue || description === (issue.description || "")) {
-      setIsEditingDescription(false);
-      return;
-    }
+    if (!issue) return;
 
-    setIsEditingDescription(true);
-    if (descriptionDebounceRef.current) {
-      clearTimeout(descriptionDebounceRef.current);
-    }
+    const descValue = debouncedDescription.trim() || null;
+    if (descValue === issue.description) return;
 
-    descriptionDebounceRef.current = setTimeout(() => {
-      if (issue) {
-        const descValue = description.trim() || null;
-        if (descValue !== issue.description) {
-          handleOptimisticDescription(issue.id, descValue);
-        }
-      }
-      setIsEditingDescription(false);
-    }, 500); // 500ms debounce
-
-    return () => {
-      if (descriptionDebounceRef.current) {
-        clearTimeout(descriptionDebounceRef.current);
-      }
-    };
-  }, [description, issue, handleOptimisticDescription]);
+    handleOptimisticDescription(issue.id, descValue);
+  }, [debouncedDescription, issue]);
 
   const handleAddComment = () => {
     if (!commentDraft.trim()) return;
@@ -175,7 +138,6 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     setLinks((prev) => [...prev, linkDraft.trim()]);
     setLinkDraft("");
   };
-
 
   if (loading) {
     return (
