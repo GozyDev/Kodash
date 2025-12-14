@@ -23,7 +23,7 @@ export default async function OrgLayout({
     console.log("Error", error.message);
   }
 
-  console.log("Org", orgs);
+
 
   // handle if org not found: redirect or show fallback
   if (!orgs) {

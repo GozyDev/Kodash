@@ -18,8 +18,6 @@ export default function OrgLayoutClient({
     setOrgId(orgId);
   }, [orgId]);
 
-  alert(orgId)
-
   return (
     <>
       <div className="text-textNa flex w-full">
