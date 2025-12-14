@@ -7,6 +7,8 @@ import { Calendar, MoreHorizontal } from "lucide-react";
 import PriorityCard from "./piortyCard";
 import { useState } from "react";
 import StatusCard from "./StatusCard";
+import Link from "next/link";
+import { useOrgIdStore } from "@/app/store/useOrgId";
 
 interface TaskCardProps {
   task: Task;
@@ -14,6 +16,7 @@ interface TaskCardProps {
 }
 
 export default function TaskCard({ task, onClick }: TaskCardProps) {
+  const orgId = useOrgIdStore((state) => state.orgId);
   const getPriorityColor = (priority: Task["priority"]) => {
     switch (priority) {
       case "high":
@@ -40,47 +43,49 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
     }
   };
 
+  const basePath = `/dashboard/org/${orgId}`;
+
   return (
-    <motion.div
-      className={`
-        border rounded-lg p-4 cursor-pointer transition-all duration-200
-        hover:shadow-md ${getStatusColor(task.status)}
-      `}
-      onClick={onClick}
-    >
-      <div className="flex items-start justify-between">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center space-x-2 mb-2">
-            <div className={``}>
-              <PriorityCard task={task} priority={task.priority}></PriorityCard>
+    <Link href={`${basePath}/issue/${task.id}`}>
+      <motion.div
+        className={`
+          border rounded-lg p-4 cursor-pointer transition-all duration-200
+          hover:shadow-md ${getStatusColor(task.status)}
+        `}
+        onClick={onClick}
+      >
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center space-x-2 mb-2">
+              <div className={``}>
+                <PriorityCard
+                  task={task}
+                  priority={task.priority}
+                ></PriorityCard>
+              </div>
+              <div className="flex items-center">
+                <span className="text-sm font-medium text-textNc capitalize">
+                  {task.status.toLowerCase()}
+                </span>
+                <StatusCard task={task} status={task.status}></StatusCard>
+              </div>
             </div>
-
-            <div className="flex items-center">
-              <span className="text-sm font-medium text-textNc capitalize">
-                {task.status.toLowerCase()}
-              </span>
-              <StatusCard task={task} status={task.status}></StatusCard>
-            </div>
+            <h3 className="font-semibold  truncate">{task.title}</h3>
+            {task.description && (
+              <p className="text-sm text-textNc  mt-1 line-clamp-2">
+                {task.description}
+              </p>
+            )}
+            {task.due_date && (
+              <div className="flex items-center mt-2 text-sm text-textNd">
+                <Calendar className="w-4 h-4 mr-1" />
+                {new Date(task.due_date).toLocaleDateString()}
+              </div>
+            )}
           </div>
-
-          <h3 className="font-semibold  truncate">{task.title}</h3>
-
-          {task.description && (
-            <p className="text-sm text-textNc  mt-1 line-clamp-2">
-              {task.description}
-            </p>
-          )}
-
-          {task.due_date && (
-            <div className="flex items-center mt-2 text-sm text-textNd">
-              <Calendar className="w-4 h-4 mr-1" />
-              {new Date(task.due_date).toLocaleDateString()}
-            </div>
-          )}
+          <MoreHorizontal className="w-5 h-5 text-gray-400 flex-shrink-0" />
         </div>
-
-        <MoreHorizontal className="w-5 h-5 text-gray-400 flex-shrink-0" />
-      </div>
-    </motion.div>
+      </motion.div>
+    </Link>
   );
 }

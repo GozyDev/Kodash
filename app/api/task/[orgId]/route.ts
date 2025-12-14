@@ -1,6 +1,7 @@
 // app/api/tasks/route.ts
 import { createClient } from "@/lib/superbase/superbase-server";
 import { NextResponse } from "next/server";
+import { Task } from "@/lib/superbase/type";
 
 export async function GET(
   req: Request,
@@ -8,15 +9,27 @@ export async function GET(
 ) {
   const { orgId } = await params;
   const supabase = await createClient();
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
 
-  const { data, error } = await supabase
-    .from("tasks")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const query = supabase.from("tasks").select("*");
+
+  if (id) {
+    const { data, error } = await query.eq("id", id).single();
+
+    if (error) {
+      console.log("Error", error);
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    return NextResponse.json(data);
+  }
+
+  const { data, error } = await query.order("created_at", { ascending: false });
 
   if (error) {
     console.log("Error", error);
-    return NextResponse.json({ error: error.message });
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
   console.log("Api DATA", data);
@@ -62,16 +75,31 @@ export async function POST(
 export async function PATCH(req: Request) {
   const supabase = await createClient();
   const body = await req.json();
-  const { id, priority, status } = body;
+  const { id, priority, status, title, description } = body;
   // const duecheck = updates.due_date ? updates.due_date : null;
-  let updateObj = {};
+  let updateObj: {
+    priority?: Task["priority"];
+    status?: Task["status"];
+    title?: string;
+    description?: string | null;
+  } = {};
+  
   if (priority !== undefined) {
-    updateObj = { priority };
+    updateObj.priority = priority;
   }
 
   if (status !== undefined) {
-    updateObj = { status };
+    updateObj.status = status;
   }
+
+  if (title !== undefined) {
+    updateObj.title = title;
+  }
+
+  if (description !== undefined) {
+    updateObj.description = description;
+  }
+
   console.log("body", body);
   console.log(updateObj);
 

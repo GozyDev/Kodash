@@ -226,7 +226,7 @@ export default function TaskClient({ orgId }: { orgId: string }) {
       </div>
 
       {/* Filters */}
-      {<TaskFilters filters={filters} onFiltersChange={setFilters} />}
+      {/* {<TaskFilters filters={filters} onFiltersChange={setFilters} />} */}
 
       {/* Task List */}
       <div className="px-6 py-4">

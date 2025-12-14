@@ -15,6 +15,16 @@ interface TaskStore {
     id: string,
     newStatus: Task["status"]
   ) => Promise<void>;
+
+  handleOptimisticTitle: (
+    id: string,
+    newTitle: string
+  ) => Promise<void>;
+
+  handleOptimisticDescription: (
+    id: string,
+    newDescription: string | null
+  ) => Promise<void>;
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
@@ -83,6 +93,50 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     if (!res.ok) {
       console.error("DB failed. Reverting.");
       set({ task: backupRevert });
+    }
+  },
+
+  handleOptimisticTitle: async (id, newTitle) => {
+    const orgId = useOrgIdStore.getState().orgId;
+    const backup = [...get().task];
+
+    set((state) => ({
+      task: state.task.map((t) =>
+        t.id === id ? { ...t, title: newTitle } : t
+      ),
+    }));
+
+    const res = await fetch(`/api/task/${orgId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, title: newTitle }),
+    });
+
+    if (!res.ok) {
+      console.error("DB failed. Reverting.");
+      set({ task: backup });
+    }
+  },
+
+  handleOptimisticDescription: async (id, newDescription) => {
+    const orgId = useOrgIdStore.getState().orgId;
+    const backup = [...get().task];
+
+    set((state) => ({
+      task: state.task.map((t) =>
+        t.id === id ? { ...t, description: newDescription } : t
+      ),
+    }));
+
+    const res = await fetch(`/api/task/${orgId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, description: newDescription }),
+    });
+
+    if (!res.ok) {
+      console.error("DB failed. Reverting.");
+      set({ task: backup });
     }
   },
 }));
