@@ -9,9 +9,8 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { LinkIcon, Loader2, MessageSquare, Plus } from "lucide-react";
-import { Task } from "@/lib/superbase/type";
+import { Task, Comment } from "@/lib/superbase/type";
 import useDebounce from "@/app/hooks/useDebounce";
-import { run } from "node:test";
 import CommentSection from "./CommentSection";
 
 type Props = {
@@ -27,7 +26,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
   const [issue, setIssue] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
   const [commentDraft, setCommentDraft] = useState("");
-  const [comments, setComments] = useState<string[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [linkDraft, setLinkDraft] = useState("");
   const [links, setLinks] = useState<string[]>([]);
   const [title, setTitle] = useState("");
@@ -160,8 +159,15 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ commentDraft, issueId: issue.id }),
     });
-    setComments((prev) => [...prev, commentDraft.trim()]);
-    setCommentDraft("");
+    if (!comentResponse.ok) {
+      const error = await comentResponse.json();
+      console.log(error);
+    } else {
+      const data = await comentResponse.json();
+
+      setComments((prev) => [...prev, data.comment]);
+      setCommentDraft("");
+    }
   };
 
   const handleAddLink = () => {

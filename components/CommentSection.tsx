@@ -2,6 +2,7 @@ import { MessageSquare, Plus } from "lucide-react";
 import React from "react";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
+import { Comment } from "@/lib/superbase/type";
 
 const formatTime = (date: string) =>
   new Date(date).toLocaleString(undefined, {
@@ -17,7 +18,7 @@ const CommentSection = ({
   setCommentDraft,
   handleAddComment,
 }: {
-  comments: any[];
+  comments: Comment[];
   commentDraft: string;
   setCommentDraft: (value: string) => void;
   handleAddComment: () => void;
