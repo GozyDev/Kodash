@@ -164,7 +164,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
       console.log(error);
     } else {
       const data = await comentResponse.json();
-
+      console.log(data.comment)
       setComments((prev) => [...prev, data.comment]);
       setCommentDraft("");
     }

@@ -65,7 +65,16 @@ export async function POST(req: NextRequest) {
         task_id: issueId,
         author_id: user.id,
       })
-      .select()
+      .select(
+        `  id,
+      content,
+      created_at,
+      author:profiles (
+        id,
+       full_name,
+        avatar_url
+      )`
+      )
       .single();
 
     if (error) {
