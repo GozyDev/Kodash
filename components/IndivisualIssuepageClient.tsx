@@ -133,8 +133,14 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     handleOptimisticDescription(issue.id, descValue);
   }, [debouncedDescription, issue]);
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (!commentDraft.trim()) return;
+    if (!issue) return;
+    const comentResponse = await fetch("/api/comment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ commentDraft, issueId: issue.id }),
+    });
     setComments((prev) => [...prev, commentDraft.trim()]);
     setCommentDraft("");
   };
@@ -181,8 +187,13 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
             />
           </header>
 
-          <CommentSection comments={comments} commentDraft={commentDraft} setCommentDraft={setCommentDraft} handleAddComment={handleAddComment} />
-         
+          <CommentSection
+            comments={comments}
+            commentDraft={commentDraft}
+            setCommentDraft={setCommentDraft}
+            handleAddComment={handleAddComment}
+          />
+
           <section className="rounded-xl border border-cardCB bg-cardC p-4">
             <div className="flex items-center gap-2 text-textNd">
               <LinkIcon className="h-4 w-4" />
