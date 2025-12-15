@@ -1,6 +1,43 @@
 import { createClient } from "@/lib/superbase/superbase-server";
 import { NextResponse, NextRequest } from "next/server";
 
+export async function GET(req: NextRequest) {
+  const svc = await createClient();
+
+  const { searchParams } = new URL(req.url);
+  const issueId = searchParams.get("issueId");
+
+  if (!issueId) {
+    return NextResponse.json({ error: "Missing issueId" }, { status: 400 });
+  }
+
+  const { data, error } = await svc
+    .from("comments")
+    .select(
+      `
+      id,
+      content,
+      created_at,
+      author:profiles (
+        id,
+       full_name,
+        avatar_url
+      )
+    `
+    )
+    .eq("task_id", issueId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch comments" },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({ comments: data }, { status: 200 });
+}
+
 export async function POST(req: NextRequest) {
   const svc = await createClient();
 

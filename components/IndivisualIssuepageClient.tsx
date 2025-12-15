@@ -133,6 +133,25 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     handleOptimisticDescription(issue.id, descValue);
   }, [debouncedDescription, issue]);
 
+  useEffect(() => {
+    if (!issueId) return;
+
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(`/api/comment?issueId=${issueId}`);
+        if (!res.ok) throw new Error("Failed to fetch comments");
+
+        const data = await res.json();
+        setComments(data.comments);
+      } catch (error) {
+        console.error(error);
+        setComments([]);
+      } finally {
+      }
+    };
+
+    fetchComments();
+  }, [issueId]);
   const handleAddComment = async () => {
     if (!commentDraft.trim()) return;
     if (!issue) return;
