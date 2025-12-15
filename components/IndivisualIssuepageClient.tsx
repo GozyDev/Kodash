@@ -12,6 +12,7 @@ import { LinkIcon, Loader2, MessageSquare, Plus } from "lucide-react";
 import { Task } from "@/lib/superbase/type";
 import useDebounce from "@/app/hooks/useDebounce";
 import { run } from "node:test";
+import CommentSection from "./CommentSection";
 
 type Props = {
   orgId: string;
@@ -179,50 +180,9 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
               className="bg-transparent border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[60px] text-textNd "
             />
           </header>
-          <section className="rounded-xl border border-cardCB bg-cardC p-4">
-            <div className="flex items-center gap-2 text-textNd">
-              <MessageSquare className="h-4 w-4" />
-              <h3 className="text-sm font-medium">Comments</h3>
-            </div>
 
-            <div className="mt-3 space-y-3">
-              {comments.length === 0 ? (
-                <p className="text-sm text-textNc">No comments yet.</p>
-              ) : (
-                <ul className="space-y-2 text-sm text-textNb">
-                  {comments.map((comment, idx) => (
-                    <li
-                      key={`${comment}-${idx}`}
-                      className="rounded-lg border border-cardCB/70 bg-cardICB/30 px-3 py-2"
-                    >
-                      {comment}
-                    </li>
-                  ))}
-                </ul>
-              )}
-
-              <Textarea
-                placeholder="Add a comment..."
-                value={commentDraft}
-                onChange={(e) => setCommentDraft(e.target.value)}
-                className="bg-cardICB/20 border-0"
-              />
-              <div className="flex justify-end">
-                <Button
-                  size="sm"
-                  className="butt"
-                  onClick={handleAddComment}
-                  disabled={!commentDraft.trim()}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add comment
-                </Button>
-              </div>
-            </div>
-            <p className="mt-2 text-xs text-textNd">
-              Comments are kept local for now; persistence will be added later.
-            </p>
-          </section>
+          <CommentSection comments={comments} commentDraft={commentDraft} setCommentDraft={setCommentDraft} handleAddComment={handleAddComment} />
+         
           <section className="rounded-xl border border-cardCB bg-cardC p-4">
             <div className="flex items-center gap-2 text-textNd">
               <LinkIcon className="h-4 w-4" />
