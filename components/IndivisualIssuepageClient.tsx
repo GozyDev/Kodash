@@ -11,6 +11,7 @@ import { Textarea } from "./ui/textarea";
 import { LinkIcon, Loader2, MessageSquare, Plus } from "lucide-react";
 import { Task } from "@/lib/superbase/type";
 import useDebounce from "@/app/hooks/useDebounce";
+import { run } from "node:test";
 
 type Props = {
   orgId: string;
@@ -50,15 +51,16 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     const existing = tasks.find((t) => t.id === issueId);
     if (existing) {
       setIssue(existing);
-      console.log('runnunug')
+      console.log("runnunug");
 
       if (!title && !description) {
-        console.log('ri')
+        console.log("ri");
         setTitle(existing.title);
         setDescription(existing.description || "");
+        console.log(existing.description);
       }
       setLoading(false);
-      return; 
+      return;
     }
 
     const fetchIssue = async () => {
@@ -91,12 +93,15 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     };
 
     fetchIssue();
-  }, [issueId, orgId, setTask, tasks]);
+  }, [issueId, orgId, setTask]);
 
   useEffect(() => {
     const refreshedIssue = tasks.find((t) => t.id === issueId);
     if (refreshedIssue) {
       setIssue(refreshedIssue);
+      console.log("runnnng");
+      console.log(refreshedIssue.title);
+      console.log(title);
 
       // Only sync local state if user is not actively editing
       if (refreshedIssue.title !== title) {
@@ -120,7 +125,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
   // Debounced description update
   useEffect(() => {
     if (!issue) return;
-
+    if (!debouncedDescription) return;
     const descValue = debouncedDescription.trim() || null;
     if (descValue === issue.description) return;
 

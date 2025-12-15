@@ -25,7 +25,7 @@ export default function TaskClient({ orgId }: { orgId: string }) {
     status: "All" as "All" | Task["status"],
     priority: "All" as "All" | Task["priority"],
   });
-  console.log("Task", task);
+
   //   // Fetch tasks
   const fetchTasks = useCallback(async () => {
     try {
