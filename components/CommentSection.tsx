@@ -17,19 +17,23 @@ const CommentSection = ({
   commentDraft,
   setCommentDraft,
   handleAddComment,
+  loadComment,
 }: {
   comments: Comment[];
   commentDraft: string;
   setCommentDraft: (value: string) => void;
   handleAddComment: () => void;
+  loadComment: boolean;
 }) => {
   return (
     <section className="space-y-4">
       {/* Header */}
 
       {/* Comments */}
-      {comments.length === 0 ? (
-        <p className="text-sm text-textNc">No comments yet.</p>
+      {loadComment ? (
+        <p className="text-[10px] text-textNd">Loading Comment</p>
+      ) : comments.length === 0 ? (
+        <p className="text-sm text-textNc">No comments yet. <MessageSquare/></p>
       ) : (
         <ul className="space-y-4">
           {comments.map((comment) => (

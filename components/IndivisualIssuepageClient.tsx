@@ -12,6 +12,7 @@ import { LinkIcon, Loader2, MessageSquare, Plus } from "lucide-react";
 import { Task, Comment } from "@/lib/superbase/type";
 import useDebounce from "@/app/hooks/useDebounce";
 import CommentSection from "./CommentSection";
+import { tree } from "next/dist/build/templates/app-page";
 
 type Props = {
   orgId: string;
@@ -27,6 +28,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
   const [loading, setLoading] = useState(true);
   const [commentDraft, setCommentDraft] = useState("");
   const [comments, setComments] = useState<Comment[]>([]);
+  const [loadComment, setLoadComment] = useState<boolean>(true);
   const [linkDraft, setLinkDraft] = useState("");
   const [links, setLinks] = useState<string[]>([]);
   const [title, setTitle] = useState("");
@@ -136,6 +138,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     if (!issueId) return;
 
     const fetchComments = async () => {
+      setLoadComment(true);
       try {
         const res = await fetch(`/api/comment?issueId=${issueId}`);
         if (!res.ok) throw new Error("Failed to fetch comments");
@@ -146,6 +149,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
         console.error(error);
         setComments([]);
       } finally {
+        setLoadComment(false);
       }
     };
 
@@ -164,7 +168,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
       console.log(error);
     } else {
       const data = await comentResponse.json();
-      console.log(data.comment)
+      console.log(data.comment);
       setComments((prev) => [...prev, data.comment]);
       setCommentDraft("");
     }
@@ -217,6 +221,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
             commentDraft={commentDraft}
             setCommentDraft={setCommentDraft}
             handleAddComment={handleAddComment}
+            loadComment={loadComment}
           />
 
           <section className="rounded-xl border border-cardCB bg-cardC p-4">
