@@ -1,16 +1,11 @@
-import { MessageSquare, Plus } from "lucide-react";
-import React from "react";
+import { MessageSquare, Plus, Reply } from "lucide-react";
+import React, { useState } from "react";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { Comment } from "@/lib/superbase/type";
+import CommentCard from "./CommentCard";
 
-const formatTime = (date: string) =>
-  new Date(date).toLocaleString(undefined, {
-    hour: "2-digit",
-    minute: "2-digit",
-    day: "numeric",
-    month: "short",
-  });
+
 
 const CommentSection = ({
   comments,
@@ -25,6 +20,7 @@ const CommentSection = ({
   handleAddComment: () => void;
   loadComment: boolean;
 }) => {
+ 
   return (
     <section className="space-y-4">
       {/* Header */}
@@ -33,37 +29,13 @@ const CommentSection = ({
       {loadComment ? (
         <p className="text-[10px] text-textNd">Loading Comment</p>
       ) : comments.length === 0 ? (
-        <p className="text-sm text-textNc">No comments yet. <MessageSquare/></p>
+        <p className="text-sm text-textNc">
+          No comments yet. <MessageSquare />
+        </p>
       ) : (
         <ul className="space-y-4">
           {comments.map((comment) => (
-            <li
-              key={comment.id}
-              className="rounded-xl border border-cardCB bg-cardICB/20 px-4 py-2"
-            >
-              {/* Author row */}
-              <div className="flex items-center gap-3">
-                <img
-                  src={comment.author?.avatar_url || "/avatar-placeholder.png"}
-                  alt={comment.author?.full_name}
-                  className="h-8 w-8 rounded-full object-cover"
-                />
-
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-textNb">
-                    {comment.author?.full_name}
-                  </span>
-                  <span className="text-xs text-textNc">
-                    {formatTime(comment.created_at)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Content */}
-              <p className="mt-2 text-sm text-textNb leading-relaxed">
-                {comment.content}
-              </p>
-            </li>
+           <CommentCard key={comment.id} comment={comment}/>
           ))}
         </ul>
       )}
