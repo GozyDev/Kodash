@@ -1,7 +1,8 @@
 import { Comment } from "@/lib/superbase/type";
-import { Reply } from "lucide-react";
+import { Plus, Reply } from "lucide-react";
 import React, { useState } from "react";
 import { Textarea } from "./ui/textarea";
+import { Button } from "./ui/button";
 
 const formatTime = (date: string) =>
   new Date(date).toLocaleString(undefined, {
@@ -50,10 +51,25 @@ const CommentCard = ({ comment }: { comment: Comment }) => {
       </div>
 
       {activeReply ? (
-        <Textarea
-          placeholder="Leave a reply..."
-          className="bg-transparent border-transparent  border-t-cardCB p-3 text-sm"
-        />
+        <div className="relative">
+          <Textarea
+            placeholder="Leave a reply..."
+            // value={commentDraft}
+            // onChange={(e) => setCommentDraft(e.target.value)}
+            className=" rounded-none border-transparent border-t-cardCB p-5 text-sm"
+          />
+
+          <div className="absolute bottom-2 right-2">
+            <Button
+              size="sm"
+              className="butt flex h-8 w-8 items-center justify-center rounded-full p-0"
+              // onClick={handleAddComment}
+              // disabled={!commentDraft.trim()}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       ) : null}
     </li>
   );
