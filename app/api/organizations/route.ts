@@ -51,7 +51,10 @@ export async function POST(request: Request) {
 
     if (tenantError || !tenantData) {
       console.error("Tenant insert error:", tenantError?.message);
-      return NextResponse.json({ error: tenantError?.message ?? "Failed to create tenant" }, { status: 500 });
+      return NextResponse.json(
+        { error: tenantError?.message ?? "Failed to create tenant" },
+        { status: 500 }
+      );
     }
 
     // Create membership
@@ -60,12 +63,15 @@ export async function POST(request: Request) {
       .insert({
         user_id: user.id,
         tenant_id: tenantData.id,
-        role: "member",
+        role: "OWNER",
       });
 
     if (membershipError) {
       console.error("Membership insert error:", membershipError.message);
-      return NextResponse.json({ error: membershipError.message }, { status: 500 });
+      return NextResponse.json(
+        { error: membershipError.message },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ organization: tenantData }, { status: 201 });
