@@ -1,5 +1,5 @@
 import { Comment } from "@/lib/superbase/type";
-import { Plus, Reply } from "lucide-react";
+import { Plus, Reply, File } from "lucide-react";
 import React, { useState } from "react";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
@@ -14,6 +14,22 @@ const formatTime = (date: string) =>
 
 const CommentCard = ({ comment }: { comment: Comment }) => {
   const [activeReply, setActiveReply] = useState<boolean>(false);
+  const attachment = comment.attachment_url ?? null;
+
+  const isImage = (url: string) => {
+    return /\.(png|jpe?g|gif|webp|svg)$/i.test(url.split("?")[0]);
+  };
+
+  const filenameFromUrl = (url: string) => {
+    try {
+      const p = new URL(url);
+      const parts = p.pathname.split("/");
+      return parts[parts.length - 1] || url;
+    } catch {
+      const parts = url.split("/");
+      return parts[parts.length - 1] ?? url;
+    }
+  };
   return (
     <li className="rounded-xl border border-cardCB bg-cardICB/20 ">
       {/* Author row */}
@@ -48,6 +64,29 @@ const CommentCard = ({ comment }: { comment: Comment }) => {
         <p className="mt-2 text-sm text-textNb leading-relaxed">
           {comment.content}
         </p>
+        {attachment ? (
+          <div className="mt-3 px-4 pb-4">
+            {isImage(attachment) ? (
+              <img
+                src={attachment}
+                alt={filenameFromUrl(attachment)}
+                className="max-h-48 w-full rounded-md object-contain"
+              />
+            ) : (
+              <div className="flex items-center gap-3 rounded-md  p-4 bg-cardICB/30">
+                <File className="h-5 w-5" />
+                <a
+                  href={attachment}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm underline"
+                >
+                  {filenameFromUrl(attachment)}
+                </a>
+              </div>
+            )}
+          </div>
+        ) : null}
       </div>
 
       {activeReply ? (

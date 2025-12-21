@@ -26,9 +26,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
 
   const [issue, setIssue] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
-  const [commentDraft, setCommentDraft] = useState("");
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [loadComment, setLoadComment] = useState<boolean>(true);
+  
   const [linkDraft, setLinkDraft] = useState("");
   const [links, setLinks] = useState<string[]>([]);
   const [title, setTitle] = useState("");
@@ -133,46 +131,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
 
     handleOptimisticDescription(issue.id, descValue);
   }, [debouncedDescription, issue]);
-
-  useEffect(() => {
-    if (!issueId) return;
-
-    const fetchComments = async () => {
-      setLoadComment(true);
-      try {
-        const res = await fetch(`/api/comment?issueId=${issueId}`);
-        if (!res.ok) throw new Error("Failed to fetch comments");
-
-        const data = await res.json();
-        setComments(data.comments);
-      } catch (error) {
-        console.error(error);
-        setComments([]);
-      } finally {
-        setLoadComment(false);
-      }
-    };
-
-    fetchComments();
-  }, [issueId]);
-  const handleAddComment = async () => {
-    if (!commentDraft.trim()) return;
-    if (!issue) return;
-    const comentResponse = await fetch("/api/comment", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ commentDraft, issueId: issue.id }),
-    });
-    if (!comentResponse.ok) {
-      const error = await comentResponse.json();
-      console.log(error);
-    } else {
-      const data = await comentResponse.json();
-      console.log(data.comment);
-      setComments((prev) => [...prev, data.comment]);
-      setCommentDraft("");
-    }
-  };
+ 
 
   const handleAddLink = () => {
     if (!linkDraft.trim()) return;
@@ -216,13 +175,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
             />
           </header>
 
-          <CommentSection
-            comments={comments}
-            commentDraft={commentDraft}
-            setCommentDraft={setCommentDraft}
-            handleAddComment={handleAddComment}
-            loadComment={loadComment}
-          />
+          <CommentSection issueId={issueId} />
 
           <section className="rounded-xl border border-cardCB bg-cardC p-4">
             <div className="flex items-center gap-2 text-textNd">
