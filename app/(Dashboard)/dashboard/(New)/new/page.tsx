@@ -31,7 +31,7 @@ const NewOrgpage = () => {
   }
   return (
     <div>
-      <div className="flex  justify-center h-screen   py-[120px]">
+      <div className="flex  justify-center h-screen px-4 md:px-6   py-[120px]">
         <NewHeader/>
         <div className="bg-cardC/60 text-neutral-100 rounded-lg w-full max-w-3xl shadow-lg border border-neutral-800 h-max">
           <div className="p-6 space-y-4">
@@ -107,7 +107,7 @@ const NewOrgpage = () => {
                 <div className="flex gap-2">
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-md bg-primaryC hover:bg-emerald-700 text-white"
+                    className="px-4 py-2 rounded-md butt text-white"
                   >
                     Create workspace
                   </button>
