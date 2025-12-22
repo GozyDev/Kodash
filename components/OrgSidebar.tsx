@@ -1,7 +1,7 @@
 // components/OrgSidebar.tsx
 "use client";
 
-import { FolderKanban, Users, Settings, LayoutGrid } from "lucide-react";
+import { Users, Settings, LayoutGrid, FilePenLine, HandCoins } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -23,10 +23,10 @@ export function OrgSidebar({ orgId }: { orgId: string }) {
   const basePath = `/dashboard/org/${orgId}`;
 
   const navItems = [
-    { title: "Projects", icon: FolderKanban, url: basePath },
-    { title: "Issues", icon: LayoutGrid, url: `${basePath}/issues` },
-    { title: "Teams", icon: Users, url: `${basePath}/team` },
     { title: "Overview", icon: LayoutGrid, url: `${basePath}/overview` },
+    { title: "Request", icon: FilePenLine, url: `${basePath}/issues` },
+    { title: "Members", icon: Users, url: `${basePath}/team` },
+    { title: "Payment", icon:HandCoins, url: basePath },
   ];
 
   return (
