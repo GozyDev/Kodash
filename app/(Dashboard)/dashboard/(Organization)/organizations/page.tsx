@@ -49,14 +49,14 @@ export default function OrganizationsPage() {
     <div className="min-h-screen p-12 text-textNa">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-semibold">Your Organizations</h1>
+          <h1 className="md:text-3xl font-semibold">Your Workspaces</h1>
 
           <button
             onClick={() => router.push("/dashboard/new")}
             className="inline-flex items-center gap-2  text-textNa px-4 py-2 rounded-md butt"
           >
-            <span className="text-2xl leading-none">+</span>
-            <span>New organization</span>
+            <span className="md:text-2xl leading-none">+</span>
+            <span>New Workspace</span>
           </button>
         </div>
 
