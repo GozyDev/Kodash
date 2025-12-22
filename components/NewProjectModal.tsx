@@ -31,7 +31,7 @@ const NewProjectModal = ({ orgId }: { orgId: string }) => {
       const res = await fetch("/api/organizations");
       if (!res.ok) throw new Error("Failed to load orgs");
       const json = await res.json();
-      setOrgs(json.organizations ?? []);
+      setOrgs(json.workspaces ?? []);
       // pick first if none selected
       if (!selectedOrg && (json.organizations?.length ?? 0) > 0) {
       }
@@ -101,9 +101,7 @@ const NewProjectModal = ({ orgId }: { orgId: string }) => {
           <form onSubmit={createProject} className="grid gap-4">
             {/* Organization selector */}
             <div className="grid sm:grid-cols-3 gap-3 items-start">
-              <label className="text-sm text-neutral-300 pt-2">
-                Organization
-              </label>
+              <label className="text-sm text-neutral-300 pt-2">Workspace</label>
               <div className="sm:col-span-2">
                 <div className="w-full h-[40] px-3 py-2 bg-cardC border border-cardCB rounded-md outline-none placeholder-neutral-500 text-neutral-100 cursor-pointer flex items-center">
                   <div className="text-sm flex gap-1">
@@ -126,7 +124,7 @@ const NewProjectModal = ({ orgId }: { orgId: string }) => {
                 </div>
 
                 <p className="text-xs text-neutral-500 mt-2">
-                  Choose which organization the project belongs to.
+                  Choose which workspace the project belongs to.
                 </p>
               </div>
             </div>

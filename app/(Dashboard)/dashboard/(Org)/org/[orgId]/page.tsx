@@ -17,7 +17,7 @@ export default function OrgProjectsPage() {
   const orgId = params?.orgId ?? "";
   const router = useRouter();
 
-  const [orgName, setOrgName] = useState("Organization");
+  const [orgName, setOrgName] = useState("Workspace");
   const [projects, setProjects] = useState<Project[]>([]);
   const [projectPassword, setProjectPassword] = useState("");
   const [description, setDescription] = useState("");
@@ -44,7 +44,7 @@ export default function OrgProjectsPage() {
       const res = await fetch(`/api/organizations?orgId=${orgId}`);
       if (!res.ok) return;
       const json = await res.json();
-      const org = (json.organizations ?? [])[0];
+      const org = (json.workspaces ?? [])[0];
       if (org) setOrgName(org.name);
     } catch (e) {}
   }

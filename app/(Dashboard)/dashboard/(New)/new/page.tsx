@@ -5,8 +5,7 @@ import React, { useState } from "react";
 
 const NewOrgpage = () => {
   const [name, setName] = useState("");
-  const [type, setType] = useState("Personal");
-  const [plan, setPlan] = useState("Free Plan");
+  const [role, setRole] = useState("freelancer"); // 'freelancer' or 'client'
   const [error, setError] = useState("");
   const router = useRouter();
   async function handleCreate(e?: React.FormEvent) {
@@ -17,7 +16,7 @@ const NewOrgpage = () => {
       const res = await fetch("/api/organizations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, type, plan }),
+        body: JSON.stringify({ name, role }),
       });
       if (!res.ok) {
         throw new Error("Create failed");
@@ -37,13 +36,10 @@ const NewOrgpage = () => {
         <div className="bg-cardC/60 text-neutral-100 rounded-lg w-full max-w-3xl shadow-lg border border-neutral-800 h-max">
           <div className="p-6 space-y-4">
             <div>
-              <h3 className="text-xl font-semibold">
-                Create a new organization
-              </h3>
+              <h3 className="text-xl font-semibold">Create a new workspace</h3>
               <p className="text-sm text-neutral-400 mt-1">
-                Organizations are a way to group your projects. Each
-                organization can be configured with different team members and
-                billing settings.
+                Workspaces are a way to group your projects. Each workspace can
+                be configured with team members and billing settings.
               </p>
             </div>
 
@@ -65,35 +61,35 @@ const NewOrgpage = () => {
               </div>
 
               <div className="grid sm:grid-cols-3 gap-3 items-start">
-                <label className="text-sm text-neutral-300 pt-2">Type</label>
+                <label className="text-sm text-neutral-300 pt-2">Who are you?</label>
                 <div className="sm:col-span-2">
-                  <select
-                    value={type}
-                    onChange={(e) => setType(e.target.value)}
-                    className="w-full px-3 py-2 bg-cardC border border-cardCB rounded-md outline-none text-neutral-100"
-                  >
-                    <option>Personal</option>
-                    <option>Educational</option>
-                    <option>Startup</option>
-                    <option>Agency</option>
-                    <option>Company</option>
-                    <option>N/A</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid sm:grid-cols-3 gap-3 items-start">
-                <label className="text-sm text-neutral-300 pt-2">Plan</label>
-                <div className="sm:col-span-2">
-                  <select
-                    value={plan}
-                    onChange={(e) => setPlan(e.target.value)}
-                    className="w-full px-3 py-2 bg-cardC border border-cardCB rounded-md outline-none text-neutral-100"
-                  >
-                    <option>Free Plan</option>
-                    <option>Pro</option>
-                    <option>Enterprise</option>
-                  </select>
+                  <div className="flex flex-col gap-2">
+                    <label className="inline-flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="role"
+                        value="freelancer"
+                        checked={role === "FREELANCER"}
+                        onChange={() => setRole("FREELANCER")}
+                        className="form-radio "
+                      />
+                      <span className="text-sm">Offering services (Freelancer)</span>
+                    </label>
+                    <label className="inline-flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="role"
+                        value="client"
+                        checked={role === "CLIENT"}
+                        onChange={() => setRole("CLIENT")}
+                        className="form-radio"
+                      />
+                      <span className="text-sm">Paying for services (Client)</span>
+                    </label>
+                  </div>
+                  <p className="text-xs text-neutral-500 mt-2">
+                    Choose whether this workspace represents a freelancer or a client.
+                  </p>
                 </div>
               </div>
 
@@ -113,7 +109,7 @@ const NewOrgpage = () => {
                     type="submit"
                     className="px-4 py-2 rounded-md bg-primaryC hover:bg-emerald-700 text-white"
                   >
-                    Create organization
+                    Create workspace
                   </button>
                 </div>
               </div>

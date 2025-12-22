@@ -28,7 +28,7 @@ export default function OrganizationsPage() {
     try {
       const res = await fetch("/api/organizations");
       const json = await res.json();
-      setOrgs(json.organizations ?? []);
+      setOrgs(json.workspaces ?? []);
     } catch (err) {
       console.error("Error", err);
     } finally {
@@ -88,7 +88,7 @@ export default function OrganizationsPage() {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search for an organization"
+              placeholder="Search for a workspace"
               className="bg-transparent placeholder-neutral-500 outline-none w-full text-textNb"
             />
           </div>
@@ -97,7 +97,7 @@ export default function OrganizationsPage() {
         <div>
           {loading && <div className="text-neutral-400">Loading...</div>}
           {!loading && filtered.length === 0 && (
-            <div className="text-textNe">No organizations found.</div>
+            <div className="text-textNe">No workspaces found.</div>
           )}
 
           <div className="grid grid-cols-1  lg:grid-cols-2 xl:grid-cols-3  gap-4">

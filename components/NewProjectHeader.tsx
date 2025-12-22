@@ -38,7 +38,7 @@ export default function NewProjectHeader({
       const res = await fetch("/api/organizations");
       if (!res.ok) throw new Error("Failed to fetch orgs");
       const json = await res.json();
-      setOrgs(json.organizations ?? []);
+      setOrgs(json.workspaces ?? []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -71,7 +71,7 @@ export default function NewProjectHeader({
 
         <div className="flex items-center gap-3">
           <p className="font-medium text-sm text-gray-100">
-            {orgs.find((o) => o.id === orgId)?.name ?? "Organizations"}
+            {orgs.find((o) => o.id === orgId)?.name ?? "Workspaces"}
           </p>
 
           <button className="px-2 text-sm font-light border border-gray-800 rounded-xl transition-colors capitalize">
@@ -87,13 +87,13 @@ export default function NewProjectHeader({
 
             <DropdownMenuContent className="bg-cardC border-none text-textNa w-[22rem] min-w-[18rem] text-sm">
               <div className="px-2 py-2">
-                <div className="flex items-center gap-2 bg-cardC rounded-md px-2 py-1">
+                  <div className="flex items-center gap-2 bg-cardC rounded-md px-2 py-1">
                   <input
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
-                    placeholder="Find organization"
+                    placeholder="Find workspace"
                     className="bg-transparent outline-none px-2 text-sm w-full placeholder:text-textNd/50"
-                    aria-label="Search organizations"
+                    aria-label="Search workspaces"
                   />
                 </div>
               </div>
@@ -107,9 +107,7 @@ export default function NewProjectHeader({
                   </div>
                 )}
                 {!loading && filtered.length === 0 && (
-                  <div className="px-3 py-2 text-xs text-textNd">
-                    No organizations
-                  </div>
+                  <div className="px-3 py-2 text-xs text-textNd">No workspaces</div>
                 )}
 
                 {filtered.map((org: Org) => (
@@ -132,20 +130,20 @@ export default function NewProjectHeader({
 
               <div className="px-1">
                 <DropdownMenuItem className="p-0">
-                  <button
+                    <button
                     onClick={() => goToAll()}
                     className="w-full text-left px-3 py-2 hover:bg-cardCB text-[13px]"
                   >
-                    All Organizations
+                    All Workspaces
                   </button>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem className="p-0">
-                  <button
+                    <button
                     onClick={() => router.push("/dashboard/new")}
                     className="w-full text-left px-3 py-2 hover:bg-cardCB text-[13px] flex items-center gap-2"
                   >
-                    <Plus className="w-4 h-4" /> New organization
+                    <Plus className="w-4 h-4" /> New workspace
                   </button>
                 </DropdownMenuItem>
               </div>
