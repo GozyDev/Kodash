@@ -3,11 +3,37 @@ import { createClient } from "@/lib/superbase/superbase-server";
 
 // GET: fetch tenants (workspaces) + projects count
 export async function GET() {
-  const svc = await createClient(); // inside request scope
+  const svc = await createClient();
 
-  const { data: tenants, error: getError } = await svc
-    .from("tenants")
-    .select(`id, name, plan, created_at, projects(count)`)
+  const { data: authData, error: authError } = await svc.auth.getUser();
+
+  if (authError) {
+    console.error("User fetch error:", authError.message);
+    return NextResponse.json({ error: authError.message }, { status: 401 });
+  }
+
+  const user = authData?.user;
+  if (!user) {
+    return NextResponse.json({ error: "User not found" }, { status: 401 });
+  }
+  // inside request scope
+
+    const { data: tenants, error: getError } = await svc
+    .from("memberships")
+    .select(
+      `
+    role,
+    tenant:tenants (
+      id,
+      name,
+      plan,
+      created_at,
+      created_by
+    )
+  `
+    )
+    .eq("user_id", user.id)
+
     .order("created_at", { ascending: false });
 
   if (getError) {
@@ -35,7 +61,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 401 });
     }
 
-
     const body = await request.json();
     const { name, role } = body; // role: 'freelancer' | 'client'
 
@@ -43,8 +68,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
-    if (!role || !["freelancer", "client"].includes(String(role).toLowerCase())) {
-      return NextResponse.json({ error: "Role must be 'freelancer' or 'client'" }, { status: 400 });
+    if (
+      !role ||
+      !["freelancer", "client"].includes(String(role).toLowerCase())
+    ) {
+      return NextResponse.json(
+        { error: "Role must be 'freelancer' or 'client'" },
+        { status: 400 }
+      );
     }
 
     // Create workspace (stored in tenants table)
@@ -61,7 +92,6 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
-
 
     // Create membership - use provided role (map to uppercase)
     const membershipRole = String(role).toUpperCase();

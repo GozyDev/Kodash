@@ -23,5 +23,25 @@ export type Comment = {
   };
 };
 
+export type Membership = {
+  role: string;
+  tenant: {
+    id: string;
+    name: string;
+    plan?: string;
+    created_at?: string;
+    created_by?: string | null;
+  };
+};
+
+export type Workspace = {
+  id: string;
+  name: string;
+  plan?: string;
+
+  created_at?: string;
+  created_by?: string | null;
+};
+
 export type TaskInsert = Omit<Task, "id" | "created_at" | "updated_at">;
 export type TaskUpdate = Partial<TaskInsert>;

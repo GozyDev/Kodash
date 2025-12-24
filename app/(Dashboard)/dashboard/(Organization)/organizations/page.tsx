@@ -1,5 +1,6 @@
 "use client";
 
+import { Membership, Workspace } from "@/lib/superbase/type";
 import { Boxes, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -8,16 +9,9 @@ type projects = {
   count: number;
 };
 
-type Org = {
-  id: string;
-  name: string;
-  plan?: string;
-  projects: projects[]; 
-  created_at?: string;
-};
-
 export default function OrganizationsPage() {
-  const [orgs, setOrgs] = useState<Org[]>([]);
+  const [orgs, setOrgs] = useState<Workspace[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -28,7 +22,16 @@ export default function OrganizationsPage() {
     try {
       const res = await fetch("/api/organizations");
       const json = await res.json();
-      setOrgs(json.workspaces ?? []);
+
+      const data = json.workspaces.map((m: Membership) => ({
+        id: m.tenant.id,
+        name: m.tenant.name,
+        plan: m.tenant.plan,
+        role: m.role,
+        created_at: m.tenant.created_at,
+        created_by: m.tenant.created_by,
+      }));
+      setOrgs(data ?? []);
     } catch (err) {
       console.error("Error", err);
     } finally {
@@ -40,7 +43,22 @@ export default function OrganizationsPage() {
     loadOrgs();
   }, []);
 
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const res = await fetch("/api/auth/user");
+        const json = await res.json();
+        setCurrentUserId(json?.user?.id ?? null);
+      } catch (err) {
+        console.error("Failed to fetch current user", err);
+      }
+    }
+
+    loadUser();
+  }, []);
+
   console.log(orgs);
+
   const filtered = orgs.filter((o) =>
     o.name.toLowerCase().includes(query.trim().toLowerCase())
   );
@@ -104,27 +122,30 @@ export default function OrganizationsPage() {
             {filtered.map((org) => (
               <div
                 key={org.id}
-                className="flex  gap-4 bg-cardC/60 border border-cardCB rounded-lg p-4  relative h-max group cursor-pointer"
+                className="flex  gap-4 bg-cardC/60 border border-cardCB rounded-lg p-4 py-8  relative h-max group cursor-pointer"
+                onClick={() => router.push(`/dashboard/org/${org.id}`)}
               >
                 <div className="w-9 h-9 rounded-full bg-black/70 border-cardCB flex items-center justify-center text-textNb">
                   <Boxes size={15} />
                 </div>
 
                 <div className="flex-1">
-                  <div className="text-sm font-medium">{org.name}</div>
-                  <div className="text-sm text-textNd">
-                    {org.plan ?? "Free Plan"} • {org.projects[0].count ?? 0}{" "}
-                    projects
+                  <div className="flex items-center gap-3">
+                    <div className="text-xl font-medium text-textNc">{org.name}</div>
+                    {currentUserId ? (
+                      <div className="text-xs px-2 py-0.5 rounded-md bg-cardC/40 text-textNd">
+                        {org.created_by && org.created_by === currentUserId
+                          ? "Created"
+                          : "Invited"}
+                      </div>
+                    ) : null}
                   </div>
                 </div>
 
                 <div className="absolute  right-5">
-                  <a
-                    href={`/dashboard/org/${org.id}`}
-                    className="text-textNb group-hover:text-primaryC transform group-hover:translate-x-3.5 "
-                  >
+                  <button className="text-textNb group-hover:text-primaryC transform group-hover:translate-x-0.5 transition-all ">
                     <ChevronRight />
-                  </a>
+                  </button>
                 </div>
               </div>
             ))}
