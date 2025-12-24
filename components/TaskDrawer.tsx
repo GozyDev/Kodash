@@ -1,7 +1,7 @@
 // app/tasks/TaskDrawer.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Task, TaskInsert, TaskUpdate } from "@/lib/superbase/type";
 import { Button } from "@/components/ui/button";
@@ -67,6 +67,60 @@ export default function TaskDrawer({
     due_date?: string;
   } | null>(null);
   const [isSending, setIsSending] = useState(false);
+
+  // Attachments state & refs
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  type Attachment = { file: File; preview?: string };
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+
+  const addFiles = (files: FileList | null) => {
+    if (!files) return;
+    const arr = Array.from(files).map((f) => {
+      return { file: f, preview: URL.createObjectURL(f) } as Attachment;
+    });
+    setAttachments((prev) => [...prev, ...arr]);
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    addFiles(e.target.files);
+    // reset input so same file can be selected again
+    e.currentTarget.value = "";
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    addFiles(e.dataTransfer.files);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleRemoveAttachment = (index: number) => {
+    setAttachments((prev) => {
+      const att = prev[index];
+      if (att?.preview) URL.revokeObjectURL(att.preview);
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
+  // cleanup on unmount
+  useEffect(() => {
+    return () => {
+      attachments.forEach((a) => {
+        if (a.preview) URL.revokeObjectURL(a.preview);
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const formatBytes = (bytes: number) => {
+    if (bytes === 0) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
 
   useEffect(() => {
     if (task) {
@@ -337,6 +391,109 @@ export default function TaskDrawer({
                     rows={isExpanded ? 20 : 6}
                     className="resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-0 py-1 placeholder:text-textNd text-sm min-h-[100px]"
                   />
+                </div>
+
+                {/* Attachments - optional */}
+                <div className="mb-6">
+                  <label className="text-xs text-textNd mb-2 block">
+                    Attachments <span className="text-textNb">(optional)</span>
+                  </label>
+
+                  <div
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full border-2 border-dashed border-cardCB rounded-md px-4 py-6 bg-cardC/40 text-center cursor-pointer hover:bg-cardC/60"
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      multiple
+                      accept=".pdf,.doc,.docx,image/png,image/jpeg"
+                      className="hidden"
+                      onChange={handleFileInputChange}
+                    />
+                    <div className="text-sm text-textNd font-medium">
+                      Add files or drag and drop
+                    </div>
+                    <div className="text-xs text-textNb mt-1">
+                      pdf, doc, docx, png, jpeg
+                    </div>
+                  </div>
+
+                  {attachments.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      {attachments.map((att, idx) => {
+                        const file = att.file;
+                        const isImage = file.type.startsWith("image/");
+
+                        if (isImage) {
+                          return (
+                            <div
+                              key={`${file.name}-${idx}`}
+                              className="flex items-center justify-between bg-cardC/50 border border-cardCB rounded px-3 py-2 text-sm"
+                            >
+                                <div
+                                  onClick={() => att.preview && window.open(att.preview, "_blank")}
+                                  className="flex items-center gap-3 truncate cursor-pointer"
+                                  role="button"
+                                  aria-label={`Open ${file.name} in new tab`}
+                                >
+                                  <div className="w-24 h-20 flex-shrink-0 bg-cardC/20 rounded overflow-hidden flex items-center justify-center">
+                                    <img
+                                      src={att.preview}
+                                      alt={file.name}
+                                      className="w-full h-full object-contain"
+                                    />
+                                  </div>
+                                  <div className="truncate">
+                                    <div className="font-medium text-textNb truncate">{file.name}</div>
+                                    <div className="text-xs text-textNd">{formatBytes(file.size)}</div>
+                                  </div>
+                                </div>
+                                <div>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => { e.stopPropagation(); handleRemoveAttachment(idx); }}
+                                    className="h-7 w-7 p-0"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <div
+                            key={`${file.name}-${idx}`}
+                            className="flex items-center justify-between bg-cardC/50 border border-cardCB rounded px-3 py-2 text-sm"
+                          >
+                            <div
+                              onClick={() => att.preview && window.open(att.preview, "_blank")}
+                              className="truncate mr-3 cursor-pointer"
+                              role="button"
+                              aria-label={`Open ${file.name} in new tab`}
+                            >
+                              <div className="font-medium text-textNb truncate">{file.name}</div>
+                              <div className="text-xs text-textNd">{formatBytes(file.size)}</div>
+                            </div>
+                            <div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => { e.stopPropagation(); handleRemoveAttachment(idx); }}
+                                className="h-7 w-7 p-0"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 <div className="mb-4">
