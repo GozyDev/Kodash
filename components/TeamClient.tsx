@@ -271,11 +271,19 @@ export default function TeamClient({ orgId }: { orgId: string }) {
 
                     setSubmitting(true);
                     try {
-                      await fetch("/api/invitations", {
+                      const res = await fetch(`/api/workspaces/${orgId}/invite`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ workspaceId: orgId, email, role }),
+                        body: JSON.stringify({ email, role, workspaceId:orgId }),
                       });
+
+                      if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        console.error("Invite API error:", err);
+                        setEmailError(err?.error || "Failed to send invitation");
+                        return;
+                      }
+
                       setInviteOpen(false);
                       setEmail("");
                     } catch (err) {
