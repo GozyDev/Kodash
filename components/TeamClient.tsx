@@ -4,7 +4,14 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UserPlus, Search, LogOut } from "lucide-react";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
+import { UserPlus, Search, LogOut, X } from "lucide-react";
 
 type Profile = {
   id: string;
@@ -22,6 +29,11 @@ export default function TeamClient({ orgId }: { orgId: string }) {
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [role, setRole] = useState<"Client" | "Freelancer">("Client");
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!orgId) return;
@@ -95,6 +107,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
             <Button
               variant="default"
               className="inline-flex items-center gap-2 text-white px-4 py-2 butt"
+              onClick={() => setInviteOpen(true)}
             >
               <UserPlus className="w-4 h-4" />
               Invite Member
@@ -184,6 +197,104 @@ export default function TeamClient({ orgId }: { orgId: string }) {
           )}
         </div>
       </div>
+      {/* Invite modal */}
+      {inviteOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setInviteOpen(false)}
+            aria-hidden
+          />
+
+          <div className="relative w-full max-w-xl mx-4">
+            <div className="bg-cardC text-white rounded-lg shadow-lg overflow-hidden border border-cardICB    ">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[#1a1c1f]">
+                <h2 className="text-lg font-semibold">Invite a member to this workspace</h2>
+                <button
+                  aria-label="Close"
+                  onClick={() => setInviteOpen(false)}
+                  className="text-textNd hover:text-textNa p-1 rounded"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-5 space-y-4">
+                <div>
+                  <label className="text-sm mb-2 block text-textNd">Member role</label>
+                  <Select defaultValue={role} onValueChange={(v) => setRole(v as any)}>
+                    <SelectTrigger className="w-full border-cardICB bg-cardICB/10" aria-label="Member role selector">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="border-cardICB bg-cardICB text-white">
+                      <SelectItem value="Client">Client</SelectItem>
+                      <SelectItem value="Freelancer">Freelancer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-sm mb-2 block text-textNd">Email address</label>
+                  <Input
+                    placeholder="Enter email address"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setEmailError(null);
+                    }}
+                    type="email"
+                    className="bg-[#0b0d10]"
+                    aria-label="Email address"
+                  />
+                  {emailError && (
+                    <div className="text-sm text-red-400 mt-2">{emailError}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-[#1a1c1f]">
+                <button
+                  onClick={() => setInviteOpen(false)}
+                  className="text-textNd hover:text-textNa px-3 py-2 rounded"
+                  aria-label="Close invite modal"
+                >
+                  Close
+                </button>
+                <Button
+                  onClick={async () => {
+                    // simple email validation
+                    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!re.test(email)) {
+                      setEmailError("Enter a valid email address");
+                      return;
+                    }
+
+                    setSubmitting(true);
+                    try {
+                      await fetch("/api/invitations", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ workspaceId: orgId, email, role }),
+                      });
+                      setInviteOpen(false);
+                      setEmail("");
+                    } catch (err) {
+                      console.error(err);
+                      setEmailError("Failed to send invitation");
+                    } finally {
+                      setSubmitting(false);
+                    }
+                  }}
+                  className="px-4 py-2 butt"
+                  disabled={submitting}
+                >
+                  Send invitation
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
