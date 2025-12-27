@@ -55,7 +55,7 @@ export async function POST(
         title,
         description,
         priority,
-        status,
+        status:"draft",
         due_date: duecheck,
         tenant_id: orgId,
       },

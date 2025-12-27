@@ -86,9 +86,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
   return (
     <div className="p-12 w-full text-textNa">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-2xl">Team</h1>
-        </div>
+        <div className="mb-6"></div>
 
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
@@ -136,7 +134,8 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                       {filteredMemberships[0]?.role || "Member"}
                     </span>
                     <span className="text-sm text-textNd">
-                      • {filteredMemberships.length} {filteredMemberships.length === 1 ? "user" : "users"}
+                      • {filteredMemberships.length}{" "}
+                      {filteredMemberships.length === 1 ? "user" : "users"}
                     </span>
                   </div>
                 </div>
@@ -209,7 +208,9 @@ export default function TeamClient({ orgId }: { orgId: string }) {
           <div className="relative w-full max-w-xl mx-4">
             <div className="bg-cardC text-white rounded-lg shadow-lg overflow-hidden border border-cardICB    ">
               <div className="flex items-center justify-between px-5 py-4 border-b border-[#1a1c1f]">
-                <h2 className="text-lg font-semibold">Invite a member to this workspace</h2>
+                <h2 className="text-lg font-semibold">
+                  Invite a member to this workspace
+                </h2>
                 <button
                   aria-label="Close"
                   onClick={() => setInviteOpen(false)}
@@ -221,9 +222,17 @@ export default function TeamClient({ orgId }: { orgId: string }) {
 
               <div className="p-5 space-y-4">
                 <div>
-                  <label className="text-sm mb-2 block text-textNd">Member role</label>
-                  <Select defaultValue={role} onValueChange={(v) => setRole(v as any)}>
-                    <SelectTrigger className="w-full border-cardICB bg-cardICB/10" aria-label="Member role selector">
+                  <label className="text-sm mb-2 block text-textNd">
+                    Member role
+                  </label>
+                  <Select
+                    defaultValue={role}
+                    onValueChange={(v) => setRole(v as any)}
+                  >
+                    <SelectTrigger
+                      className="w-full border-cardICB bg-cardICB/10"
+                      aria-label="Member role selector"
+                    >
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="border-cardICB bg-cardICB text-white">
@@ -234,7 +243,9 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                 </div>
 
                 <div>
-                  <label className="text-sm mb-2 block text-textNd">Email address</label>
+                  <label className="text-sm mb-2 block text-textNd">
+                    Email address
+                  </label>
                   <Input
                     placeholder="Enter email address"
                     value={email}
@@ -247,7 +258,9 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                     aria-label="Email address"
                   />
                   {emailError && (
-                    <div className="text-sm text-red-400 mt-2">{emailError}</div>
+                    <div className="text-sm text-red-400 mt-2">
+                      {emailError}
+                    </div>
                   )}
                 </div>
               </div>
@@ -271,16 +284,25 @@ export default function TeamClient({ orgId }: { orgId: string }) {
 
                     setSubmitting(true);
                     try {
-                      const res = await fetch(`/api/workspaces/${orgId}/invite`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email, role, workspaceId:orgId }),
-                      });
+                      const res = await fetch(
+                        `/api/workspaces/${orgId}/invite`,
+                        {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            email,
+                            role,
+                            workspaceId: orgId,
+                          }),
+                        }
+                      );
 
                       if (!res.ok) {
                         const err = await res.json().catch(() => ({}));
                         console.error("Invite API error:", err);
-                        setEmailError(err?.error || "Failed to send invitation");
+                        setEmailError(
+                          err?.error || "Failed to send invitation"
+                        );
                         return;
                       }
 
@@ -306,4 +328,3 @@ export default function TeamClient({ orgId }: { orgId: string }) {
     </div>
   );
 }
-

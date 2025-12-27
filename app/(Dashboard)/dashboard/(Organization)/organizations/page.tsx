@@ -123,7 +123,13 @@ export default function OrganizationsPage() {
               <div
                 key={org.id}
                 className="flex  gap-4 bg-cardC/60 border border-cardCB rounded-lg p-4 py-8  relative h-max group cursor-pointer"
-                onClick={() => router.push(`/dashboard/org/${org.id}`)}
+                onClick={() =>
+                  router.push(
+                    org.role === "FREELANCER"
+                      ? `/dashboard/fr-og/${org.id}`
+                      : `/dashboard/cl-og/${org.id}`
+                  )
+                }
               >
                 <div className="w-9 h-9 rounded-full bg-black/70 border-cardCB flex items-center justify-center text-textNb">
                   <Boxes size={15} />
@@ -131,7 +137,10 @@ export default function OrganizationsPage() {
 
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
-                    <div className="text-xl font-medium text-textNc">{org.name}</div>
+                    <div className="text-xl font-medium text-textNc">
+                      {org.name}
+                      {org.role}
+                    </div>
                     {currentUserId ? (
                       <div className="text-xs px-2 py-0.5 rounded-md bg-cardC/40 text-textNd">
                         {org.created_by && org.created_by === currentUserId

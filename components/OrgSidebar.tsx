@@ -20,7 +20,7 @@ const toolItems = [{ title: "Settings", icon: Settings, url: "/settings" }];
 
 export function OrgSidebar({ orgId }: { orgId: string }) {
   const pathname = usePathname();
-  const basePath = `/dashboard/org/${orgId}`;
+  const basePath = `/dashboard/fr-og/${orgId}`;
 
   const navItems = [
     { title: "Overview", icon: LayoutGrid, url: `${basePath}/overview` },
