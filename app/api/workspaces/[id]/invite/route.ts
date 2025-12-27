@@ -65,18 +65,25 @@ export async function POST(
     const appUrl = process.env.NEXT_PUBLIC_APP_URL;
     if (!appUrl) {
       console.error("NEXT_PUBLIC_APP_URL is not set");
-      return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Server misconfiguration" },
+        { status: 500 }
+      );
     }
 
-    const inviteUrl = `${appUrl.replace(/\/$/, "")}/invite?token=${encodeURIComponent(
-      token
-    )}`;
+    const inviteUrl = `${appUrl.replace(
+      /\/$/,
+      ""
+    )}/invite?token=${encodeURIComponent(token)}`;
 
     // Send email via Resend
     const resendKey = process.env.RESEND_API_KEY;
     if (!resendKey) {
       console.error("RESEND_API_KEY is not set");
-      return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Server misconfiguration" },
+        { status: 500 }
+      );
     }
 
     const resend = new Resend(resendKey);
@@ -94,15 +101,24 @@ export async function POST(
     `;
 
     try {
-      await resend.emails.send({
-        from: fromAddress,
+      const { data, error } = await resend.emails.send({
+        from: "onboarding@resend.dev",
         to: email,
         subject,
         html,
       });
+
+      console.log("Resend response:", { data, error });
+
+      if (error) {
+        throw error;
+      }
     } catch (sendErr: any) {
       console.error("Resend send error:", sendErr);
-      return NextResponse.json({ error: "Failed to send invite email" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to send invite email" },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ invite: insertData }, { status: 201 });
