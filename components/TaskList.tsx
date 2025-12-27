@@ -22,6 +22,7 @@ export default function TaskList({
   const groups = useMemo(() => {
     const byStatus: Record<Task["status"], Task[]> = {
       "to-do": [],
+      "draft": [],
       "in-progress": [],
       done: [],
     } as Record<Task["status"], Task[]>;
@@ -32,6 +33,11 @@ export default function TaskList({
 
     return [
       {
+        key: "draft" as Task["status"],
+        label: "Draft",
+        items: byStatus["draft"],
+      },
+           {
         key: "to-do" as Task["status"],
         label: "Todo",
         items: byStatus["to-do"],
