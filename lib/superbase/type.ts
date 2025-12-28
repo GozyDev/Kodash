@@ -5,7 +5,7 @@ export type Task = {
   title: string;
   description: string | null;
   priority: "high" | "medium" | "low" | "ugency" | "no priority";
-  status: "to-do" | "in-progress" | "done";
+  status: "proposed" | "active" | "deliver" | "draft" | "complete" | "cancel";
   due_date: string | null;
   created_at: string;
   updated_at: string;

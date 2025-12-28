@@ -167,5 +167,29 @@
 
 * {
   outline: none;
+  /* color: rgb(249, 190, 0); */
+}
 
+.kodash-draft {
+  color: #f9be00; /* amber */
+}
+
+.kodash-active {
+  color: #2563eb; /* blue */
+}
+
+.kodash-delivered {
+  color: #7c3aed; /* purple */
+}
+
+.kodash-completed {
+  color: #22c55e; /* green */
+}
+
+.kodash-proposed {
+  color: #f97316; /* orange */
+}
+
+.kodash-cancelled {
+  color: #ef4444; /* red */
 }

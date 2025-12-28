@@ -21,10 +21,12 @@ export default function TaskList({
 }: TaskListProps) {
   const groups = useMemo(() => {
     const byStatus: Record<Task["status"], Task[]> = {
-      "to-do": [],
-      "draft": [],
-      "in-progress": [],
-      done: [],
+      draft: [],
+      proposed: [],
+      active: [],
+      deliver: [],
+      complete: [],
+      cancel: [],
     } as Record<Task["status"], Task[]>;
 
     for (const t of tasks) {
@@ -37,17 +39,31 @@ export default function TaskList({
         label: "Draft",
         items: byStatus["draft"],
       },
-           {
-        key: "to-do" as Task["status"],
-        label: "Todo",
-        items: byStatus["to-do"],
+      {
+        key: "proposed" as Task["status"],
+        label: "Proposed",
+        items: byStatus["proposed"],
       },
       {
-        key: "in-progress" as Task["status"],
-        label: "In Progress",
-        items: byStatus["in-progress"],
+        key: "active" as Task["status"],
+        label: "Active",
+        items: byStatus["active"],
       },
-      { key: "done" as Task["status"], label: "Done", items: byStatus["done"] },
+      {
+        key: "deliver" as Task["status"],
+        label: "Delivered",
+        items: byStatus["deliver"],
+      },
+      {
+        key: "complete" as Task["status"],
+        label: "Completed",
+        items: byStatus["complete"],
+      },
+      {
+        key: "cancel" as Task["status"],
+        label: "Cancelled",
+        items: byStatus["cancel"],
+      },
     ];
   }, [tasks]);
 

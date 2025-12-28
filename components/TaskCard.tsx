@@ -31,19 +31,32 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
   };
 
   const getStatusColor = (status: Task["status"]) => {
-    switch (status) {
-      case "to-do":
-        return "border-gray-300/10 bg-gray-200/5";
-      case "in-progress":
-        return "border-blue-300/10 bg-blue-800/5";
-      case "done":
-        return "border-green-300/10 bg-green-800/5";
-      default:
-        return "border-gray-300/10 bg-gray-50/5";
-    }
-  };
+  switch (status) {
+    case "draft":
+      return "border-[#f9be00]/10 bg-[#f9be00]/2";
 
-  const basePath = `/dashboard/org/${orgId}`;
+    case "proposed":
+      return "border-[#f97316]/10 bg-[#f97316]/2";
+
+    case "active":
+      return "border-[#2563eb]/10 bg-[#2563eb]/2";
+
+    case "deliver":
+      return "border-[#7c3aed]/10 bg-[#7c3aed]/2";
+
+    case "complete":
+      return "border-[#22c55e]/10 bg-[#22c55e]/2";
+
+    case "cancel":
+      return "border-[#ef4444]/10 bg-[#ef4444]/2";
+
+    default:
+      return "border-gray-300/10 bg-gray-50/2";
+  }
+};
+
+
+  const basePath = `/dashboard/fr-og/${orgId}`;
 
   return (
     <Link href={`${basePath}/issue/${task.id}`}>

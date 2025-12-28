@@ -17,89 +17,120 @@ interface StatusData {
 
 const statusData: StatusData[] = [
   {
-    name: "to-do",
+    name: "draft",
     svg: (
       <svg
-        aria-label="Todo"
-        className="color-override"
+        xmlns="http://www.w3.org/2000/svg"
         width="14"
         height="14"
-        viewBox="0 0 14 14"
-        role="img"
-        focusable="false"
-        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="kodash-status kodash-draft"
       >
-        <rect
-          x="1"
-          y="1"
-          width="12"
-          height="12"
-          rx="6"
-          stroke="#e2e2e2"
-          strokeWidth="1.5"
-          fill="none"
-        ></rect>
-        <path
-          fill="#e2e2e2"
-          stroke="none"
-          d="M 3.5,3.5 L3.5,0 A3.5,3.5 0 0,1 3.5, 0 z"
-          transform="translate(3.5,3.5)"
-        ></path>
+        <circle cx="12" cy="12" r="9" />
+        <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none" />
       </svg>
     ),
   },
   {
-    name: "in-progress",
+    name: "proposed",
     svg: (
       <svg
-        aria-label="In Progress"
-        className="color-override"
+        xmlns="http://www.w3.org/2000/svg"
         width="14"
         height="14"
-        viewBox="0 0 14 14"
-        role="img"
-        focusable="false"
-        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="kodash-status kodash-proposed"
       >
-        <rect
-          x="1"
-          y="1"
-          width="12"
-          height="12"
-          rx="6"
-          stroke="lch(80% 90 85)"
-          strokeWidth="1.5"
-          fill="none"
-        ></rect>
-        <path
-          fill="lch(80% 90 85)"
-          stroke="none"
-          d="M 3.5,3.5 L3.5,0 A3.5,3.5 0 0,1 3.5, 7 z"
-          transform="translate(3.5,3.5)"
-        ></path>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M8 12h8" />
       </svg>
     ),
   },
   {
-    name: "done",
+    name: "active",
     svg: (
       <svg
-        className="color-override"
+        xmlns="http://www.w3.org/2000/svg"
         width="14"
         height="14"
-        viewBox="0 0 14 14"
-        fill="lch(48% 59.31 288.43)"
-        role="img"
-        focusable="false"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        //   style="--icon-color: lch(48% 59.31 288.43);"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        stroke="none"
+        className="kodash-status kodash-active"
       >
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M7 0C3.13401 0 0 3.13401 0 7C0 10.866 3.13401 14 7 14C10.866 14 14 10.866 14 7C14 3.13401 10.866 0 7 0ZM11.101 5.10104C11.433 4.76909 11.433 4.23091 11.101 3.89896C10.7691 3.56701 10.2309 3.56701 9.89896 3.89896L5.5 8.29792L4.10104 6.89896C3.7691 6.56701 3.2309 6.56701 2.89896 6.89896C2.56701 7.2309 2.56701 7.7691 2.89896 8.10104L4.89896 10.101C5.2309 10.433 5.7691 10.433 6.10104 10.101L11.101 5.10104Z"
-        ></path>
+        <circle cx="12" cy="12" r="9" />
+      </svg>
+    ),
+  },
+  {
+    name: "deliver",
+    svg: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="kodash-status kodash-delivered"
+      >
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 16V8" />
+        <path d="M8.5 11.5L12 8l3.5 3.5" />
+      </svg>
+    ),
+  },
+
+  {
+    name: "complete",
+    svg: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="kodash-status kodash-completed"
+      >
+        <circle cx="12" cy="12" r="9" />
+        <path d="M8.5 12.5l2.5 2.5 4.5-5" />
+      </svg>
+    ),
+  },
+  {
+    name: "cancel",
+    svg: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="kodash-status kodash-cancelled"
+      >
+        <circle cx="12" cy="12" r="9" />
+        <path d="M8 8l8 8" />
       </svg>
     ),
   },
@@ -107,128 +138,100 @@ const statusData: StatusData[] = [
 
 const getStatusImage = (status: Task["status"]) => {
   switch (status) {
-    case "to-do":
+    case "draft":
       return (
         <svg
-          aria-label="Todo"
-          className="color-override"
+          xmlns="http://www.w3.org/2000/svg"
           width="14"
           height="14"
-          viewBox="0 0 14 14"
-          role="img"
-          focusable="false"
-          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="kodash-status kodash-draft"
         >
-          <rect
-            x="1"
-            y="1"
-            width="12"
-            height="12"
-            rx="6"
-            stroke="#e2e2e2"
-            strokeWidth="1.5"
-            fill="none"
-          ></rect>
-          <path
-            fill="#e2e2e2"
-            stroke="none"
-            d="M 3.5,3.5 L3.5,0 A3.5,3.5 0 0,1 3.5, 0 z"
-            transform="translate(3.5,3.5)"
-          ></path>
+          <circle cx="12" cy="12" r="9" />
+          <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none" />
         </svg>
       );
-    case "in-progress":
+
+    case "proposed":
       return (
         <svg
-          aria-label="In Progress"
-          className="color-override"
+          xmlns="http://www.w3.org/2000/svg"
           width="14"
           height="14"
-          viewBox="0 0 14 14"
-          role="img"
-          focusable="false"
-          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="kodash-status kodash-proposed"
         >
-          <rect
-            x="1"
-            y="1"
-            width="12"
-            height="12"
-            rx="6"
-            stroke="lch(80% 90 85)"
-            strokeWidth="1.5"
-            fill="none"
-          ></rect>
-          <path
-            fill="lch(80% 90 85)"
-            stroke="none"
-            d="M 3.5,3.5 L3.5,0 A3.5,3.5 0 0,1 3.5, 7 z"
-            transform="translate(3.5,3.5)"
-          ></path>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M8 12h8" />
         </svg>
       );
-    case "done":
+
+    case "active":
       return (
         <svg
-          className="color-override"
+          xmlns="http://www.w3.org/2000/svg"
           width="14"
           height="14"
-          viewBox="0 0 14 14"
-          fill="lch(48% 59.31 288.43)"
-          role="img"
-          focusable="false"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          //   style="--icon-color: lch(48% 59.31 288.43);"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          stroke="none"
+          className="kodash-status kodash-active"
         >
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M7 0C3.13401 0 0 3.13401 0 7C0 10.866 3.13401 14 7 14C10.866 14 14 10.866 14 7C14 3.13401 10.866 0 7 0ZM11.101 5.10104C11.433 4.76909 11.433 4.23091 11.101 3.89896C10.7691 3.56701 10.2309 3.56701 9.89896 3.89896L5.5 8.29792L4.10104 6.89896C3.7691 6.56701 3.2309 6.56701 2.89896 6.89896C2.56701 7.2309 2.56701 7.7691 2.89896 8.10104L4.89896 10.101C5.2309 10.433 5.7691 10.433 6.10104 10.101L11.101 5.10104Z"
-          ></path>
+          <circle cx="12" cy="12" r="9" />
+        </svg>
+      );
+
+    case "deliver":
+      return (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="kodash-status kodash-delivered"
+        >
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 16V8" />
+          <path d="M8.5 11.5L12 8l3.5 3.5" />
+        </svg>
+      );
+
+    case "cancel":
+      return (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="kodash-status kodash-cancelled"
+        >
+          <circle cx="12" cy="12" r="9" />
+          <path d="M8 8l8 8" />
         </svg>
       );
 
     default:
-      return (
-        <svg
-          aria-label="No Priority"
-          className=""
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="lch(62.6% 1.35 272 / 1)"
-          role="img"
-          focusable="false"
-          xmlns="http://www.w3.org/2000/svg"
-          // style="--icon-color: lch(62.6% 1.35 272 / 1);"
-        >
-          <rect
-            x="1.5"
-            y="7.25"
-            width="3"
-            height="1.5"
-            rx="0.5"
-            opacity="0.9"
-          ></rect>
-          <rect
-            x="6.5"
-            y="7.25"
-            width="3"
-            height="1.5"
-            rx="0.5"
-            opacity="0.9"
-          ></rect>
-          <rect
-            x="11.5"
-            y="7.25"
-            width="3"
-            height="1.5"
-            rx="0.5"
-            opacity="0.9"
-          ></rect>
-        </svg>
-      );
+      return null;
   }
 };
 
