@@ -5,7 +5,9 @@ import { Task } from "@/lib/superbase/type";
 import { motion } from "framer-motion";
 import { Calendar, MoreHorizontal } from "lucide-react";
 import PriorityCard from "./piortyCard";
+import WriteProposalDialog from "./WriteProposalDialog";
 import { useState } from "react";
+
 import StatusCard from "./StatusCard";
 import Link from "next/link";
 import { useOrgIdStore } from "@/app/store/useOrgId";
@@ -16,6 +18,8 @@ interface TaskCardProps {
 }
 
 export default function TaskCard({ task, onClick }: TaskCardProps) {
+  const [openProposal, setOpenProposal] = useState(false);
+
   const orgId = useOrgIdStore((state) => state.orgId);
   const getPriorityColor = (priority: Task["priority"]) => {
     switch (priority) {
@@ -93,12 +97,27 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
               {new Date(task.due_date).toLocaleDateString()}
             </div>
           )}
-
           {task.status === "draft" && (
-            <button className="text-sm bg-cardC py-1 px-3 mt-[20px] rounded-lg text-textNd cursor-pointer">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenProposal(true);
+              }}
+              className="text-sm bg-cardC py-1 px-3 mt-[20px] rounded-lg text-textNd"
+            >
               Write Proposal
             </button>
           )}
+
+          <WriteProposalDialog
+            open={openProposal}
+            onOpenChange={setOpenProposal}
+            task={task}
+            onSubmit={(proposal) => {
+              console.log("SUBMIT PROPOSAL", proposal);
+              setOpenProposal(false);
+            }}
+          />
         </div>
         <MoreHorizontal className="w-5 h-5 text-gray-400 flex-shrink-0" />
       </div>
