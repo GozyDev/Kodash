@@ -167,7 +167,7 @@ export default function TaskClient({ orgId }: { orgId: string }) {
 
   const progress =
     task.length > 0
-      ? (task.filter((t) => t.status === "done").length / task.length) * 100
+      ? (task.filter((t) => t.status === "complete").length / task.length) * 100
       : 0;
 
   if (loading) {
@@ -186,14 +186,17 @@ export default function TaskClient({ orgId }: { orgId: string }) {
           <div>
             <div className="flex items-center gap-2 mt-1 text-xs">
               <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
-                Todo: {task.filter((t) => t.status === "to-do").length}
+                {/* Todo: {task.filter((t) => t.status === "to-do").length} */}
+                All request
               </span>
               <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
-                In Progress:{" "}
-                {task.filter((t) => t.status === "in-progress").length}
+                {/* In Progress:{" "}
+                {task.filter((t) => t.status === "in-progress").length} */}
+                proposed
               </span>
               <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
-                Done: {task.filter((t) => t.status === "done").length}
+                {/* Done: {task.filter((t) => t.status === "done").length} */}
+                Completed
               </span>
             </div>
           </div>
@@ -205,8 +208,8 @@ export default function TaskClient({ orgId }: { orgId: string }) {
             }}
             className="butt"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            New Task
+            <Plus className="w-4 h-4" />
+            New Request
           </Button>
         </div>
 

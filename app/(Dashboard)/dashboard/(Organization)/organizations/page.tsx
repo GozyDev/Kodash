@@ -139,7 +139,6 @@ export default function OrganizationsPage() {
                   <div className="flex items-center gap-3">
                     <div className="text-xl font-medium text-textNc">
                       {org.name}
-                      {org.role}
                     </div>
                     {currentUserId ? (
                       <div className="text-xs px-2 py-0.5 rounded-md bg-cardC/40 text-textNd">
