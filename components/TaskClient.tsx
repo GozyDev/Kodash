@@ -184,7 +184,7 @@ export default function TaskClient({ orgId }: { orgId: string }) {
       <div className="border-b border-cardCB px-6 pb-4 py-[5px] ">
         <div className="flex items-center justify-between">
           <div>
-            <div className="flex items-center gap-2 mt-1 text-xs">
+            <div className="flex items-center gap-2 mt-1 text-sm">
               <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
                 {/* Todo: {task.filter((t) => t.status === "to-do").length} */}
                 All request
@@ -192,7 +192,7 @@ export default function TaskClient({ orgId }: { orgId: string }) {
               <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
                 {/* In Progress:{" "}
                 {task.filter((t) => t.status === "in-progress").length} */}
-                proposed
+                Proposed
               </span>
               <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
                 {/* Done: {task.filter((t) => t.status === "done").length} */}
@@ -201,16 +201,16 @@ export default function TaskClient({ orgId }: { orgId: string }) {
             </div>
           </div>
 
-          <Button
+          <button
             onClick={() => {
               setSelectedTask(null);
               setIsDrawerOpen(true);
             }}
-            className="butt"
+            className="butt w-10 h-10 flex items-center justify-center rounded-full"
           >
             <Plus className="w-4 h-4" />
-            New Request
-          </Button>
+           
+          </button>
         </div>
 
         {/* Progress Bar */}

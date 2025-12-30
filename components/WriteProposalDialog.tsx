@@ -51,13 +51,13 @@ export default function WriteProposalDialog({
           <div className="space-y-6">
             {/* Definition of Done */}
             <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-textNc">
+              <label className="flex items-center gap-2 text-md font-medium text-textNa">
                 <FileText className="w-4 h-4" />
                 Definition of Done
               </label>
               <textarea
-                className="w-full border-b border-cardCB bg-transparent p-2 focus:outline-none"
-                rows={4}
+                className="w-full border-b border-cardCB bg-transparent p-2 focus:outline-none text-sm text-textNb"
+                rows={7}
                 value={dod}
                 onChange={(e) => setDod(e.target.value)}
               />
@@ -73,7 +73,7 @@ export default function WriteProposalDialog({
                 type="text"
                 className="w-full border-b border-cardCB bg-transparent p-2 focus:outline-none"
                 value={price}
-                onChange={(e) => setPrice(Number(e.target.value))}
+                onChange={(e) => setPrice(e.target.value)}
               />
             </div>
 

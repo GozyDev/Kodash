@@ -114,8 +114,12 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
             onOpenChange={setOpenProposal}
             task={task}
             onSubmit={(proposal) => {
-              console.log("SUBMIT PROPOSAL", proposal);
-              setOpenProposal(false);
+              const response = fetch("/api/proposal", {
+                method: "POST",
+                headers: { "Content-type": "application/json" },
+                body: JSON.stringify({ ...proposal, requestId: task.id }),
+              });
+              // setOpenProposal(false);
             }}
           />
         </div>
