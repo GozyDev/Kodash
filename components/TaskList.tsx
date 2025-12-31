@@ -153,7 +153,7 @@ export default function TaskList({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.04 }}
                     >
-                      <TaskCard task={task} onClick={() => onTaskClick(task)} />
+                      <TaskCard task={task} />
                     </motion.div>
                   ))}
                 </motion.div>

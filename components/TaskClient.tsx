@@ -209,7 +209,6 @@ export default function TaskClient({ orgId }: { orgId: string }) {
             className="butt w-10 h-10 flex items-center justify-center rounded-full"
           >
             <Plus className="w-4 h-4" />
-           
           </button>
         </div>
 
@@ -235,9 +234,6 @@ export default function TaskClient({ orgId }: { orgId: string }) {
       <div className="px-6 py-4">
         <TaskList
           tasks={filteredTasks}
-          onTaskClick={(task) => {
-            setSelectedTask(task);
-          }}
           onCreateWithStatus={(status) => {
             setSelectedTask(null);
             setCreateInitialStatus(status);

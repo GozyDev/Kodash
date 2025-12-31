@@ -8,11 +8,25 @@ import PriorityCard from "./piortyCard";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { LinkIcon, Loader2, MessageSquare, Plus } from "lucide-react";
+import {
+  LinkIcon,
+  Loader2,
+  MessageSquare,
+  Paperclip,
+  Plus,
+} from "lucide-react";
 import { Task, Comment } from "@/lib/superbase/type";
 import useDebounce from "@/app/hooks/useDebounce";
 import CommentSection from "./CommentSection";
-import { tree } from "next/dist/build/templates/app-page";
+import ProposalOverview from "./ProposalOverview";
+
+export type Proposal = {
+  id: string;
+  price: number | string | null;
+  currency: string | null;
+  due_date: string | null;
+  dod: string | null;
+};
 
 type Props = {
   orgId: string;
@@ -26,11 +40,12 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
 
   const [issue, setIssue] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   const [linkDraft, setLinkDraft] = useState("");
   const [links, setLinks] = useState<string[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [proposal, setProposal] = useState<Proposal | null>(null);
 
   const handleOptimisticTitle = useTaskStore(
     (state) => state.handleOptimisticTitle
@@ -95,6 +110,29 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     fetchIssue();
   }, [issueId, orgId, setTask]);
 
+  // Fetch proposal for this issue on mount
+  useEffect(() => {
+    if (!issueId) return;
+
+    const fetchProposal = async () => {
+      try {
+        const res = await fetch(`/api/proposal/${issueId}`);
+        if (!res.ok) {
+          console.error('Failed to load proposal')
+          setProposal(null)
+          return
+        }
+        const json = await res.json()
+        setProposal(json.proposal || null)
+      } catch (err) {
+        console.error(err)
+        setProposal(null)
+      }
+    }
+
+    fetchProposal()
+  }, [issueId]);
+
   useEffect(() => {
     const refreshedIssue = tasks.find((t) => t.id === issueId);
     if (refreshedIssue) {
@@ -131,7 +169,6 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
 
     handleOptimisticDescription(issue.id, descValue);
   }, [debouncedDescription, issue]);
- 
 
   const handleAddLink = () => {
     if (!linkDraft.trim()) return;
@@ -175,18 +212,22 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
             />
           </header>
 
-          <CommentSection issueId={issueId} />
+          {/* <CommentSection issueId={issueId} /> */}
 
-          <section className="rounded-xl border border-cardCB bg-cardC p-4">
-            <div className="flex items-center gap-2 text-textNd">
-              <LinkIcon className="h-4 w-4" />
-              <h3 className="text-sm font-medium">Links</h3>
+          <section className="py-4">
+            <div className="flex  items-center gap-3">
+              <div className="flex items-center gap-2 text-textNd bg-cardC w-max py-1.5 px-5 rounded cursor-pointer">
+                <LinkIcon className="h-3 w-3" />
+                <h3 className="text-sm font-medium">Links</h3>
+              </div>
+              <div className="flex items-center gap-2 text-textNd bg-cardC w-max py-1.5 px-5 rounded cursor-pointer">
+                <Paperclip className="h-3 w-3" />
+                <h3 className="text-sm font-medium">Attachment</h3>
+              </div>
             </div>
 
-            <div className="mt-3 space-y-3">
-              {links.length === 0 ? (
-                <p className="text-sm text-textNc">No links yet.</p>
-              ) : (
+            {/* <div className="mt-3 space-y-3">
+              {links.length === 0 ? null : (
                 <ul className="space-y-2 text-sm text-primary underline">
                   {links.map((link, idx) => (
                     <li key={`${link}-${idx}`}>
@@ -207,20 +248,24 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
                 />
                 <Button
                   size="sm"
-                  className="butt"
+                  className="butt flex"
                   onClick={handleAddLink}
                   disabled={!linkDraft.trim()}
                 >
-                  <Plus className="mr-2 h-4 w-4" />
                   Add link
                 </Button>
               </div>
-            </div>
-            <p className="mt-2 text-xs text-textNd">
-              Links are stored locally for now; saving to the workspace will be
-              added later.
-            </p>
+            </div> */}
           </section>
+
+          {/* Proposal */}
+          {proposal ? (
+            <ProposalOverview proposal={proposal} />
+          ) : (
+            <div className="rounded-xl border border-cardCB bg-cardC p-6">
+              <p className="text-sm text-textNc">No proposal found.</p>
+            </div>
+          )}
         </div>
 
         <aside className="space-y-4">

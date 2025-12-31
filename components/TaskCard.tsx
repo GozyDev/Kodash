@@ -11,13 +11,14 @@ import { useState } from "react";
 import StatusCard from "./StatusCard";
 import Link from "next/link";
 import { useOrgIdStore } from "@/app/store/useOrgId";
+import { useRouter } from "next/navigation";
 
 interface TaskCardProps {
   task: Task;
-  onClick: () => void;
 }
 
-export default function TaskCard({ task, onClick }: TaskCardProps) {
+export default function TaskCard({ task }: TaskCardProps) {
+  const router = useRouter();
   const [openProposal, setOpenProposal] = useState(false);
 
   const orgId = useOrgIdStore((state) => state.orgId);
@@ -70,7 +71,11 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
           border rounded-lg p-4 cursor-pointer transition-all duration-200
           hover:shadow-md ${getStatusColor(task.status)}
         `}
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault()
+        router.push(`${basePath}/issue/${task.id}`);
+      }}
     >
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
@@ -101,6 +106,7 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
             <button
               onClick={(e) => {
                 e.stopPropagation();
+                e.preventDefault()
                 setOpenProposal(true);
               }}
               className="text-sm bg-cardC py-1 px-3 mt-[20px] rounded-lg text-textNd"
