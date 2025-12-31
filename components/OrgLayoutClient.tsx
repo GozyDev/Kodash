@@ -6,10 +6,11 @@ import { OrgSidebar } from "@/components/OrgSidebar";
 
 export default function OrgLayoutClient({
   orgId,
+  role,
   children,
 }: {
   orgId: string;
-
+  role: "client" | "freelancer";
   children: ReactNode;
 }) {
   const setOrgId = useOrgIdStore((s) => s.setOrgId);
@@ -22,7 +23,7 @@ export default function OrgLayoutClient({
     <>
       <div className="text-textNa flex w-full">
         <aside>
-          <OrgSidebar orgId={orgId} />
+          <OrgSidebar orgId={orgId} role={role} />
         </aside>
         <main className="flex-1 pt-[74px]">
           <div className="flex w-full">

@@ -1,12 +1,12 @@
 import IndivisualIssuepageClient from "@/components/IndivisualIssuepageClient";
 import React from "react";
 
-function IndivisualIssuepage({
+export default async function IndivisualIssuepage({
   params,
 }: {
-  params: { orgId: string; issueId: string };
+  params: Promise<{ orgId: string; issueId: string }>;
 }) {
-  const { orgId, issueId } = params;
+  const { orgId, issueId } = await params;
 
   return (
     <IndivisualIssuepageClient
@@ -16,4 +16,3 @@ function IndivisualIssuepage({
   );
 }
 
-export default IndivisualIssuepage;

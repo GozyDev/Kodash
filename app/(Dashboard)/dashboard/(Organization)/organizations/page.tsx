@@ -126,8 +126,8 @@ export default function OrganizationsPage() {
                 onClick={() =>
                   router.push(
                     org.role === "FREELANCER"
-                      ? `/dashboard/fr-og/${org.id}`
-                      : `/dashboard/cl-og/${org.id}`
+                      ? `/dashboard/fr-org/${org.id}`
+                      : `/dashboard/cl-org/${org.id}`
                   )
                 }
               >

@@ -10,7 +10,8 @@ export default async function Taskpage({
 
   return (
     <div>
-      <TaskClient orgId={orgId} />
+      <TaskClient orgId={orgId} userRole="client" />
     </div>
   );
 }
+

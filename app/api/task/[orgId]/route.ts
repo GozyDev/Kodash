@@ -44,6 +44,26 @@ export async function POST(
 ) {
   const { orgId } = await params;
   const supabase = await createClient();
+  
+  // 1. Auth check
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  if (authError || !authData.user) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  // 2. Permission check: Only CLIENT can create issues/tasks
+  const { getUserRole } = await import("@/lib/utils/role");
+  const userRole = await getUserRole(authData.user.id, orgId);
+  if (userRole !== "CLIENT") {
+    return NextResponse.json(
+      { error: "Only clients can create issues" },
+      { status: 403 }
+    );
+  }
+
   const body = await req.json();
   const { title, description, priority, status, due_date } = body;
   const duecheck = due_date ? due_date : null;
@@ -58,6 +78,7 @@ export async function POST(
         status:"draft",
         due_date: duecheck,
         tenant_id: orgId,
+        created_by: authData.user.id,
       },
     ])
     .select()

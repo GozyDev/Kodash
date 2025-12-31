@@ -9,13 +9,14 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface TaskListProps {
   tasks: Task[];
-
-  onTaskClick: (task: Task) => void;
+  userRole: "client" | "freelancer";
+  onTaskClick?: (task: Task) => void;
   onCreateWithStatus?: (status: Task["status"]) => void;
 }
 
 export default function TaskList({
   tasks,
+  userRole,
   onTaskClick,
   onCreateWithStatus,
 }: TaskListProps) {
@@ -77,9 +78,11 @@ export default function TaskList({
   if (!hasAny) {
     return (
       <div className="text-center py-12">
-        <div className="text-gray-400 text-lg">No tasks found</div>
+        <div className="text-gray-400 text-lg">No requests found</div>
         <div className="text-gray-500 text-sm mt-2">
-          Create your first task to get started
+          {userRole === "client"
+            ? "Create your first request to get started"
+            : "No requests available yet"}
         </div>
       </div>
     );
@@ -111,7 +114,7 @@ export default function TaskList({
                 <span className="text-xs text-textNd">
                   {group.items.length}
                 </span>
-                {!!onCreateWithStatus && (
+                {/* {!!onCreateWithStatus && (
                   <span
                     onClick={(e) => {
                       e.stopPropagation();
@@ -134,7 +137,7 @@ export default function TaskList({
                     </svg>
                     New
                   </span>
-                )}
+                )} */}
               </div>
             </button>
 
@@ -153,7 +156,7 @@ export default function TaskList({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.04 }}
                     >
-                      <TaskCard task={task} />
+                      <TaskCard task={task} userRole={userRole} />
                     </motion.div>
                   ))}
                 </motion.div>

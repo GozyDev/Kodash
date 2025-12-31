@@ -36,6 +36,7 @@ interface TaskDrawerProps {
   onClose: () => void;
   onDelete?: () => void;
   initialStatus?: Task["status"]; // optional preset when creating
+  userRole: "client" | "freelancer";
 }
 
 export default function TaskDrawer({
@@ -44,6 +45,7 @@ export default function TaskDrawer({
   onClose,
   onDelete,
   initialStatus,
+  userRole,
 }: TaskDrawerProps) {
   const [formData, setFormData] = useState({
     title: "",
@@ -375,6 +377,8 @@ export default function TaskDrawer({
                     value={formData.title}
                     onChange={(e) => handleChange("title", e.target.value)}
                     placeholder="Issue title"
+                    disabled={userRole === "freelancer" && task !== null}
+                    readOnly={userRole === "freelancer" && task !== null}
                     className="text-base font-medium border-0 bg-transparent focus:outline-none px-0 py-1 placeholder:text-textNd h-auto"
                     autoFocus
                   />
@@ -390,6 +394,8 @@ export default function TaskDrawer({
                     placeholder="Add description..."
                     rows={isExpanded ? 20 : 6}
                     className="resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-0 py-1 placeholder:text-textNd text-sm min-h-[100px]"
+                    disabled={userRole === "freelancer" && task !== null}
+                    readOnly={userRole === "freelancer" && task !== null}
                   />
                 </div>
 
@@ -633,7 +639,7 @@ export default function TaskDrawer({
               {/* Footer */}
               <div className="flex items-center justify-between px-5 py-3 border-t border-cardCB/50 bg-bgPrimary/10">
                 <div>
-                  {onDelete && (
+                  {onDelete && userRole === "client" && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -656,24 +662,21 @@ export default function TaskDrawer({
                   >
                     Cancel
                   </Button>
-                  <Button
-                    onClick={() =>
-                      handleCreateTask(
-                        formData,
-                        "9284994c-9801-4205-ba35-6936a69071fc"
-                      )
-                    }
-                    disabled={!formData.title.trim() || isSaving}
-                    className="h-7 px-3 text-xs butt"
-                  >
-                    {task
-                      ? isSaving
-                        ? "Saving..."
-                        : "Save"
-                      : isSaving
-                      ? "Creating..."
-                      : "Create issue"}
-                  </Button>
+                  {userRole === "client" && (
+                    <Button
+                      onClick={() => handleCreateTask(formData)}
+                      disabled={!formData.title.trim() || isSaving}
+                      className="h-7 px-3 text-xs butt"
+                    >
+                      {task
+                        ? isSaving
+                          ? "Saving..."
+                          : "Save"
+                        : isSaving
+                        ? "Creating..."
+                        : "Create issue"}
+                    </Button>
+                  )}
                 </div>
               </div>
             </motion.div>

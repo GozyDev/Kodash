@@ -18,9 +18,11 @@ import Link from "next/link";
 
 const toolItems = [{ title: "Settings", icon: Settings, url: "/settings" }];
 
-export function OrgSidebar({ orgId }: { orgId: string }) {
+export function OrgSidebar({ orgId, role }: { orgId: string; role: "client" | "freelancer" }) {
   const pathname = usePathname();
-  const basePath = `/dashboard/fr-og/${orgId}`;
+  const basePath = role === "freelancer" 
+    ? `/dashboard/fr-org/${orgId}`
+    : `/dashboard/cl-org/${orgId}`;
 
   const navItems = [
     { title: "Overview", icon: LayoutGrid, url: `${basePath}/overview` },

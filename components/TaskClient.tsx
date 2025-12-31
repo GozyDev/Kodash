@@ -10,7 +10,13 @@ import TaskDrawer from "@/components/TaskDrawer";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
 
-export default function TaskClient({ orgId }: { orgId: string }) {
+export default function TaskClient({ 
+  orgId, 
+  userRole 
+}: { 
+  orgId: string;
+  userRole: "client" | "freelancer";
+}) {
   const task = useTaskStore((state) => state.task);
   const setTask = useTaskStore((state) => state.setTask);
 
@@ -143,8 +149,10 @@ export default function TaskClient({ orgId }: { orgId: string }) {
   //   setCreateInitialStatus(null);
   // };
 
-  // Keyboard shortcut
+  // Keyboard shortcut - only for clients
   useEffect(() => {
+    if (userRole !== "client") return;
+    
     const handleKeyPress = (e: KeyboardEvent) => {
       // ignore when typing in inputs, textareas or contenteditable elements
       const target = e.target as HTMLElement | null;
@@ -163,7 +171,7 @@ export default function TaskClient({ orgId }: { orgId: string }) {
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress); // MATCH event
-  }, []);
+  }, [userRole]);
 
   const progress =
     task.length > 0
@@ -234,11 +242,16 @@ export default function TaskClient({ orgId }: { orgId: string }) {
       <div className="px-6 py-4">
         <TaskList
           tasks={filteredTasks}
-          onCreateWithStatus={(status) => {
-            setSelectedTask(null);
-            setCreateInitialStatus(status);
-            setIsDrawerOpen(true);
-          }}
+          userRole={userRole}
+          onCreateWithStatus={
+            userRole === "client"
+              ? (status) => {
+                  setSelectedTask(null);
+                  setCreateInitialStatus(status);
+                  setIsDrawerOpen(true);
+                }
+              : undefined
+          }
         />
       </div>
 
@@ -248,14 +261,13 @@ export default function TaskClient({ orgId }: { orgId: string }) {
           <TaskDrawer
             task={selectedTask}
             isOpen={isDrawerOpen}
+            userRole={userRole}
             onClose={() => {
               setIsDrawerOpen(false);
               setSelectedTask(null);
               setCreateInitialStatus(null);
             }}
-            onDelete={
-              selectedTask ? () => handleDeleteTask(selectedTask.id) : undefined
-            }
+            onDelete={undefined}
             initialStatus={createInitialStatus ?? undefined}
           />
         )}

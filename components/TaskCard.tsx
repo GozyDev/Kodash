@@ -15,9 +15,10 @@ import { useRouter } from "next/navigation";
 
 interface TaskCardProps {
   task: Task;
+  userRole: "client" | "freelancer";
 }
 
-export default function TaskCard({ task }: TaskCardProps) {
+export default function TaskCard({ task, userRole }: TaskCardProps) {
   const router = useRouter();
   const [openProposal, setOpenProposal] = useState(false);
 
@@ -60,7 +61,9 @@ export default function TaskCard({ task }: TaskCardProps) {
     }
   };
 
-  const basePath = `/dashboard/fr-og/${orgId}`;
+  const basePath = userRole === "freelancer" 
+    ? `/dashboard/fr-org/${orgId}`
+    : `/dashboard/cl-org/${orgId}`;
 
   return (
     // <Link href={`${basePath}/issue/${task.id}`}>
@@ -102,7 +105,8 @@ export default function TaskCard({ task }: TaskCardProps) {
               {new Date(task.due_date).toLocaleDateString()}
             </div>
           )}
-          {task.status === "draft" && (
+          {/* Only show "Write Proposal" for freelancers on draft requests */}
+          {task.status === "draft" && userRole === "freelancer" && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
