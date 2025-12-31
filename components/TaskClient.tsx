@@ -201,15 +201,15 @@ export default function TaskClient({ orgId }: { orgId: string }) {
             </div>
           </div>
 
-          <button
-            onClick={() => {
-              setSelectedTask(null);
-              setIsDrawerOpen(true);
-            }}
-            className="butt w-10 h-10 flex items-center justify-center rounded-full"
-          >
-            <Plus className="w-4 h-4" />
-          </button>
+            {/* <button
+              onClick={() => {
+                setSelectedTask(null);
+                setIsDrawerOpen(true);
+              }}
+              className="butt w-10 h-10 flex items-center justify-center rounded-full"
+            >
+              <Plus className="w-4 h-4" />
+            </button> */}
         </div>
 
         {/* Progress Bar */}
