@@ -10,10 +10,10 @@ import TaskDrawer from "@/components/TaskDrawer";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
 
-export default function TaskClient({ 
-  orgId, 
-  userRole 
-}: { 
+export default function TaskClient({
+  orgId,
+  userRole,
+}: {
   orgId: string;
   userRole: "client" | "freelancer";
 }) {
@@ -152,7 +152,7 @@ export default function TaskClient({
   // Keyboard shortcut - only for clients
   useEffect(() => {
     if (userRole !== "client") return;
-    
+
     const handleKeyPress = (e: KeyboardEvent) => {
       // ignore when typing in inputs, textareas or contenteditable elements
       const target = e.target as HTMLElement | null;
@@ -209,15 +209,17 @@ export default function TaskClient({
             </div>
           </div>
 
-            {/* <button
+          {userRole === "client" && (
+            <button
               onClick={() => {
                 setSelectedTask(null);
                 setIsDrawerOpen(true);
               }}
-              className="butt w-10 h-10 flex items-center justify-center rounded-full"
+              className="butt w-10 h-5 flex items-center justify-center rounded text-sm"
             >
-              <Plus className="w-4 h-4" />
-            </button> */}
+              <Plus className="w-3 h-3" />
+            </button>
+          )}
         </div>
 
         {/* Progress Bar */}
