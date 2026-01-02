@@ -5,7 +5,7 @@ import { useOrgIdStore } from "./useOrgId";
 interface TaskStore {
   task: Task[];
   setTask: (data: Task[]) => void;
-  handleCreateTask: (taskdata: Omit<TaskInsert, "project_id">) => Promise<void>;
+  handleCreateTask: (taskdata: any) => Promise<void>;
   handleOptimisticPriority: (
     id: string,
     newPriority: Task["priority"]

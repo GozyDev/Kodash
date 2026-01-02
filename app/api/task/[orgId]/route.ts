@@ -66,6 +66,9 @@ export async function POST(
 
   const body = await req.json();
   const { title, description, priority, status, due_date } = body;
+  if (!title || !title.toString().trim()) {
+    return NextResponse.json({ error: "Title is required" }, { status: 400 });
+  }
   const duecheck = due_date ? due_date : null;
   console.log("check", duecheck);
   const { data, error } = await supabase
@@ -87,6 +90,42 @@ export async function POST(
   if (error) {
     console.log(error.message);
     return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  // If client provided uploaded attachments, insert them into request_attachments
+  try {
+    const attachments = body.attachments;
+    if (attachments && Array.isArray(attachments) && attachments.length > 0) {
+      // dedupe by file_url to avoid duplicates
+      const seen = new Set<string>();
+      const uniqueInserts: Array<{
+        request_id: string;
+        file_url: string;
+        file_type: string;
+        file_size: number;
+      }> = [];
+
+      for (const a of attachments) {
+        if (!a || !a.file_url) continue;
+        if (seen.has(a.file_url)) continue;
+        seen.add(a.file_url);
+        uniqueInserts.push({
+          request_id: data.id,
+          file_url: a.file_url,
+          file_type: a.file_type || null,
+          file_size: a.file_size || null,
+        });
+      }
+
+      if (uniqueInserts.length > 0) {
+        const { error: attachErr } = await supabase.from("request_attachments").insert(uniqueInserts);
+        if (attachErr) {
+          console.log("Failed to insert request_attachments:", attachErr.message);
+        }
+      }
+    }
+  } catch (e) {
+    console.log("Failed to process attachments:", e);
   }
 
   return NextResponse.json(data);

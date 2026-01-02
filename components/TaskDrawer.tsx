@@ -28,6 +28,7 @@ import {
   Paperclip,
 } from "lucide-react";
 import { useTaskStore } from "@/app/store/useTask";
+import { uploadFile } from "@/lib/upload";
 import StatusCardCreate from "./StatusCardCreate";
 import PriorityCardCreate from "./PriorityCardCreate";
 
@@ -73,15 +74,64 @@ export default function TaskDrawer({
 
   // Attachments state & refs
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  type Attachment = { file: File; preview?: string };
+  type Attachment = {
+    id: string;
+    file: File;
+    preview?: string;
+    status?: "idle" | "uploading" | "failed" | "uploaded";
+    progress?: number;
+    file_id?: string;
+    file_url?: string;
+    abort?: () => void;
+  };
   const [attachments, setAttachments] = useState<Attachment[]>([]);
 
   const addFiles = (files: FileList | null) => {
     if (!files) return;
-    const arr = Array.from(files).map((f) => {
-      return { file: f, preview: URL.createObjectURL(f) } as Attachment;
+    // prevent duplicate selections by name+size
+    const incoming = Array.from(files).filter((f) =>
+      !attachments.some((a) => a.file.name === f.name && a.file.size === f.size)
+    );
+
+    const arr = incoming.map((f) => {
+      return {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+        file: f,
+        preview: URL.createObjectURL(f),
+        status: "idle",
+        progress: 0,
+      } as Attachment;
     });
-    setAttachments((prev) => [...prev, ...arr]);
+
+    setAttachments((prev) => {
+      const next = [...prev, ...arr];
+      // start uploads for newly added
+      arr.forEach((fileObj) => startUploadFile(fileObj.file, fileObj.id));
+      return next;
+    });
+  };
+
+  const startUploadFile = async (file: File, id: string) => {
+    // guard: don't start if already uploading or uploaded
+    const existing = attachments.find((a) => a.id === id);
+    if (existing && (existing.status === "uploading" || existing.status === "uploaded")) return;
+
+    setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, status: "uploading", progress: 0 } : a)));
+
+    const { promise, abort } = uploadFile(file, (p) => {
+      // show progress internally but UI only shows spinner
+      setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, progress: p } : a)));
+    }, id);
+
+    // store abort so caller can cancel
+    setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, abort } : a)));
+
+    try {
+      const res = await promise;
+      setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, status: "uploaded", progress: 100, file_id: res.file_id, file_url: res.file_url, abort: undefined } : a)));
+    } catch (err) {
+      setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, status: "failed", abort: undefined } : a)));
+    }
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,12 +149,44 @@ export default function TaskDrawer({
     e.preventDefault();
   };
 
-  const handleRemoveAttachment = (index: number) => {
-    setAttachments((prev) => {
-      const att = prev[index];
-      if (att?.preview) URL.revokeObjectURL(att.preview);
-      return prev.filter((_, i) => i !== index);
-    });
+  const deleteFileOnServer = async (file_id?: string) => {
+    if (!file_id) return;
+    try {
+      await fetch("/api/files/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ file_id }),
+      });
+    } catch (e) {
+      console.error("Failed to delete file on server", e);
+    }
+  };
+
+  const handleRemoveAttachment = async (id: string) => {
+    const att = attachments.find((a) => a.id === id);
+    if (!att) return;
+
+    // cancel upload if running
+    if (att.status === "uploading" && att.abort) {
+      try {
+        att.abort();
+      } catch {}
+    }
+
+    // if file already uploaded, delete from server
+    if (att.file_id) {
+      await deleteFileOnServer(att.file_id);
+    } else {
+      // If upload may have completed server-side but client didn't get response,
+      // attempt to delete by the deterministic filename we used (clientId-file.name)
+      const sanitized = att.file.name.replace(/\s+/g, "_");
+      const candidate = `${att.id}-${sanitized}`;
+      await deleteFileOnServer(candidate);
+    }
+
+    // cleanup preview and remove
+    if (att.preview) URL.revokeObjectURL(att.preview);
+    setAttachments((prev) => prev.filter((a) => a.id !== id));
   };
 
   // cleanup on unmount
@@ -116,6 +198,37 @@ export default function TaskDrawer({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleClose = async () => {
+    // cancel and delete any uploaded or uploading attachments
+    const list = [...attachments];
+    for (const att of list) {
+      if (att.status === "uploading" && att.abort) {
+        try {
+          att.abort();
+        } catch {}
+      }
+      if (att.file_id) {
+        try {
+          await deleteFileOnServer(att.file_id);
+        } catch (e) {
+          console.error("Failed to delete during close", e);
+        }
+      } else {
+        const sanitized = att.file.name.replace(/\s+/g, "_");
+        const candidate = `${att.id}-${sanitized}`;
+        try {
+          await deleteFileOnServer(candidate);
+        } catch (e) {
+          console.error("Failed to delete candidate during close", e);
+        }
+      }
+      if (att.preview) URL.revokeObjectURL(att.preview);
+    }
+
+    setAttachments([]);
+    onClose();
+  };
 
   const formatBytes = (bytes: number) => {
     if (bytes === 0) return "0 B";
@@ -155,12 +268,12 @@ export default function TaskDrawer({
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
-        onClose();
+        handleClose();
       }
     };
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   const handleDelete = () => {
     setIsDeleting(true);
@@ -194,6 +307,15 @@ export default function TaskDrawer({
     // Clear the AI parsed data after accepting
     setAiParsedData(null);
   };
+
+  const isAnyUploading = attachments.some((a) => a.status === "uploading");
+  const uploadedAttachments = attachments
+    .filter((a) => a.status === "uploaded" && a.file_url)
+    .map((a) => ({
+      file_url: a.file_url as string,
+      file_type: a.file.type,
+      file_size: a.file.size,
+    }));
 
   const handleSendAI = async () => {
     if (!aiInput.trim() || isSending) return;
@@ -317,7 +439,7 @@ export default function TaskDrawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
-            onClick={onClose}
+            onClick={handleClose}
           />
 
           {/* Centered Modal */}
@@ -358,7 +480,7 @@ export default function TaskDrawer({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={onClose}
+                    onClick={handleClose}
                     className="h-7 w-7 p-0 text-textNd hover:text-textNb hover:bg-bgPrimary/30"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -443,7 +565,7 @@ export default function TaskDrawer({
                         if (isImage) {
                           return (
                             <div
-                              key={`${file.name}-${idx}`}
+                              key={att.id}
                               className="flex items-center justify-between bg-cardC/50 border border-cardCB rounded px-3 py-2 text-sm"
                             >
                               <div
@@ -469,6 +591,15 @@ export default function TaskDrawer({
                                   <div className="text-xs text-textNd">
                                     {formatBytes(file.size)}
                                   </div>
+                                  {att.status === "uploading" && (
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <span className="inline-block w-4 h-4 border-2 border-t-transparent rounded-full animate-spin" />
+                                      <span className="text-xs text-textNd">Uploading...</span>
+                                    </div>
+                                  )}
+                                  {att.status === "failed" && (
+                                    <div className="text-xs text-red-400 mt-1">Failed to upload</div>
+                                  )}
                                 </div>
                               </div>
                               <div>
@@ -477,7 +608,7 @@ export default function TaskDrawer({
                                   size="sm"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleRemoveAttachment(idx);
+                                    handleRemoveAttachment(att.id);
                                   }}
                                   className="h-7 w-7 p-0"
                                 >
@@ -490,7 +621,7 @@ export default function TaskDrawer({
 
                         return (
                           <div
-                            key={`${file.name}-${idx}`}
+                            key={att.id}
                             className="flex items-center justify-between bg-cardC/50 border border-cardCB rounded px-3 py-2 text-sm"
                           >
                             <div
@@ -508,6 +639,12 @@ export default function TaskDrawer({
                               <div className="text-xs text-textNd">
                                 {formatBytes(file.size)}
                               </div>
+                              {att.status === "uploading" && (
+                                <div className="flex items-center gap-2 mt-1"><span className="inline-block w-4 h-4 border-2 border-t-transparent rounded-full animate-spin" /></div>
+                              )}
+                              {att.status === "failed" && (
+                                <div className="text-xs text-red-400 mt-1">Failed to upload</div>
+                              )}
                             </div>
                             <div>
                               <Button
@@ -515,7 +652,7 @@ export default function TaskDrawer({
                                 size="sm"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleRemoveAttachment(idx);
+                                  handleRemoveAttachment(att.id);
                                 }}
                                 className="h-7 w-7 p-0"
                               >
@@ -684,15 +821,17 @@ export default function TaskDrawer({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={onClose}
+                    onClick={handleClose}
                     className="h-7 px-3 text-xs text-textNd hover:text-textNb hover:bg-bgPrimary/30"
                   >
                     Cancel
                   </Button>
                   {userRole === "client" && (
                     <Button
-                      onClick={() => handleCreateTask(formData)}
-                      disabled={!formData.title.trim() || isSaving}
+                      onClick={() =>
+                        handleCreateTask({ ...formData, attachments: uploadedAttachments })
+                      }
+                      disabled={!formData.title.trim() || isSaving || isAnyUploading}
                       className="h-7 px-3 text-xs butt"
                     >
                       {task
