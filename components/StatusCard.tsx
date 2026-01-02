@@ -249,17 +249,29 @@ const StatusCard = ({
   const orgId = useOrgIdStore((state) => state.orgId);
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="p-1 rounded cursor-pointer text-[10px] tracking-widest">
+      <DropdownMenuTrigger 
+        className="p-1 rounded cursor-pointer text-[10px] tracking-widest"
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         {getStatusImage(status)}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="outline-0 border-none w-[200px]">
+      <DropdownMenuContent 
+        className="outline-0 border-none w-[200px]"
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         {/* <DropdownMenuLabel>My Account</DropdownMenuLabel> */}
         <DropdownMenuSeparator className="bg-cardCB/50" />
         {statusData.map((data, idx) => (
           <DropdownMenuItem
             key={idx}
             className="text-[12px] tracking-widest text-textNc"
-            onClick={() => handleOptimisticStatus(task.id, data.name)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleOptimisticStatus(task.id, data.name);
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
           >
             <span>{data.svg}</span> {data.name}
           </DropdownMenuItem>

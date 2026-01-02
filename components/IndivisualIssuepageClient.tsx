@@ -110,6 +110,10 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     fetchIssue();
   }, [issueId, orgId, setTask]);
 
+  const handleOptimisticStatus = useTaskStore(
+    (state) => state.handleOptimisticStatus
+  );
+
   // Fetch proposal for this issue on mount
   useEffect(() => {
     if (!issueId) return;
@@ -123,7 +127,17 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
           return
         }
         const json = await res.json()
-        setProposal(json.proposal || null)
+        const proposalData = json.proposal || null
+        setProposal(proposalData)
+        
+        // If proposal exists and task status is draft, update to proposed
+        if (proposalData) {
+          const currentTask = tasks.find((t) => t.id === issueId);
+          if (currentTask && currentTask.status === "draft") {
+            // Use optimistic update to change status from draft to proposed
+            handleOptimisticStatus(issueId, "proposed");
+          }
+        }
       } catch (err) {
         console.error(err)
         setProposal(null)
@@ -131,7 +145,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     }
 
     fetchProposal()
-  }, [issueId]);
+  }, [issueId, tasks, handleOptimisticStatus]);
 
   useEffect(() => {
     const refreshedIssue = tasks.find((t) => t.id === issueId);

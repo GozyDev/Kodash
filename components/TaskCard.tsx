@@ -11,6 +11,7 @@ import { useState } from "react";
 import StatusCard from "./StatusCard";
 import Link from "next/link";
 import { useOrgIdStore } from "@/app/store/useOrgId";
+import { useTaskStore } from "@/app/store/useTask";
 import { useRouter } from "next/navigation";
 
 interface TaskCardProps {
@@ -23,6 +24,9 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
   const [openProposal, setOpenProposal] = useState(false);
 
   const orgId = useOrgIdStore((state) => state.orgId);
+  const handleOptimisticStatus = useTaskStore(
+    (state) => state.handleOptimisticStatus
+  );
   const getPriorityColor = (priority: Task["priority"]) => {
     switch (priority) {
       case "high":
@@ -65,28 +69,32 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
     ? `/dashboard/fr-org/${orgId}`
     : `/dashboard/cl-org/${orgId}`;
 
-  return (
-    // <Link href={`${basePath}/issue/${task.id}`}>
+  const handleCardClick = () => {
+    router.push(`${basePath}/issue/${task.id}`);
+  };
 
-    // </Link>
+  return (
     <motion.div
       className={`
           border rounded-lg p-4 cursor-pointer transition-all duration-200
           hover:shadow-md ${getStatusColor(task.status)}
         `}
-      onClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault()
-        router.push(`${basePath}/issue/${task.id}`);
-      }}
+      onClick={handleCardClick}
     >
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-2">
-            <div className={``}>
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
               <PriorityCard task={task} priority={task.priority}></PriorityCard>
             </div>
-            <div className="flex items-center">
+            <div 
+              className="flex items-center"
+              onClick={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
               <span className="text-sm font-medium text-textNc capitalize">
                 {task.status.toLowerCase()}
               </span>
@@ -110,30 +118,51 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                e.preventDefault()
                 setOpenProposal(true);
               }}
+              onMouseDown={(e) => e.stopPropagation()}
               className="text-sm bg-cardC py-1 px-3 mt-[20px] rounded-lg text-textNd"
             >
               Write Proposal
             </button>
           )}
 
-          <WriteProposalDialog
-            open={openProposal}
-            onOpenChange={setOpenProposal}
-            task={task}
-            onSubmit={(proposal) => {
-              const response = fetch("/api/proposal", {
-                method: "POST",
-                headers: { "Content-type": "application/json" },
-                body: JSON.stringify({ ...proposal, requestId: task.id }),
-              });
-              // setOpenProposal(false);
-            }}
-          />
+          <div onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+            <WriteProposalDialog
+              open={openProposal}
+              onOpenChange={setOpenProposal}
+              task={task}
+              onSubmit={async (proposal) => {
+                try {
+                  const response = await fetch("/api/proposal", {
+                    method: "POST",
+                    headers: { "Content-type": "application/json" },
+                    body: JSON.stringify({ ...proposal, requestId: task.id }),
+                  });
+                  
+                  if (response.ok) {
+                    // If proposal was created successfully and task is draft, update status to proposed
+                    if (task.status === "draft") {
+                      handleOptimisticStatus(task.id, "proposed");
+                    }
+                    setOpenProposal(false);
+                  } else {
+                    const error = await response.json();
+                    console.error("Failed to create proposal:", error);
+                  }
+                } catch (err) {
+                  console.error("Error creating proposal:", err);
+                }
+              }}
+            />
+          </div>
         </div>
-        <MoreHorizontal className="w-5 h-5 text-gray-400 flex-shrink-0" />
+        <div 
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          <MoreHorizontal className="w-5 h-5 text-gray-400 flex-shrink-0" />
+        </div>
       </div>
     </motion.div>
   );
