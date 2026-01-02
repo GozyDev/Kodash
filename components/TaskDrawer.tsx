@@ -25,6 +25,7 @@ import {
   Mic,
   MoveUp,
   Check,
+  Paperclip,
 } from "lucide-react";
 import { useTaskStore } from "@/app/store/useTask";
 import StatusCardCreate from "./StatusCardCreate";
@@ -401,15 +402,23 @@ export default function TaskDrawer({
 
                 {/* Attachments - optional */}
                 <div className="mb-6">
-                  <label className="text-xs text-textNd mb-2 block">
-                    Attachments <span className="text-textNb">(optional)</span>
-                  </label>
+                  {/* <label className="text-xs text-textNd mb-2 block">
+                    <div
+                      onDrop={handleDrop}
+                      onDragOver={handleDragOver}
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex items-center gap-2 text-textNd bg-cardICB/50 w-max py-1.5 px-5 rounded cursor-pointer"
+                    >
+                      <Paperclip className="h-3 w-3" />
+                      <h3 className="text-sm font-medium">Attachment</h3>
+                    </div>
+                  </label> */}
 
                   <div
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full border-2 border-dashed border-cardCB rounded-md px-4 py-6 bg-cardC/40 text-center cursor-pointer hover:bg-cardC/60"
+                    className=""
                   >
                     <input
                       ref={fileInputRef}
@@ -419,11 +428,9 @@ export default function TaskDrawer({
                       className="hidden"
                       onChange={handleFileInputChange}
                     />
-                    <div className="text-sm text-textNd font-medium">
-                      Add files or drag and drop
-                    </div>
-                    <div className="text-xs text-textNb mt-1">
-                      pdf, doc, docx, png, jpeg
+                    <div className="flex items-center gap-2 text-textNd bg-cardICB/50 w-max py-1.5 px-5 rounded cursor-pointer">
+                      <Paperclip className="h-3 w-3" />
+                      <h3 className="text-sm font-medium">Attachment</h3>
                     </div>
                   </div>
 
@@ -439,34 +446,44 @@ export default function TaskDrawer({
                               key={`${file.name}-${idx}`}
                               className="flex items-center justify-between bg-cardC/50 border border-cardCB rounded px-3 py-2 text-sm"
                             >
-                                <div
-                                  onClick={() => att.preview && window.open(att.preview, "_blank")}
-                                  className="flex items-center gap-3 truncate cursor-pointer"
-                                  role="button"
-                                  aria-label={`Open ${file.name} in new tab`}
+                              <div
+                                onClick={() =>
+                                  att.preview &&
+                                  window.open(att.preview, "_blank")
+                                }
+                                className="flex items-center gap-3 truncate cursor-pointer"
+                                role="button"
+                                aria-label={`Open ${file.name} in new tab`}
+                              >
+                                <div className="w-24 h-20 flex-shrink-0 bg-cardC/20 rounded overflow-hidden flex items-center justify-center">
+                                  <img
+                                    src={att.preview}
+                                    alt={file.name}
+                                    className="w-full h-full object-contain"
+                                  />
+                                </div>
+                                <div className="truncate">
+                                  <div className="font-medium text-textNb truncate">
+                                    {file.name}
+                                  </div>
+                                  <div className="text-xs text-textNd">
+                                    {formatBytes(file.size)}
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRemoveAttachment(idx);
+                                  }}
+                                  className="h-7 w-7 p-0"
                                 >
-                                  <div className="w-24 h-20 flex-shrink-0 bg-cardC/20 rounded overflow-hidden flex items-center justify-center">
-                                    <img
-                                      src={att.preview}
-                                      alt={file.name}
-                                      className="w-full h-full object-contain"
-                                    />
-                                  </div>
-                                  <div className="truncate">
-                                    <div className="font-medium text-textNb truncate">{file.name}</div>
-                                    <div className="text-xs text-textNd">{formatBytes(file.size)}</div>
-                                  </div>
-                                </div>
-                                <div>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={(e) => { e.stopPropagation(); handleRemoveAttachment(idx); }}
-                                    className="h-7 w-7 p-0"
-                                  >
-                                    <X className="w-4 h-4" />
-                                  </Button>
-                                </div>
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </div>
                             </div>
                           );
                         }
@@ -477,19 +494,29 @@ export default function TaskDrawer({
                             className="flex items-center justify-between bg-cardC/50 border border-cardCB rounded px-3 py-2 text-sm"
                           >
                             <div
-                              onClick={() => att.preview && window.open(att.preview, "_blank")}
+                              onClick={() =>
+                                att.preview &&
+                                window.open(att.preview, "_blank")
+                              }
                               className="truncate mr-3 cursor-pointer"
                               role="button"
                               aria-label={`Open ${file.name} in new tab`}
                             >
-                              <div className="font-medium text-textNb truncate">{file.name}</div>
-                              <div className="text-xs text-textNd">{formatBytes(file.size)}</div>
+                              <div className="font-medium text-textNb truncate">
+                                {file.name}
+                              </div>
+                              <div className="text-xs text-textNd">
+                                {formatBytes(file.size)}
+                              </div>
                             </div>
                             <div>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={(e) => { e.stopPropagation(); handleRemoveAttachment(idx); }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemoveAttachment(idx);
+                                }}
                                 className="h-7 w-7 p-0"
                               >
                                 <X className="w-4 h-4" />
