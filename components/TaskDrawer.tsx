@@ -53,7 +53,7 @@ export default function TaskDrawer({
     title: "",
     description: "",
     priority: "no priority" as Task["priority"],
-    status: "to-do" as Task["status"],
+    status: "draft" as Task["status"],
     due_date: "",
   });
 
@@ -128,7 +128,7 @@ export default function TaskDrawer({
     setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, abort } : a)));
 
     try {
-      const res = await promise;
+      const res: any = await promise;
       setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, status: "uploaded", progress: 100, file_id: res.file_id, file_url: res.file_url, file_name: res.file_name, abort: undefined } : a)));
     } catch (err) {
       setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, status: "failed", abort: undefined } : a)));
@@ -253,7 +253,7 @@ export default function TaskDrawer({
         title: "",
         description: "",
         priority: "no priority",
-        status: initialStatus || "to-do",
+        status: initialStatus || "draft",
         due_date: "",
       });
     }
@@ -396,23 +396,29 @@ export default function TaskDrawer({
     }
   };
 
-  const getStatusIcon = (status: Task["status"]) => {
+  const getStatusIcon = (status: any) => {
     switch (status) {
+      case "draft":
       case "to-do":
         return <Circle className="w-3.5 h-3.5" />;
+      case "active":
       case "in-progress":
         return <Minus className="w-3.5 h-3.5 rotate-90" />;
+      case "complete":
       case "done":
         return <Circle className="w-3.5 h-3.5 fill-current" />;
     }
   };
 
-  const getStatusColor = (status: Task["status"]) => {
+  const getStatusColor = (status: any) => {
     switch (status) {
+      case "draft":
       case "to-do":
         return "bg-gray-500/10 text-gray-400 border-gray-500/20 hover:bg-gray-500/20";
+      case "active":
       case "in-progress":
         return "bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20";
+      case "complete":
       case "done":
         return "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20";
     }
@@ -759,9 +765,9 @@ export default function TaskDrawer({
                               Status
                             </label>
                             <div className="text-sm text-textNb bg-cardC/50 border border-cardCB rounded px-3 py-2 capitalize">
-                              {aiParsedData.status === "to-do"
+                              {aiParsedData.status === "to-do" || aiParsedData.status === "draft"
                                 ? "Todo"
-                                : aiParsedData.status === "in-progress"
+                                : aiParsedData.status === "in-progress" || aiParsedData.status === "active"
                                 ? "In Progress"
                                 : "Done"}
                             </div>
