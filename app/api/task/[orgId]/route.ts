@@ -101,8 +101,9 @@ export async function POST(
       const uniqueInserts: Array<{
         request_id: string;
         file_url: string;
-        file_type: string;
-        file_size: number;
+        file_type: string | null;
+        file_size: number | null;
+        file_name?: string | null;
       }> = [];
 
       for (const a of attachments) {
@@ -114,6 +115,7 @@ export async function POST(
           file_url: a.file_url,
           file_type: a.file_type || null,
           file_size: a.file_size || null,
+          file_name: a.file_name || null,
         });
       }
 

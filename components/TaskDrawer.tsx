@@ -57,7 +57,7 @@ export default function TaskDrawer({
     due_date: "",
   });
 
-  console.log(formData);
+
   const handleCreateTask = useTaskStore((state) => state.handleCreateTask);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -82,6 +82,7 @@ export default function TaskDrawer({
     progress?: number;
     file_id?: string;
     file_url?: string;
+    file_name?: string;
     abort?: () => void;
   };
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -128,7 +129,7 @@ export default function TaskDrawer({
 
     try {
       const res = await promise;
-      setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, status: "uploaded", progress: 100, file_id: res.file_id, file_url: res.file_url, abort: undefined } : a)));
+      setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, status: "uploaded", progress: 100, file_id: res.file_id, file_url: res.file_url, file_name: res.file_name, abort: undefined } : a)));
     } catch (err) {
       setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, status: "failed", abort: undefined } : a)));
     }
@@ -315,6 +316,7 @@ export default function TaskDrawer({
       file_url: a.file_url as string,
       file_type: a.file.type,
       file_size: a.file.size,
+      file_name: a.file_name || a.file.name,
     }));
 
   const handleSendAI = async () => {

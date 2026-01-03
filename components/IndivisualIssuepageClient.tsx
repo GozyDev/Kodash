@@ -46,6 +46,13 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [proposal, setProposal] = useState<Proposal | null>(null);
+  const [attachments, setAttachments] = useState<{
+    file_url: string;
+    file_type: string | null;
+    file_size: number | null;
+    file_name?: string | null;
+  }[]>([]);
+  const [attachmentsLoading, setAttachmentsLoading] = useState(true);
 
   const handleOptimisticTitle = useTaskStore(
     (state) => state.handleOptimisticTitle
@@ -109,6 +116,36 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
 
     fetchIssue();
   }, [issueId, orgId, setTask]);
+
+  // Load attachments for this request (read-only)
+  useEffect(() => {
+    if (!issueId) return;
+    let mounted = true;
+    const fetchAttachments = async () => {
+      setAttachmentsLoading(true);
+      try {
+        const res = await fetch(`/api/request_attachments/${issueId}`);
+        if (!res.ok) {
+          console.error("Failed to load attachments");
+          if (mounted) setAttachments([]);
+          return;
+        }
+        const json = await res.json();
+        if (mounted) setAttachments(Array.isArray(json) ? json : []);
+      } catch (err) {
+        console.error(err);
+        if (mounted) setAttachments([]);
+      } finally {
+        if (mounted) setAttachmentsLoading(false);
+      }
+    };
+
+    fetchAttachments();
+
+    return () => {
+      mounted = false;
+    };
+  }, [issueId]);
 
   const handleOptimisticStatus = useTaskStore(
     (state) => state.handleOptimisticStatus
@@ -239,37 +276,51 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
                 <h3 className="text-sm font-medium">Attachment</h3>
               </div>
             </div>
+            <div className="mt-3">
+              {attachmentsLoading ? (
+                <div className="flex items-center gap-2 text-sm text-textNd">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Loading attachments...</span>
+                </div>
+              ) : attachments.length === 0 ? (
+                <div className="text-sm text-textNc">No attachments.</div>
+              ) : (
+                <ul className="space-y-2 text-sm">
+                  {attachments.map((a, idx) => {
+                    const isImage = !!a.file_type && a.file_type.startsWith("image/");
+                    return (
+                      <li key={`${a.file_url}-${idx}`} className="flex items-center justify-between bg-cardC/50 border border-cardCB rounded px-3 py-2 text-sm">
+                        <div className="flex items-center gap-3 truncate">
+                          {isImage ? (
+                            <div className="w-24 h-20 flex-shrink-0 bg-cardC/20 rounded overflow-hidden flex items-center justify-center">
+                              <img src={a.file_url} alt={a.file_name || "attachment"} className="w-full h-full object-contain" />
+                            </div>
+                          ) : (
+                            <div className="w-24 h-20 flex-shrink-0 bg-cardC/20 rounded flex items-center justify-center text-xs text-textNd">
+                              <Paperclip />
+                            </div>
+                          )}
 
-            {/* <div className="mt-3 space-y-3">
-              {links.length === 0 ? null : (
-                <ul className="space-y-2 text-sm text-primary underline">
-                  {links.map((link, idx) => (
-                    <li key={`${link}-${idx}`}>
-                      <a href={link} target="_blank" rel="noreferrer">
-                        {link}
-                      </a>
-                    </li>
-                  ))}
+                          <div className="truncate">
+                            <div className="font-medium text-textNb truncate">{a.file_name || a.file_url}</div>
+                            <div className="text-xs text-textNd">
+                              {a.file_type ? `${a.file_type} • ` : ""}
+                              {a.file_size !== null && a.file_size !== undefined
+                                ? `${(a.file_size / 1024).toFixed(2)} KB`
+                                : ""}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <a href={a.file_url} target="_blank" rel="noreferrer" className="text-primary underline text-sm">Open</a>
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
-
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <Input
-                  placeholder="https://example.com"
-                  value={linkDraft}
-                  onChange={(e) => setLinkDraft(e.target.value)}
-                  className="bg-cardICB/20"
-                />
-                <Button
-                  size="sm"
-                  className="butt flex"
-                  onClick={handleAddLink}
-                  disabled={!linkDraft.trim()}
-                >
-                  Add link
-                </Button>
-              </div>
-            </div> */}
+            </div>
           </section>
 
           {/* Proposal */}

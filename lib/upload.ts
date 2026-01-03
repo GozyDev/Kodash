@@ -1,7 +1,7 @@
 export function uploadFile(file: File, onProgress?: (p: number) => void, clientId?: string) {
   let xhr: XMLHttpRequest | null = new XMLHttpRequest();
 
-  const promise: Promise<{ file_id: string; file_url: string }> = new Promise(
+  const promise: Promise<{ file_id: string; file_url: string; file_name?: string }> = new Promise(
     (resolve, reject) => {
       const url = "/api/files/upload";
 
@@ -18,7 +18,7 @@ export function uploadFile(file: File, onProgress?: (p: number) => void, clientI
         try {
           const resp = JSON.parse(xhr!.responseText || "{}");
           if (xhr!.status >= 200 && xhr!.status < 300) {
-            resolve({ file_id: resp.file_id, file_url: resp.file_url });
+            resolve({ file_id: resp.file_id, file_url: resp.file_url, file_name: resp.file_name });
           } else {
             reject(new Error(resp.error || "Upload failed"));
           }

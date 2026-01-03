@@ -38,7 +38,7 @@ export async function POST(req: Request) {
 
     const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(uploadData.path);
 
-    return NextResponse.json({ file_id: uploadData.path, file_url: publicUrlData.publicUrl });
+    return NextResponse.json({ file_id: uploadData.path, file_url: publicUrlData.publicUrl, file_name: file.name });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: (err as Error).message || "Upload failed" }, { status: 500 });
