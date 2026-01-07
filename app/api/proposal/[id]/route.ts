@@ -12,7 +12,7 @@ export async function GET(
     // Fetch proposal for this issue
     const { data, error } = await supabase
       .from("request_proposal")
-      .select("id, price, currency, due_date, dod")
+      .select("id, price, currency, due_date, dod,status")
       .eq("request_id", issueId)
       .limit(1);
 

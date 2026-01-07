@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Kodash
 
-## Getting Started
+Kodash is a multi-tenant, workspace-based productivity system built with Next.js and Supabase. Each workspace acts as its own isolated environment, making it ideal for client work, product management, or personal projects. You begin by creating issues, and only when you need structure do you group them into projects. The workflow stays clean, fast, and flexible.
 
-First, run the development server:
+What Makes Kodash Different
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Traditional tools like Linear and Asana are built for internal teams. Kodash flips the model. Every workspace represents a client, a product, or a personal environment. You are never forced into project-first workflows. You capture issues immediately and structure them later when it matters.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Core Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Multi-Tenant Architecture
+Every workspace is fully isolated using Supabase Row-Level Security. Perfect for freelancers, agencies, or builders managing multiple clients or products.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Issue-First Workflow
+Issues come first. They can be tasks, bugs, ideas, or notes. Add statuses, priorities, tags, and descriptions. Assign them to a project only when you want organization.
 
-## Learn More
+Projects as Optional Structure
+Projects start empty. When you are ready, you can group specific issues under goals, releases, features, or milestones. Issues live independently and projects simply act as containers.
 
-To learn more about Next.js, take a look at the following resources:
+Workspace-Level Membership
+Users are added to specific workspaces, not globally. Boundaries stay clean and controlled.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Dashboard Overview
+A simple view of recent issues, statuses, and active projects inside each workspace. Light analytics planned.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Responsive Interface
+Designed with TailwindCSS for a clean, modern, and accessible interface across all devices.
 
-## Deploy on Vercel
+Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Next.js (App Router)
+Supabase (Auth, Postgres, RLS)
+TailwindCSS
+TypeScript
+ShadCN UI (planned)
+Framer Motion (planned)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Current Status
+
+Kodash is actively under development. Multi-tenant routing is being refined, workspace isolation is being strengthened with RLS, issue and project flows are being polished, and the UI is undergoing continuous iteration.
+
+Vision
+
+Kodash aims to be the simplest workspace-first productivity system for managing client projects, personal tools, multi-product pipelines, or small teams. No forced structure. No clutter. Just a flexible issue-first environment you can shape around your work.

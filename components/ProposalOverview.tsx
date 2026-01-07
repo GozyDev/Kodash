@@ -116,14 +116,14 @@ export default function ProposalOverview({
           {/* Action buttons visible only to CLIENT role */}
           {role === "client" && (
             <div className="flex items-center gap-2">
-              <Button
+              {/* <Button
                 variant="secondary"
                 size="sm"
-               className="h-8 px-3 text-xs bg-[#f9be00]/40 hover:bg-[#f9be00]/30 text-whiten rounded"
+                className="h-8 px-3 text-xs bg-[#f9be00]/40 hover:bg-[#f9be00]/30 text-whiten rounded"
               >
-                {/* Dispute - neutral/draft styling */}
+                
                 Dispute
-              </Button>
+              </Button> */}
 
               <Button
                 variant="destructive"
@@ -167,6 +167,16 @@ export default function ProposalOverview({
             <MoreVertical className="h-4 w-4" />
           </Button> */}
         </div>
+      </div>
+
+      <div className="text-xs text-textNc">
+        {proposal.status === "pending" ? (
+          <span className="bg-cardICB/50 py-1 p-2 rounded">{proposal.status}</span>
+        ) : proposal.status === "accepted" ? (
+          <span className="bg-green-800/50 py-1 p-2 rounded">{proposal.status}</span>
+        ) : (
+          <span className="bg-red-800/50 py-1 p-2 rounded">{proposal.status}</span>
+        )}
       </div>
 
       {/* Summary Cards */}

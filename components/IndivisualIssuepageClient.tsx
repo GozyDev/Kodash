@@ -87,6 +87,7 @@ export type Proposal = {
   currency: string | null;
   due_date: string | null;
   dod: string | null;
+  status: "pending" | "canceled" | "accepted";
 };
 
 type Props = {
@@ -410,7 +411,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
           )}
         </div>
 
-        <aside className="space-y-4  h-max sticky top-[100px]">
+        <aside className="space-y-4  h-max md:sticky top-[100px] right-6">
           <section className="rounded-xl border border-cardCB bg-cardC p-4">
             <div className="flex items-start justify-between">
               <div>
