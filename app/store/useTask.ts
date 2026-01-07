@@ -47,22 +47,16 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       return;
     }
 
-    set((state) => ({
-      task: [data, ...state.task],
-    }));
+    // Do NOT update local state here. The UI should update when the
+    // subscription (read-time updates) emits the new task. Leaving the
+    // server-created task in `data` for callers if needed.
   },
 
   handleOptimisticPriority: async (id, newPriority) => {
     const orgId = useOrgIdStore.getState().orgId; // 🔥 FIXED
 
-    const backup = [...get().task];
-
-    set((state) => ({
-      task: state.task.map((t) =>
-        t.id === id ? { ...t, priority: newPriority } : t
-      ),
-    }));
-
+    // Do not update local state here. The UI should update when the
+    // realtime subscription emits the updated task row.
     const res = await fetch(`/api/task/${orgId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -70,20 +64,16 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     });
 
     if (!res.ok) {
-      console.error("DB failed. Reverting.");
-      set({ task: backup });
+      const err = await res.json().catch(() => null);
+      console.error("DB failed to update priority:", err?.error || res.statusText);
     }
   },
 
   handleOptimisticStatus: async (id, newStatus) => {
     const orgId = useOrgIdStore.getState().orgId;
-    const backupRevert = [...get().task];
-    set((state) => ({
-      task: state.task.map((t) =>
-        t.id === id ? { ...t, status: newStatus } : t
-      ),
-    }));
 
+    // Do not update local state here. The UI should update when the
+    // realtime subscription emits the updated task row.
     const res = await fetch(`/api/task/${orgId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -91,8 +81,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     });
 
     if (!res.ok) {
-      console.error("DB failed. Reverting.");
-      set({ task: backupRevert });
+      const err = await res.json().catch(() => null);
+      console.error("DB failed to update status:", err?.error || res.statusText);
     }
   },
 

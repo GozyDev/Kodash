@@ -9,6 +9,7 @@ import TaskFilters from "@/components/TaskFilters";
 import TaskDrawer from "@/components/TaskDrawer";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
+import { createClient } from "@supabase/supabase-js";
 
 export default function TaskClient({
   orgId,
@@ -55,6 +56,76 @@ export default function TaskClient({
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
+
+  useEffect(() => {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY  !
+    );
+    const channel = supabase
+      .channel("task-channel")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "tasks" },
+        (payload) => {
+          try {
+            const newTask = payload.new as Task;
+            const current = useTaskStore.getState().task;
+
+            // If we already have this task, replace it; otherwise insert at top
+            const exists = current.some((t) => t.id === newTask.id);
+            const next = exists
+              ? [newTask, ...current.filter((t) => t.id !== newTask.id)]
+              : [newTask, ...current];
+            useTaskStore.setState({ task: next });
+
+            console.log("new task received via subscription:", newTask.id);
+          } catch (e) {
+            console.error("Failed handling task insert payload", e);
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "tasks" },
+        (payload) => {
+          try {
+            const updated = payload.new as Task;
+            const current = useTaskStore.getState().task;
+
+            // Replace existing task if present, otherwise insert
+            const exists = current.some((t) => t.id === updated.id);
+            const next = exists
+              ? current.map((t) => (t.id === updated.id ? updated : t))
+              : [updated, ...current];
+            useTaskStore.setState({ task: next });
+
+            console.log("task updated via subscription:", updated.id);
+          } catch (e) {
+            console.error("Failed handling task update payload", e);
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "tasks" },
+        (payload) => {
+          try {
+            const removed = payload.old as Task;
+            const current = useTaskStore.getState().task;
+            useTaskStore.setState({ task: current.filter((t) => t.id !== removed.id) });
+            console.log("task removed via subscription:", removed.id);
+          } catch (e) {
+            console.error("Failed handling task delete payload", e);
+          }
+        }
+      )
+      .subscribe((status) => console.log(status));
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   // Apply filters
   useEffect(() => {
