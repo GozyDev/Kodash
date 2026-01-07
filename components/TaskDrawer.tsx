@@ -836,9 +836,22 @@ export default function TaskDrawer({
                   </Button>
                   {userRole === "client" && (
                     <Button
-                      onClick={() =>
-                        handleCreateTask({ ...formData, attachments: uploadedAttachments })
-                      }
+                      onClick={async () => {
+                        if (!formData.title.trim() || isSaving || isAnyUploading) return;
+                        try {
+                          setIsSaving(true);
+                          await handleCreateTask({ ...formData, attachments: uploadedAttachments });
+                          setIsSaving(false);
+
+                          // Close drawer only after creating a NEW task (when `task` is null)
+                          if (!task) {
+                            handleClose();
+                          }
+                        } catch (e) {
+                          console.error("Failed creating task", e);
+                          setIsSaving(false);
+                        }
+                      }}
                       disabled={!formData.title.trim() || isSaving || isAnyUploading}
                       className="h-7 px-3 text-xs butt"
                     >

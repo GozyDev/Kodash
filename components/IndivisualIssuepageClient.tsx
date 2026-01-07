@@ -302,7 +302,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
   return (
     <div className=" text-textNb">
       <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_320px]">
-        <div className="space-y-8 pb-6 px-6">
+        <div className="space-y-8 pb-6 px-3 lg:px-6">
           <div className="bg-cardC w-full h-[40px]"></div>
           <header className="mb-6 space-y-6 rounded">
             <Input
@@ -337,12 +337,20 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
               ) : (
                 <ul className="space-y-2 text-sm">
                   {attachments.map((a, idx) => {
-                    const isImage =
-                      !!a.file_type && a.file_type.startsWith("image/");
+                    const isImage = !!a.file_type && a.file_type.startsWith("image/");
                     return (
                       <li
                         key={`${a.file_url}-${idx}`}
-                        className="flex items-center justify-between bg-cardC/50 border border-cardCB rounded px-3 py-2 text-sm"
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => window.open(a.file_url, "_blank")}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            window.open(a.file_url, "_blank");
+                          }
+                        }}
+                        className="flex items-center justify-between bg-cardC/50 border border-cardCB rounded px-3 py-2 text-sm cursor-pointer"
                       >
                         <div className="flex items-center gap-3 truncate">
                           {isImage ? (
@@ -372,16 +380,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
                           </div>
                         </div>
 
-                        <div>
-                          <a
-                            href={a.file_url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-primary underline text-sm"
-                          >
-                            Open
-                          </a>
-                        </div>
+                        {/* Removed the explicit Open link. Clicking the item opens the file in a new tab. */}
                       </li>
                     );
                   })}
@@ -411,7 +410,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
           )}
         </div>
 
-        <aside className="space-y-4  h-max md:sticky top-[100px] right-6">
+        <aside className="space-y-4 px-3 lg:px-6  h-max md:sticky top-[100px] right-6">
           <section className="rounded-xl border border-cardCB bg-cardC p-4">
             <div className="flex items-start justify-between">
               <div>
