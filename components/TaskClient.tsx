@@ -1,6 +1,7 @@
 // app/tasks/page.tsx
 "use client";
 import { useTaskStore } from "@/app/store/useTask";
+import { useOrgIdStore } from "@/app/store/useOrgId";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Task, TaskInsert, TaskUpdate } from "@/lib/superbase/type";
@@ -10,6 +11,7 @@ import TaskDrawer from "@/components/TaskDrawer";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
+
 
 export default function TaskClient({
   orgId,
@@ -36,6 +38,17 @@ export default function TaskClient({
   //   // Fetch tasks
   const fetchTasks = useCallback(async () => {
     try {
+      // If the client store already has tasks for this org, skip network call.
+      const current = useTaskStore.getState().task;
+      const currentOrg = useOrgIdStore.getState().orgId;
+
+      // Ensure the store's orgId matches and there is cached data
+      if (current && current.length > 0 && currentOrg === orgId) {
+        // Just set loading false; filtered tasks will be derived from store
+        setLoading(false);
+        return;
+      }
+
       const res = await fetch(`/api/task/${orgId}`);
 
       if (!res.ok) {
@@ -51,6 +64,11 @@ export default function TaskClient({
     } finally {
       setLoading(false);
     }
+  }, [orgId]);
+
+  // keep the global orgId in sync so other components can use it when checking cache
+  useEffect(() => {
+    useOrgIdStore.getState().setOrgId(orgId);
   }, [orgId]);
 
   useEffect(() => {
@@ -86,6 +104,7 @@ export default function TaskClient({
         }
       )
       .on(
+
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "tasks" },
         (payload) => {
