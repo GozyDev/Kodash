@@ -108,7 +108,7 @@ export default function TaskClient({
           event: "UPDATE",
           schema: "public",
           table: "tasks",
-          filter: `id=eq.${orgId}`,
+          
         },
         (payload) => {
           try {

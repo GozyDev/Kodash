@@ -1,43 +1,33 @@
 "use client";
 
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useOrgIdStore } from "@/app/store/useOrgId";
 import { useTaskStore } from "@/app/store/useTask";
 import StatusCard from "./StatusCard";
 import PriorityCard from "./piortyCard";
-import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
   LinkIcon,
   Loader2,
-  MessageSquare,
   Paperclip,
-  Plus,
 } from "lucide-react";
 import { Task, Comment } from "@/lib/superbase/type";
-// view-only page — single issue state (no inline editing)
 import CommentSection from "./CommentSection";
 import ProposalOverview from "./ProposalOverview";
-import { Textarea } from "./ui/textarea";
 
 // Small helper component for description viewing/editing
 function DescriptionViewer({
   text,
-  onChange,
   limit = 300,
-  editable = true,
 }: {
   text: string;
-  onChange: (v: string) => void;
   limit?: number;
-  editable?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
 
   const needsToggle = useMemo(() => {
-    return text && text.length > limit;
+    return !!text && text.length > limit;
   }, [text, limit]);
 
   const truncated = useMemo(() => {
@@ -46,37 +36,20 @@ function DescriptionViewer({
   }, [text, limit]);
 
   return (
-    <div>
-      {isEditing ? (
-        <Textarea
-          value={text}
-          onChange={(e: any) => onChange(e.target.value)}
-          onBlur={() => setIsEditing(false)}
-          autoFocus
-          className="bg-transparent border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[60px] text-textNd"
-        />
-      ) : (
-        <div
-          className="whitespace-pre-wrap text-sm text-textNd"
-          onClick={() => editable && setIsEditing(true)}
-        >
-          <div>
-            {expanded || !needsToggle ? text : `${truncated.trimEnd()}...`}
-          </div>
+    <div className="whitespace-pre-wrap text-sm text-textNd">
+      <div>{expanded || !needsToggle ? text : `${truncated.trimEnd()}...`}</div>
 
-          {needsToggle && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpanded((s) => !s);
-              }}
-              className="mt-2 text-sm text-textNc bg-cardC p-2  rounded cursor-pointer"
-              aria-expanded={expanded}
-            >
-              {expanded ? "Show less" : "Show more"}
-            </button>
-          )}
-        </div>
+      {needsToggle && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setExpanded((s) => !s);
+          }}
+          className="mt-2 text-sm text-textNc bg-cardC p-2  rounded cursor-pointer"
+          aria-expanded={expanded}
+        >
+          {expanded ? "Show less" : "Show more"}
+        </button>
       )}
     </div>
   );
@@ -103,10 +76,6 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
 
   const [issue, setIssue] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const [linkDraft, setLinkDraft] = useState("");
-  const [links, setLinks] = useState<string[]>([]);
-  // All UI reads/writes come from `issue` single state (view-only)
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [attachments, setAttachments] = useState<
     {
@@ -118,7 +87,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
   >([]);
   const [attachmentsLoading, setAttachmentsLoading] = useState(true);
 
-  // no inline editing on this page — optimistic handlers not used here
+  // keep single-source state: `issue` drives all displayed values
 
   useEffect(() => {
     setOrgId(orgId);
@@ -139,7 +108,10 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
         if (!res.ok) throw new Error("Unable to load issue");
         const data = await res.json();
         setIssue(data);
-        if (data && (tasks.length === 0 || !tasks.some((task) => task.id === data.id))) {
+        if (
+          data &&
+          (tasks.length === 0 || !tasks.some((task) => task.id === data.id))
+        ) {
           setTask([...tasks, data]);
         }
       } catch (error) {
@@ -152,7 +124,6 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
 
     fetchIssue();
   }, [issueId, orgId, setTask, tasks]);
-
 
   // Load attachments for this request (read-only)
   useEffect(() => {
@@ -227,7 +198,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     }
   }, [issueId, tasks]);
 
-  // Subscribe to realtime changes for this specific issue and update local/global state
+  // Subscribe to realtime updates for this specific issue and update local/global state
   useEffect(() => {
     if (!issueId) return;
 
@@ -237,21 +208,24 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     );
 
     const channel = supabase
-      .channel(`task-${issueId}`)
+      .channel(`issue-${issueId}`)
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "tasks", filter: `id=eq.${issueId}` },
         (payload) => {
           try {
             const updated = payload.new as Task;
+            // update local single-source state
             setIssue(updated);
 
+            // update global store
             const current = useTaskStore.getState().task;
             const exists = current.some((t) => t.id === updated.id);
             const next = exists
               ? current.map((t) => (t.id === updated.id ? updated : t))
               : [updated, ...current];
             useTaskStore.setState({ task: next });
+            console.log("issue updated via realtime:", updated.id);
           } catch (e) {
             console.error("Failed handling task update payload", e);
           }
@@ -266,6 +240,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
             setIssue(null);
             const current = useTaskStore.getState().task;
             useTaskStore.setState({ task: current.filter((t) => t.id !== removed.id) });
+            console.log("issue deleted via realtime:", removed.id);
           } catch (e) {
             console.error("Failed handling task delete payload", e);
           }
@@ -278,12 +253,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     };
   }, [issueId]);
 
-
-  const handleAddLink = () => {
-    if (!linkDraft.trim()) return;
-    setLinks((prev) => [...prev, linkDraft.trim()]);
-    setLinkDraft("");
-  };
+  // No inline editing or debounced updates on this view-only page.
 
   if (loading) {
     return (
@@ -309,7 +279,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
           <div className="bg-cardC w-full h-[40px]"></div>
           <header className="mb-6 space-y-6 rounded">
             <Input
-              value={issue?.title || ""}
+              value={issue.title}
               readOnly
               className="text-xl font-semibold bg-transparent border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto"
               placeholder="Issue title..."
@@ -318,11 +288,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
               {/* Description display with expandable/collapsible behavior */}
               {/* Show Textarea for editing when focused; otherwise show truncated text with toggle */}
               {/** Local UI state manages expansion and edit mode */}
-              <DescriptionViewer
-                text={issue?.description || ""}
-                onChange={(_v: string) => {}}
-                editable={false}
-              />
+              <DescriptionViewer text={issue.description || ""} />
             </div>
           </header>
 
