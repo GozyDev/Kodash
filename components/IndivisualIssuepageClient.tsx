@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
+import { createClient } from "@supabase/supabase-js";
 import { useOrgIdStore } from "@/app/store/useOrgId";
 import { useTaskStore } from "@/app/store/useTask";
 import StatusCard from "./StatusCard";
@@ -15,7 +16,7 @@ import {
   Plus,
 } from "lucide-react";
 import { Task, Comment } from "@/lib/superbase/type";
-import useDebounce from "@/app/hooks/useDebounce";
+// view-only page — single issue state (no inline editing)
 import CommentSection from "./CommentSection";
 import ProposalOverview from "./ProposalOverview";
 import { Textarea } from "./ui/textarea";
@@ -105,8 +106,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
 
   const [linkDraft, setLinkDraft] = useState("");
   const [links, setLinks] = useState<string[]>([]);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  // All UI reads/writes come from `issue` single state (view-only)
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [attachments, setAttachments] = useState<
     {
@@ -118,16 +118,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
   >([]);
   const [attachmentsLoading, setAttachmentsLoading] = useState(true);
 
-  const handleOptimisticTitle = useTaskStore(
-    (state) => state.handleOptimisticTitle
-  );
-  const handleOptimisticDescription = useTaskStore(
-    (state) => state.handleOptimisticDescription
-  );
-
-  // Debounce refs
-  const debouncedTitle = useDebounce(title, 500);
-  const debouncedDescription = useDebounce(description, 500);
+  // no inline editing on this page — optimistic handlers not used here
 
   useEffect(() => {
     setOrgId(orgId);
@@ -137,10 +128,6 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     const existing = tasks.find((t) => t.id === issueId);
     if (existing) {
       setIssue(existing);
-      if (!title && !description) {
-        setTitle(existing.title);
-        setDescription(existing.description || "");
-      }
       setLoading(false);
       return;
     }
@@ -152,14 +139,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
         if (!res.ok) throw new Error("Unable to load issue");
         const data = await res.json();
         setIssue(data);
-        if (!title && !description) {
-          setTitle(data.title);
-          setDescription(data.description || "");
-        }
-        if (
-          data &&
-          (tasks.length === 0 || !tasks.some((task) => task.id === data.id))
-        ) {
+        if (data && (tasks.length === 0 || !tasks.some((task) => task.id === data.id))) {
           setTask([...tasks, data]);
         }
       } catch (error) {
@@ -171,7 +151,8 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     };
 
     fetchIssue();
-  }, [issueId, orgId, setTask, tasks, title, description]);
+  }, [issueId, orgId, setTask, tasks]);
+
 
   // Load attachments for this request (read-only)
   useEffect(() => {
@@ -243,38 +224,60 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
     const refreshedIssue = tasks.find((t) => t.id === issueId);
     if (refreshedIssue) {
       setIssue(refreshedIssue);
-      console.log("runnnng");
-      console.log(refreshedIssue.title);
-      console.log(title);
-
-      // Only sync local state if user is not actively editing
-      if (refreshedIssue.title !== title) {
-        setTitle(refreshedIssue.title);
-        console.log("setting title");
-      }
-      if ((refreshedIssue.description || "") !== description) {
-        setDescription(refreshedIssue.description || "");
-      }
     }
   }, [issueId, tasks]);
 
-  // Debounced title update
+  // Subscribe to realtime changes for this specific issue and update local/global state
   useEffect(() => {
-    if (!issue) return;
-    if (!debouncedTitle.trim()) return;
-    if (issue.title === debouncedTitle) return;
-    handleOptimisticTitle(issue.id, debouncedTitle.trim());
-  }, [debouncedTitle, issue]);
+    if (!issueId) return;
 
-  // Debounced description update
-  useEffect(() => {
-    if (!issue) return;
-    if (!debouncedDescription) return;
-    const descValue = debouncedDescription.trim() || null;
-    if (descValue === issue.description) return;
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+    );
 
-    handleOptimisticDescription(issue.id, descValue);
-  }, [debouncedDescription, issue]);
+    const channel = supabase
+      .channel(`task-${issueId}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "tasks", filter: `id=eq.${issueId}` },
+        (payload) => {
+          try {
+            const updated = payload.new as Task;
+            setIssue(updated);
+
+            const current = useTaskStore.getState().task;
+            const exists = current.some((t) => t.id === updated.id);
+            const next = exists
+              ? current.map((t) => (t.id === updated.id ? updated : t))
+              : [updated, ...current];
+            useTaskStore.setState({ task: next });
+          } catch (e) {
+            console.error("Failed handling task update payload", e);
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "tasks", filter: `id=eq.${issueId}` },
+        (payload) => {
+          try {
+            const removed = payload.old as Task;
+            setIssue(null);
+            const current = useTaskStore.getState().task;
+            useTaskStore.setState({ task: current.filter((t) => t.id !== removed.id) });
+          } catch (e) {
+            console.error("Failed handling task delete payload", e);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [issueId]);
+
 
   const handleAddLink = () => {
     if (!linkDraft.trim()) return;
@@ -306,7 +309,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
           <div className="bg-cardC w-full h-[40px]"></div>
           <header className="mb-6 space-y-6 rounded">
             <Input
-              value={title}
+              value={issue?.title || ""}
               readOnly
               className="text-xl font-semibold bg-transparent border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto"
               placeholder="Issue title..."
@@ -316,8 +319,8 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
               {/* Show Textarea for editing when focused; otherwise show truncated text with toggle */}
               {/** Local UI state manages expansion and edit mode */}
               <DescriptionViewer
-                text={description}
-                onChange={(v: string) => setDescription(v)}
+                text={issue?.description || ""}
+                onChange={(_v: string) => {}}
                 editable={false}
               />
             </div>

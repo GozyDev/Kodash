@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 
-
 export default function TaskClient({
   orgId,
   userRole,
@@ -78,7 +77,7 @@ export default function TaskClient({
   useEffect(() => {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY  !
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
     );
     const channel = supabase
       .channel("task-channel")
@@ -104,9 +103,13 @@ export default function TaskClient({
         }
       )
       .on(
-
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "tasks" },
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "tasks",
+          filter: `id=eq.${orgId}`,
+        },
         (payload) => {
           try {
             const updated = payload.new as Task;
@@ -132,7 +135,9 @@ export default function TaskClient({
           try {
             const removed = payload.old as Task;
             const current = useTaskStore.getState().task;
-            useTaskStore.setState({ task: current.filter((t) => t.id !== removed.id) });
+            useTaskStore.setState({
+              task: current.filter((t) => t.id !== removed.id),
+            });
             console.log("task removed via subscription:", removed.id);
           } catch (e) {
             console.error("Failed handling task delete payload", e);
