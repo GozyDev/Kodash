@@ -2,6 +2,7 @@
 "use client";
 
 import { Task } from "@/lib/superbase/type";
+import { displayStatusForStatusCard } from "@/lib/status";
 import { motion, AnimatePresence } from "framer-motion";
 import TaskCard from "./TaskCard";
 import { useMemo, useState, useCallback } from "react";
@@ -23,15 +24,17 @@ export default function TaskList({
   const groups = useMemo(() => {
     const byStatus: Record<Task["status"], Task[]> = {
       draft: [],
-      proposed: [],
-      active: [],
+      propose: [],
+      "on-going": [],
       deliver: [],
       complete: [],
       cancel: [],
     } as Record<Task["status"], Task[]>;
 
     for (const t of tasks) {
-      if (byStatus[t.status]) byStatus[t.status].push(t);
+      // normalize stored status to present-tense for grouping (DB may store past-tense)
+      const present = displayStatusForStatusCard(t.status) as Task["status"];
+      if (byStatus[present]) byStatus[present].push(t);
     }
 
     return [
@@ -41,14 +44,14 @@ export default function TaskList({
         items: byStatus["draft"],
       },
       {
-        key: "proposed" as Task["status"],
+        key: "propose" as Task["status"],
         label: "Proposed",
-        items: byStatus["proposed"],
+        items: byStatus["propose"],
       },
       {
-        key: "active" as Task["status"],
-        label: "Active",
-        items: byStatus["active"],
+        key: "on-going" as Task["status"],
+        label: "On-going",
+        items: byStatus["on-going"],
       },
       {
         key: "deliver" as Task["status"],

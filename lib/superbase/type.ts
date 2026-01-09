@@ -6,15 +6,12 @@ export type Task = {
   description: string | null;
   priority: "high" | "medium" | "low" | "ugency" | "no priority";
   status:
-    | "proposed"
-    | "active"
+    | "propose"
+    | "on-going"
     | "deliver"
     | "draft"
     | "complete"
-    | "cancel"
-    | "to-do"
-    | "in-progress"
-    | "done";
+    | "cancel";
   due_date: string | null;
   created_at: string;
   updated_at: string;

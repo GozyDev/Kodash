@@ -10,9 +10,14 @@ import {
 import { Task } from "@/lib/superbase/type";
 import { useTaskStore } from "@/app/store/useTask";
 import { useOrgIdStore } from "@/app/store/useOrgId";
+import {
+  presentToPast,
+  displayStatusForStatusCard,
+} from "@/lib/status";
 
 interface StatusData {
-  name: Task["status"];
+  // use present-tense values for selection/display in the StatusCard UI
+  name: string;
   svg?: React.ReactNode;
 }
 
@@ -38,7 +43,7 @@ const statusData: StatusData[] = [
     ),
   },
   {
-    name: "proposed",
+    name: "propose",
     svg: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -58,7 +63,7 @@ const statusData: StatusData[] = [
     ),
   },
   {
-    name: "active",
+    name: "on-going",
     svg: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -138,7 +143,9 @@ const statusData: StatusData[] = [
 ];
 
 const getStatusImage = (status: Task["status"]) => {
-  switch (status) {
+  // ensure we compare using present-tense for selecting images
+  const present = displayStatusForStatusCard(status);
+  switch (present) {
     case "draft":
       return (
         <svg
@@ -158,7 +165,7 @@ const getStatusImage = (status: Task["status"]) => {
         </svg>
       );
 
-    case "proposed":
+    case "propose":
       return (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -177,7 +184,7 @@ const getStatusImage = (status: Task["status"]) => {
         </svg>
       );
 
-    case "active":
+    case "on-going":
       return (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -249,14 +256,14 @@ const StatusCard = ({
   const orgId = useOrgIdStore((state) => state.orgId);
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger 
+      <DropdownMenuTrigger
         className="p-1 rounded cursor-pointer text-[10px] tracking-widest"
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
       >
         {getStatusImage(status)}
       </DropdownMenuTrigger>
-      <DropdownMenuContent 
+      <DropdownMenuContent
         className="outline-0 border-none w-[200px]"
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
@@ -269,7 +276,9 @@ const StatusCard = ({
             className="text-[12px] tracking-widest text-textNc"
             onClick={(e) => {
               e.stopPropagation();
-              handleOptimisticStatus(task.id, data.name);
+              // convert present-tense selection to past-tense before sending/storing
+              const dbStatus = presentToPast(data.name);
+              handleOptimisticStatus(task.id, dbStatus as Task["status"]);
             }}
             onMouseDown={(e) => e.stopPropagation()}
           >

@@ -9,6 +9,7 @@ import WriteProposalDialog from "./WriteProposalDialog";
 import { useState } from "react";
 
 import StatusCard from "./StatusCard";
+import { displayStatusForTaskCard } from "@/lib/status";
 import Link from "next/link";
 import { useOrgIdStore } from "@/app/store/useOrgId";
 import { useTaskStore } from "@/app/store/useTask";
@@ -41,23 +42,21 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
   };
 
   const getStatusColor = (status: Task["status"]) => {
-    switch (status) {
-      case "draft":
-        return "border-[#f9be00]/10 bg-[#f9be00]/2";
-
+    const normalized = displayStatusForTaskCard(status);
+    switch (normalized) {
       case "proposed":
         return "border-[#f97316]/10 bg-[#f97316]/2";
 
-      case "active":
+      case "on-going":
         return "border-[#2563eb]/10 bg-[#2563eb]/2";
 
-      case "deliver":
+      case "delivered":
         return "border-[#7c3aed]/10 bg-[#7c3aed]/2";
 
-      case "complete":
+      case "completed":
         return "border-[#22c55e]/10 bg-[#22c55e]/2";
 
-      case "cancel":
+      case "canceled":
         return "border-[#ef4444]/10 bg-[#ef4444]/2";
 
       default:
@@ -65,9 +64,10 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
     }
   };
 
-  const basePath = userRole === "freelancer" 
-    ? `/dashboard/fr-org/${orgId}`
-    : `/dashboard/cl-org/${orgId}`;
+  const basePath =
+    userRole === "freelancer"
+      ? `/dashboard/fr-org/${orgId}`
+      : `/dashboard/cl-org/${orgId}`;
 
   const handleCardClick = () => {
     router.push(`${basePath}/issue/${task.id}`);
@@ -84,19 +84,19 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-2">
-            <div 
+            <div
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
             >
               <PriorityCard task={task} priority={task.priority}></PriorityCard>
             </div>
-            <div 
+            <div
               className="flex items-center"
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
             >
               <span className="text-sm font-medium text-textNc capitalize">
-                {task.status.toLowerCase()}
+                {displayStatusForTaskCard(task.status).toLowerCase()}
               </span>
               <StatusCard task={task} status={task.status}></StatusCard>
             </div>
@@ -127,7 +127,10 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
             </button>
           )}
 
-          <div onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
             <WriteProposalDialog
               open={openProposal}
               onOpenChange={setOpenProposal}
@@ -139,11 +142,14 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
                     headers: { "Content-type": "application/json" },
                     body: JSON.stringify({ ...proposal, requestId: task.id }),
                   });
-                  
+
                   if (response.ok) {
                     // If proposal was created successfully and task is draft, update status to proposed
                     if (task.status === "draft") {
-                      handleOptimisticStatus(task.id, "proposed");
+                      handleOptimisticStatus(
+                        task.id,
+                        "proposed" as Task["status"]
+                      );
                     }
                     setOpenProposal(false);
                   } else {
@@ -157,7 +163,7 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
             />
           </div>
         </div>
-        <div 
+        <div
           onClick={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
         >
