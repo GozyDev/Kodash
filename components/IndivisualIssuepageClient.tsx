@@ -7,11 +7,7 @@ import { useTaskStore } from "@/app/store/useTask";
 import StatusCard from "./StatusCard";
 import PriorityCard from "./piortyCard";
 import { Input } from "./ui/input";
-import {
-  LinkIcon,
-  Loader2,
-  Paperclip,
-} from "lucide-react";
+import { LinkIcon, Loader2, Paperclip } from "lucide-react";
 import { Task, Comment } from "@/lib/superbase/type";
 import CommentSection from "./CommentSection";
 import ProposalOverview from "./ProposalOverview";
@@ -211,7 +207,12 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
       .channel(`issue-${issueId}`)
       .on(
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "tasks", filter: `id=eq.${issueId}` },
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "tasks",
+          filter: `id=eq.${issueId}`,
+        },
         (payload) => {
           try {
             const updated = payload.new as Task;
@@ -233,13 +234,20 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
       )
       .on(
         "postgres_changes",
-        { event: "DELETE", schema: "public", table: "tasks", filter: `id=eq.${issueId}` },
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "tasks",
+          filter: `id=eq.${issueId}`,
+        },
         (payload) => {
           try {
             const removed = payload.old as Task;
             setIssue(null);
             const current = useTaskStore.getState().task;
-            useTaskStore.setState({ task: current.filter((t) => t.id !== removed.id) });
+            useTaskStore.setState({
+              task: current.filter((t) => t.id !== removed.id),
+            });
             console.log("issue deleted via realtime:", removed.id);
           } catch (e) {
             console.error("Failed handling task delete payload", e);
@@ -274,7 +282,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
 
   return (
     <div className=" text-textNb">
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_320px]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_200px]">
         <div className="space-y-8 pb-6 px-3 lg:px-6">
           <div className="bg-cardC w-full h-[40px]"></div>
           <header className="mb-6 space-y-6 rounded">
@@ -306,7 +314,8 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
               ) : (
                 <ul className="space-y-2 text-sm">
                   {attachments.map((a, idx) => {
-                    const isImage = !!a.file_type && a.file_type.startsWith("image/");
+                    const isImage =
+                      !!a.file_type && a.file_type.startsWith("image/");
                     return (
                       <li
                         key={`${a.file_url}-${idx}`}
@@ -379,31 +388,17 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
           )}
         </div>
 
-        <aside className="space-y-4 px-3 lg:px-6  h-max md:sticky top-[100px] right-6">
-          <section className="rounded-xl border border-cardCB bg-cardC p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-textNd">
-                  Status
-                </p>
-                <p className="text-sm text-textNc">
-                  Track where this issue is right now.
-                </p>
-              </div>
+        <aside className="space-y-4  h-max  md:sticky top-[74px] right-[10px] ">
+          <section className="rounded border border-cardCB bg-cardC p-2">
+            <div className="flex items-center justify-between">
+              <p className=" capitalize ">{issue.status}</p>
               <StatusCard task={issue} status={issue.status}></StatusCard>
             </div>
           </section>
 
-          <section className="rounded-xl border border-cardCB bg-cardC p-4">
+          <section className="rounded border border-cardCB bg-cardC p-2">
             <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-textNd">
-                  Priority
-                </p>
-                <p className="text-sm text-textNc">
-                  Set priority to organize the backlog.
-                </p>
-              </div>
+              <p className=" capitalize">{issue.priority}</p>
               <PriorityCard
                 task={issue}
                 priority={issue.priority}
