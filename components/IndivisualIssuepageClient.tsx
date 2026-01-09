@@ -256,6 +256,73 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
           }
         }
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "request_proposal",
+          filter: `request_id=eq.${issueId}`,
+        },
+        (payload) => {
+          try {
+            const newProposal = payload.new as any;
+            setProposal(newProposal);
+            // if proposal includes a decision, reflect request status in global tasks
+            if (newProposal?.status) {
+              const tasks = useTaskStore.getState().task;
+              const updated = tasks.map((t) =>
+                t.id === issueId
+                  ? {
+                      ...t,
+                      status:
+                        newProposal.status === "accepted"
+                          ? "on-going"
+                          : t.status,
+                    }
+                  : t
+              );
+              useTaskStore.setState({ task: updated });
+            }
+          } catch (e) {
+            console.error("Failed handling proposal insert payload", e);
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "request_proposal",
+          filter: `request_id=eq.${issueId}`,
+        },
+        (payload) => {
+          try {
+            const updatedProposal = payload.new as any;
+            setProposal(updatedProposal);
+            if (updatedProposal?.status) {
+              const tasks = useTaskStore.getState().task;
+              const updated = tasks.map((t) =>
+                t.id === issueId
+                  ? {
+                      ...t,
+                      status:
+                        updatedProposal.status === "accepted"
+                          ? "on-going"
+                          : updatedProposal.status === "canceled"
+                          ? "canceled"
+                          : t.status,
+                    }
+                  : t
+              );
+              useTaskStore.setState({ task: updated });
+            }
+          } catch (e) {
+            console.error("Failed handling proposal update payload", e);
+          }
+        }
+      )
       .subscribe();
 
     return () => {
@@ -382,7 +449,11 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
 
           {/* Proposal */}
           {proposal ? (
-              <ProposalOverview proposal={proposal} orgId={orgId} issueId={issueId} />
+            <ProposalOverview
+              proposal={proposal}
+              orgId={orgId}
+              issueId={issueId}
+            />
           ) : (
             <div className="rounded-xl border border-cardCB bg-cardC p-6">
               <p className="text-sm text-textNc">No proposal found.</p>

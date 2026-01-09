@@ -134,15 +134,6 @@ export default function ProposalOverview({
           {/* Action buttons visible only to CLIENT role and only when proposal is pending */}
           {role === "client" && localProposal.status === "pending" && (
             <div className="flex items-center gap-2">
-              {/* <Button
-                variant="secondary"
-                size="sm"
-                className="h-8 px-3 text-xs bg-[#f9be00]/40 hover:bg-[#f9be00]/30 text-whiten rounded"
-              >
-                
-                Dispute
-              </Button> */}
-
               <Button
                 variant="destructive"
                 size="sm"
@@ -166,32 +157,6 @@ export default function ProposalOverview({
               </button>
             </div>
           )}
-
-          {/* {onEdit && (
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={onEdit}
-              className="h-8 px-3 text-xs"
-            >
-              <Edit className="h-3.5 w-3.5 mr-1.5" />
-              Edit
-            </Button>
-          )}
-          {onWithdraw && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={onWithdraw}
-              className="h-8 px-3 text-xs"
-            >
-              <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-              Withdraw Proposal
-            </Button>
-          )}
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreVertical className="h-4 w-4" />
-          </Button> */}
         </div>
       </div>
 
@@ -219,16 +184,16 @@ export default function ProposalOverview({
           setConfirmOpen(open);
         }}
       >
-        <DialogContent className="max-w-md" showCloseButton={!processing}>
+        <DialogContent className="max-w-xl bg-cardC border-cardCB text-textNa" showCloseButton={!processing}>
           <DialogHeader>
-            <DialogTitle>Confirm action</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-textNa">Confirm action</DialogTitle>
+            <DialogDescription className="text-textNc">
               This action cannot be reverted. Are you sure you want to proceed?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
-              variant="ghost"
+              className="bg-cardCB"
               disabled={processing}
               onClick={() => {
                 if (processing) return;
@@ -240,7 +205,7 @@ export default function ProposalOverview({
               Cancel
             </Button>
             <Button
-              variant="default"
+              className="butt"
               onClick={async () => {
                 if (!pendingAction || !issueId) return;
                 setProcessing(true);
