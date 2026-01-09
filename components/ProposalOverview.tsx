@@ -11,13 +11,24 @@ import {
   MoreVertical,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTaskStore } from "@/app/store/useTask";
+import { Loader2 } from "lucide-react";
 import type { Proposal } from "./IndivisualIssuepageClient";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 interface ProposalOverviewProps {
   proposal: Proposal;
   orgId?: string;
   onEdit?: () => void;
   onWithdraw?: () => void;
+  issueId?: string;
 }
 
 export default function ProposalOverview({
@@ -25,8 +36,17 @@ export default function ProposalOverview({
   orgId,
   onEdit,
   onWithdraw,
+  issueId,
 }: ProposalOverviewProps) {
+  const [localProposal, setLocalProposal] = useState<Proposal>(proposal);
+  useEffect(() => setLocalProposal(proposal), [proposal]);
   const [role, setRole] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<
+    "accept" | "reject" | null
+  >(null);
+  const [processing, setProcessing] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (!orgId) return;
@@ -47,14 +67,14 @@ export default function ProposalOverview({
   }, [orgId]);
   // Format price with currency
   const formatPrice = () => {
-    if (!proposal.price) return "—";
-    const currency = proposal.currency || "USD";
+    if (!localProposal.price) return "—";
+    const currency = localProposal.currency || "USD";
     const priceValue =
-      typeof proposal.price === "string"
-        ? parseFloat(proposal.price)
-        : proposal.price;
+      typeof localProposal.price === "string"
+        ? parseFloat(localProposal.price)
+        : localProposal.price;
 
-    if (isNaN(priceValue)) return proposal.price.toString();
+    if (isNaN(priceValue)) return localProposal.price.toString();
 
     const formatted = new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -63,43 +83,41 @@ export default function ProposalOverview({
       maximumFractionDigits: 0,
     }).format(priceValue);
 
-    // Append currency code for clarity (e.g., "$10,000 USD")
     return `${formatted} ${currency}`;
   };
 
   // Format due date
   const formatDueDate = () => {
-    if (!proposal.due_date) return "—";
+    if (!localProposal.due_date) return "—";
     try {
-      const date = new Date(proposal.due_date);
+      const date = new Date(localProposal.due_date);
       return new Intl.DateTimeFormat("en-US", {
         month: "short",
         day: "numeric",
         year: "numeric",
       }).format(date);
     } catch {
-      return proposal.due_date;
+      return localProposal.due_date;
     }
   };
 
   // Parse DOD - could be JSON array, newline-separated, or plain text
   const parseDOD = (): string[] => {
-    if (!proposal.dod) return [];
+    if (!localProposal.dod) return [];
 
     try {
-      // Try parsing as JSON array first
-      const parsed = JSON.parse(proposal.dod);
+      const parsed = JSON.parse(localProposal.dod);
       if (Array.isArray(parsed)) {
         return parsed.filter((item) => typeof item === "string" && item.trim());
       }
     } catch {
-      // Not JSON, try splitting by newlines
-      const lines = proposal.dod.split(/\n+/).filter((line) => line.trim());
+      const lines = localProposal.dod
+        .split(/\n+/)
+        .filter((line) => line.trim());
       if (lines.length > 1) {
         return lines.map((line) => line.trim());
       }
-      // Single line, return as single item
-      return [proposal.dod.trim()];
+      return [localProposal.dod.trim()];
     }
 
     return [];
@@ -113,8 +131,8 @@ export default function ProposalOverview({
       <div className="flex items-center justify-between">
         <h3 className="text-base font-medium text-textNb">Proposal Overview</h3>
         <div className="flex items-center gap-2">
-          {/* Action buttons visible only to CLIENT role */}
-          {role === "client" && (
+          {/* Action buttons visible only to CLIENT role and only when proposal is pending */}
+          {role === "client" && localProposal.status === "pending" && (
             <div className="flex items-center gap-2">
               {/* <Button
                 variant="secondary"
@@ -129,13 +147,21 @@ export default function ProposalOverview({
                 variant="destructive"
                 size="sm"
                 className="h-8 px-3 text-sm bg-red-800/50 text-whiten rounded hover:bg-red-800/40"
+                onClick={() => {
+                  setPendingAction("reject");
+                  setConfirmOpen(true);
+                }}
               >
-                {/* Reject - red */}
                 Reject
               </Button>
 
-              <button className="h-8 px-3 text-xs bg-green-800/50 text-whiten rounded hover:bg-green-800/40">
-                {/* Accept - green with slightly transparent background and solid border */}
+              <button
+                className="h-8 px-3 text-xs bg-green-800/50 text-whiten rounded hover:bg-green-800/40"
+                onClick={() => {
+                  setPendingAction("accept");
+                  setConfirmOpen(true);
+                }}
+              >
                 Accept
               </button>
             </div>
@@ -170,14 +196,121 @@ export default function ProposalOverview({
       </div>
 
       <div className="text-xs text-textNc">
-        {proposal.status === "pending" ? (
-          <span className="bg-cardICB/50 py-1 p-2 rounded">{proposal.status}</span>
-        ) : proposal.status === "accepted" ? (
-          <span className="bg-green-800/50 py-1 p-2 rounded">{proposal.status}</span>
+        {localProposal.status === "pending" ? (
+          <span className="bg-cardICB/50 py-1 p-2 rounded">
+            Proposal Pending
+          </span>
+        ) : localProposal.status === "accepted" ? (
+          <span className="bg-green-800/50 py-1 p-2 rounded">
+            Proposal Accepted
+          </span>
         ) : (
-          <span className="bg-red-800/50 py-1 p-2 rounded">{proposal.status}</span>
+          <span className="bg-red-800/50 py-1 p-2 rounded">
+            Proposal Canceled
+          </span>
         )}
       </div>
+
+      <Dialog
+        open={confirmOpen}
+        onOpenChange={(open) => {
+          if (processing) return; // lock dialog while processing
+          if (!open) setPendingAction(null);
+          setConfirmOpen(open);
+        }}
+      >
+        <DialogContent className="max-w-md" showCloseButton={!processing}>
+          <DialogHeader>
+            <DialogTitle>Confirm action</DialogTitle>
+            <DialogDescription>
+              This action cannot be reverted. Are you sure you want to proceed?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              disabled={processing}
+              onClick={() => {
+                if (processing) return;
+                setConfirmOpen(false);
+                setPendingAction(null);
+                setErrorMsg(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              onClick={async () => {
+                if (!pendingAction || !issueId) return;
+                setProcessing(true);
+                setErrorMsg(null);
+                const newStatus =
+                  pendingAction === "accept" ? "accepted" : "canceled";
+
+                try {
+                  const res = await fetch(`/api/proposal/${issueId}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      status: newStatus,
+                      id: proposal.id,
+                    }),
+                  });
+
+                  if (!res.ok) {
+                    const err = await res.json().catch(() => null);
+                    setErrorMsg(
+                      err?.error || "Failed to update proposal status"
+                    );
+                    setProcessing(false);
+                    return;
+                  }
+
+                  const json = await res.json().catch(() => null);
+                  const updatedProposal = json?.proposal || null;
+
+                  // Update local state only after server success
+                  if (updatedProposal) {
+                    setLocalProposal(updatedProposal);
+                  } else {
+                    setLocalProposal((p) => ({ ...p, status: newStatus }));
+                  }
+
+                  // Update global task store mapping
+                  const tasks = useTaskStore.getState().task;
+                  const updated = tasks.map((t) =>
+                    t.id === issueId
+                      ? {
+                          ...t,
+                          status:
+                            newStatus === "accepted" ? "on-going" : t.status,
+                        }
+                      : t
+                  );
+                  useTaskStore.setState({ task: updated });
+
+                  setProcessing(false);
+                  setConfirmOpen(false);
+                  setPendingAction(null);
+                } catch (err) {
+                  console.error("Error updating proposal status:", err);
+                  setErrorMsg("Server error while updating proposal status");
+                  setProcessing(false);
+                }
+              }}
+            >
+              {processing ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" /> Processing...
+                </span>
+              ) : (
+                "Confirm"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-4">
@@ -228,7 +361,7 @@ export default function ProposalOverview({
         </div>
       )}
 
-      {dodItems.length === 0 && proposal.dod && (
+      {dodItems.length === 0 && localProposal.dod && (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-green-400" />
@@ -237,7 +370,7 @@ export default function ProposalOverview({
             </h4>
             <Info className="h-3.5 w-3.5 text-textNd" />
           </div>
-          <p className="text-sm text-textNc pl-6">{proposal.dod}</p>
+          <p className="text-sm text-textNc pl-6">{localProposal.dod}</p>
         </div>
       )}
     </div>

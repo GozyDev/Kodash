@@ -382,7 +382,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
 
           {/* Proposal */}
           {proposal ? (
-            <ProposalOverview proposal={proposal} orgId={orgId} />
+              <ProposalOverview proposal={proposal} orgId={orgId} issueId={issueId} />
           ) : (
             <div className="rounded-xl border border-cardCB bg-cardC p-6">
               <p className="text-sm text-textNc">No proposal found.</p>
