@@ -9,6 +9,7 @@ import PriorityCard from "./piortyCard";
 import { Input } from "./ui/input";
 import { LinkIcon, Loader2, Paperclip } from "lucide-react";
 import { Task, Comment } from "@/lib/superbase/type";
+import { presentToPast } from "@/lib/status";
 import CommentSection from "./CommentSection";
 import ProposalOverview from "./ProposalOverview";
 
@@ -174,8 +175,9 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
         if (proposalData) {
           const currentTask = tasks.find((t) => t.id === issueId);
           if (currentTask && currentTask.status === "draft") {
-            // Use optimistic update to change status from draft to proposed
-            handleOptimisticStatus(issueId, "proposed");
+            // Use optimistic update to change status from draft to proposed (DB past-tense)
+            const dbStatus = presentToPast("propose");
+            handleOptimisticStatus(issueId, dbStatus as Task["status"]);
           }
         }
       } catch (err) {

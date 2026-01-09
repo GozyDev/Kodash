@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Task } from "@/lib/superbase/type";
 import { useOrgIdStore } from "@/app/store/useOrgId";
+import { displayStatusForStatusCard } from "@/lib/status";
 
 interface StatusData {
   name: Task["status"];
@@ -37,7 +38,7 @@ const statusData: StatusData[] = [
     ),
   },
   {
-    name: "proposed",
+    name: "propose",
     svg: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +58,7 @@ const statusData: StatusData[] = [
     ),
   },
   {
-    name: "active",
+    name: "on-going",
     svg: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -137,7 +138,8 @@ const statusData: StatusData[] = [
 ];
 
 const getStatusImage = (status: Task["status"]) => {
-  switch (status) {
+  const present = displayStatusForStatusCard(status);
+  switch (present) {
     case "draft":
       return (
         <svg
@@ -157,7 +159,7 @@ const getStatusImage = (status: Task["status"]) => {
         </svg>
       );
 
-    case "proposed":
+    case "propose":
       return (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -176,7 +178,7 @@ const getStatusImage = (status: Task["status"]) => {
         </svg>
       );
 
-    case "active":
+    case "on-going":
       return (
         <svg
           xmlns="http://www.w3.org/2000/svg"

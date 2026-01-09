@@ -9,7 +9,7 @@ import WriteProposalDialog from "./WriteProposalDialog";
 import { useState } from "react";
 
 import StatusCard from "./StatusCard";
-import { displayStatusForTaskCard } from "@/lib/status";
+import { displayStatusForTaskCard, presentToPast } from "@/lib/status";
 import Link from "next/link";
 import { useOrgIdStore } from "@/app/store/useOrgId";
 import { useTaskStore } from "@/app/store/useTask";
@@ -28,18 +28,6 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
   const handleOptimisticStatus = useTaskStore(
     (state) => state.handleOptimisticStatus
   );
-  const getPriorityColor = (priority: Task["priority"]) => {
-    switch (priority) {
-      case "high":
-        return "bg-red-500/20";
-      case "medium":
-        return "bg-yellow-500/20";
-      case "low":
-        return "bg-green-500/20";
-      default:
-        return "bg-gray-400";
-    }
-  };
 
   const getStatusColor = (status: Task["status"]) => {
     const normalized = displayStatusForTaskCard(status);
@@ -146,10 +134,9 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
                   if (response.ok) {
                     // If proposal was created successfully and task is draft, update status to proposed
                     if (task.status === "draft") {
-                      handleOptimisticStatus(
-                        task.id,
-                        "proposed" as Task["status"]
-                      );
+                      // convert present-tense selection to past-tense for DB
+                      const dbStatus = presentToPast("propose");
+                      handleOptimisticStatus(task.id, dbStatus as Task["status"]);
                     }
                     setOpenProposal(false);
                   } else {

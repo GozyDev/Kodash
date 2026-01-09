@@ -268,23 +268,82 @@ const StatusCard = ({
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        {/* <DropdownMenuLabel>My Account</DropdownMenuLabel> */}
         <DropdownMenuSeparator className="bg-cardCB/50" />
-        {statusData.map((data, idx) => (
-          <DropdownMenuItem
-            key={idx}
-            className="text-[12px] tracking-widest text-textNc"
-            onClick={(e) => {
-              e.stopPropagation();
-              // convert present-tense selection to past-tense before sending/storing
-              const dbStatus = presentToPast(data.name);
-              handleOptimisticStatus(task.id, dbStatus as Task["status"]);
-            }}
-            onMouseDown={(e) => e.stopPropagation()}
-          >
-            <span>{data.svg}</span> {data.name}
-          </DropdownMenuItem>
-        ))}
+        {/* Only show Deliver and Cancel controls. Enabled only when status is on-going. */}
+        {(() => {
+          const present = displayStatusForStatusCard(status);
+          const enabled = present === "on-going";
+          return (
+            <>
+              <DropdownMenuItem
+                className={`text-[12px] tracking-widest text-textNc flex items-center gap-2 ${
+                  enabled ? "" : "opacity-50 cursor-not-allowed"
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!enabled) return;
+                  const dbStatus = presentToPast("deliver");
+                  handleOptimisticStatus(task.id, dbStatus as Task["status"]);
+                }}
+                onMouseDown={(e) => e.stopPropagation()}
+                disabled={!enabled}
+              >
+                <span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="kodash-status kodash-delivered"
+                  >
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 16V8" />
+                    <path d="M8.5 11.5L12 8l3.5 3.5" />
+                  </svg>
+                </span>
+                Deliver
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                className={`text-[12px] tracking-widest text-textNc flex items-center gap-2 ${
+                  enabled ? "" : "opacity-50 cursor-not-allowed"
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!enabled) return;
+                  const dbStatus = presentToPast("cancel");
+                  handleOptimisticStatus(task.id, dbStatus as Task["status"]);
+                }}
+                onMouseDown={(e) => e.stopPropagation()}
+                disabled={!enabled}
+              >
+                <span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="kodash-status kodash-cancelled"
+                  >
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M8 8l8 8" />
+                  </svg>
+                </span>
+                Cancel
+              </DropdownMenuItem>
+            </>
+          );
+        })()}
       </DropdownMenuContent>
     </DropdownMenu>
   );
