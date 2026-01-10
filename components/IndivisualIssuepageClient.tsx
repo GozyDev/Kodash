@@ -275,10 +275,9 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
                 t.id === issueId
                   ? {
                       ...t,
-                      status:
-                        newProposal.status === "accepted"
-                          ? "on-going"
-                          : t.status,
+                      status: (newProposal.status === "accepted"
+                        ? "on-going"
+                        : t.status) as Task["status"],
                     }
                   : t
               );
@@ -307,12 +306,11 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
                 t.id === issueId
                   ? {
                       ...t,
-                      status:
-                        updatedProposal.status === "accepted"
-                          ? "on-going"
-                          : updatedProposal.status === "canceled"
-                          ? "canceled"
-                          : t.status,
+                      status: (updatedProposal.status === "accepted"
+                        ? "on-going"
+                        : updatedProposal.status === "canceled"
+                        ? "cancel"
+                        : t.status) as Task["status"],
                     }
                   : t
               );
@@ -352,7 +350,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
   return (
     <div className=" text-textNb">
       <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_200px]">
-        <div className="space-y-8 pb-6 px-3 lg:px-6">
+        <div className="space-y-8 pb-[20px] px-3 lg:px-6">
           <div className="bg-cardC w-full h-[40px]"></div>
           <header className="mb-6 space-y-6 rounded">
             <Input
@@ -435,7 +433,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
               )}
             </div>
 
-            <div className="flex  items-center gap-3">
+            {/* <div className="flex  items-center gap-3">
               <div className="flex items-center gap-2 text-textNd bg-cardC w-max py-1.5 px-5 rounded cursor-pointer">
                 <LinkIcon className="h-3 w-3" />
                 <h3 className="text-sm font-medium">Links</h3>
@@ -444,7 +442,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
                 <Paperclip className="h-3 w-3" />
                 <h3 className="text-sm font-medium">Attachment</h3>
               </div>
-            </div>
+            </div> */}
           </section>
 
           {/* Proposal */}
@@ -461,7 +459,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
           )}
         </div>
 
-        <aside className="space-y-4  h-max  md:sticky top-[74px] right-[10px] ">
+        <aside className="space-y-4  h-max p-4 lg:p-0 md:sticky top-[74px] right-[10px] ">
           <section className="rounded border border-cardCB bg-cardC p-2">
             <div className="flex items-center justify-between">
               <p className=" capitalize ">{issue.status}</p>
