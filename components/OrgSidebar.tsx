@@ -1,7 +1,13 @@
 // components/OrgSidebar.tsx
 "use client";
 
-import { Users, Settings, LayoutGrid, FilePenLine, HandCoins } from "lucide-react";
+import {
+  Users,
+  Settings,
+  LayoutGrid,
+  FilePenLine,
+  HandCoins,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -18,17 +24,24 @@ import Link from "next/link";
 
 const toolItems = [{ title: "Settings", icon: Settings, url: "/settings" }];
 
-export function OrgSidebar({ orgId, role }: { orgId: string; role: "client" | "freelancer" }) {
+export function OrgSidebar({
+  orgId,
+  role,
+}: {
+  orgId: string;
+  role: "client" | "freelancer";
+}) {
   const pathname = usePathname();
-  const basePath = role === "freelancer" 
-    ? `/dashboard/fr-org/${orgId}`
-    : `/dashboard/cl-org/${orgId}`;
+  const basePath =
+    role === "freelancer"
+      ? `/dashboard/fr-org/${orgId}`
+      : `/dashboard/cl-org/${orgId}`;
 
   const navItems = [
-    { title: "Overview", icon: LayoutGrid, url: `${basePath}/overview` },
+    { title: "Overview", icon: LayoutGrid, url: basePath },
     { title: "Request", icon: FilePenLine, url: `${basePath}/issues` },
     { title: "Members", icon: Users, url: `${basePath}/team` },
-    { title: "Payment", icon:HandCoins, url: basePath },
+    { title: "Payment", icon: HandCoins, url: `basePath/payments` },
   ];
 
   return (
