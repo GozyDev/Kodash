@@ -318,7 +318,7 @@ export default function TaskClient({
         </div>
 
         {/* Progress Bar */}
-        {
+        {/* {
           <div className="mt-4">
             <div className="w-full bg-cardC rounded-full h-2">
               <motion.div
@@ -329,7 +329,7 @@ export default function TaskClient({
               />
             </div>
           </div>
-        }
+        } */}
       </div>
 
       {/* Filters */}

@@ -23,8 +23,31 @@ const DropDownContent = ({ orgs }: { orgs: Org[] }) => {
     return orgs.filter((o: Org) => o.name.toLowerCase().includes(term));
   }, [orgs, q]);
 
-  // helper navigation
-  const goToOrg = (id: string) => router.push(`/dashboard/org/${id}`);
+  // helper navigation: fetch user's role for the org and route accordingly
+  const goToOrg = async (id: string) => {
+    try {
+      const res = await fetch(`/api/role/${id}`);
+      if (res.status === 401) {
+        router.push("/dashboard/auth/sign_in");
+        return;
+      }
+      if (res.status === 403) {
+        router.push("/dashboard/organizations");
+        return;
+      }
+
+      const json = await res.json();
+      const role = json?.role;
+      if (role === "freelancer") {
+        router.push(`/dashboard/fr-org/${id}`);
+      } else {
+        router.push(`/dashboard/cl-org/${id}`);
+      }
+    } catch (err) {
+      console.error("Failed to determine org role:", err);
+      router.push("/dashboard/organizations");
+    }
+  };
   const goToAll = () => router.push("/dashboard/organizations");
 
   return (

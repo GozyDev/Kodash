@@ -34,9 +34,9 @@ export default function OrgHeader({
             {orgs.find((o) => o.id === orgId)?.name ?? "Organizations"}
           </p>
 
-          <button className="px-2 text-sm font-light border border-gray-800 rounded-xl transition-colors  capitalize">
+          {/* <button className="px-2 text-sm font-light border border-gray-800 rounded-xl transition-colors  capitalize">
             {orgs.find((o) => o.id === orgId)?.plan ?? "Free Plan"}
-          </button>
+          </button> */}
 
           <DropDownContent orgs={orgs} />
         </div>
