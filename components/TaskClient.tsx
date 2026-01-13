@@ -19,6 +19,7 @@ export default function TaskClient({
   orgId: string;
   userRole: "client" | "freelancer";
 }) {
+  console.log("Role", userRole);
   const task = useTaskStore((state) => state.task);
   const setTask = useTaskStore((state) => state.setTask);
 
@@ -108,7 +109,6 @@ export default function TaskClient({
           event: "UPDATE",
           schema: "public",
           table: "tasks",
-          
         },
         (payload) => {
           try {
@@ -165,84 +165,6 @@ export default function TaskClient({
     console.log("changed");
     setFilteredTasks(result);
   }, [task, filters]);
-
-  // Create task
-  // Client-side methods now use fetch()
-
-  // const handleCreateTask = async (taskData: Omit<TaskInsert, "project_id">) => {
-  //   const res = await fetch(`/api/task/${orgId}`, {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify(taskData),
-  //   });
-
-  //   const data = await res.json();
-  //   if (!res.ok) {
-  //     console.error("Error creating task:", data.error);
-  //     return;
-  //   }
-
-  //   setTasks((prev) => [data, ...prev]);
-  //   setIsDrawerOpen(false);
-  //   setCreateInitialStatus(null);
-  // };
-
-  // const handleOptimisticPriority = (
-  //   id: string,
-  //   newPriority: Task["priority"]
-  // ) => {
-  //   const old = tasks;
-
-  //   setTasks((prev) =>
-  //     prev.map((t) => (t.id === id ? { ...t, priority: newPriority } : t))
-  //   );
-
-  //   // send update to DB
-  //   fetch(`/api/task/${orgId}`, {
-  //     method: "PATCH",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({ id, priority: newPriority }),
-  //   }).then(async (res) => {
-  //     if (!res.ok) {
-  //       console.error("DB failed. Reverting.");
-  //       setTasks(old); // revert
-  //     }
-  //   });
-  // };
-
-  // const handleUpdateTask = async (id: string, updatesFields: TaskUpdate) => {
-  //   const res = await fetch(`/api/task/${orgId}`, {
-  //     method: "PATCH",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({ id, updatesFields }),
-  //   });
-
-  //   const data = await res.json();
-  //   if (!res.ok) {
-  //     console.error("Error updating task:", data.error);
-  //     return;
-  //   }
-  //   console.log(selectedTask);
-  //   setTasks((prev) => prev.map((task) => (task.id === id ? data : task)));
-  //   setSelectedTask(data);
-  // };
-
-  // const handleDeleteTask = async (id: string) => {
-  //   const res = await fetch(`/api/task/${orgId}?id=${id}`, {
-  //     method: "DELETE",
-  //   });
-  //   const data = await res.json();
-
-  //   if (!res.ok) {
-  //     console.error("Error deleting task:", data.error);
-  //     return;
-  //   }
-
-  //   setTasks((prev) => prev.filter((task) => task.id !== id));
-  //   setIsDrawerOpen(false);
-  //   setSelectedTask(null);
-  //   setCreateInitialStatus(null);
-  // };
 
   // Keyboard shortcut - only for clients
   useEffect(() => {
