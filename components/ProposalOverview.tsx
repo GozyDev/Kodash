@@ -14,14 +14,7 @@ import { useEffect, useState } from "react";
 import { useTaskStore } from "@/app/store/useTask";
 import { Loader2 } from "lucide-react";
 import type { Proposal } from "./IndivisualIssuepageClient";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import ConfirmProposalDecisionDialog from "@/components/ConfirmProposalDecisionDialog";
 
 interface ProposalOverviewProps {
   proposal: Proposal;
@@ -41,10 +34,10 @@ export default function ProposalOverview({
   const [localProposal, setLocalProposal] = useState<Proposal>(proposal);
   useEffect(() => setLocalProposal(proposal), [proposal]);
   const [role, setRole] = useState<string | null>(null);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [pendingAction, setPendingAction] = useState<
-    "accept" | "reject" | null
-  >(null);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"accept" | "cancel" | null>(
+    null
+  );
   const [processing, setProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -139,18 +132,18 @@ export default function ProposalOverview({
                 size="sm"
                 className="h-8 px-3 text-sm bg-red-800/50 text-whiten rounded hover:bg-red-800/40"
                 onClick={() => {
-                  setPendingAction("reject");
-                  setConfirmOpen(true);
+                  setPendingAction("cancel");
+                  setConfirmDialogOpen(true);
                 }}
               >
-                Reject
+                Cancel
               </Button>
 
               <button
                 className="h-8 px-3 text-xs bg-green-800/50 text-whiten rounded hover:bg-green-800/40"
                 onClick={() => {
                   setPendingAction("accept");
-                  setConfirmOpen(true);
+                  setConfirmDialogOpen(true);
                 }}
               >
                 Accept
@@ -176,106 +169,72 @@ export default function ProposalOverview({
         )}
       </div>
 
-      <Dialog
-        open={confirmOpen}
+      <ConfirmProposalDecisionDialog
+        open={confirmDialogOpen}
         onOpenChange={(open) => {
           if (processing) return; // lock dialog while processing
           if (!open) setPendingAction(null);
-          setConfirmOpen(open);
+          setConfirmDialogOpen(open);
         }}
-      >
-        <DialogContent className="max-w-xl bg-cardC border-cardCB text-textNa" showCloseButton={!processing}>
-          <DialogHeader>
-            <DialogTitle className="text-textNa">Confirm action</DialogTitle>
-            <DialogDescription className="text-textNc">
-              This action cannot be reverted. Are you sure you want to proceed?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              className="bg-cardCB"
-              disabled={processing}
-              onClick={() => {
-                if (processing) return;
-                setConfirmOpen(false);
-                setPendingAction(null);
-                setErrorMsg(null);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="butt"
-              onClick={async () => {
-                if (!pendingAction || !issueId) return;
-                setProcessing(true);
-                setErrorMsg(null);
-                const newStatus =
-                  pendingAction === "accept" ? "accepted" : "canceled";
+        action={pendingAction || "accept"}
+        onConfirm={async () => {
+          if (!pendingAction || !issueId) return;
+          setProcessing(true);
+          setErrorMsg(null);
+          const newStatus =
+            pendingAction === "accept" ? "accepted" : "canceled";
 
-                try {
-                  const res = await fetch(`/api/proposal/${issueId}`, {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      status: newStatus,
-                      id: proposal.id,
-                    }),
-                  });
+          try {
+            const res = await fetch(`/api/proposal/${issueId}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                status: newStatus,
+                id: proposal.id,
+              }),
+            });
 
-                  if (!res.ok) {
-                    const err = await res.json().catch(() => null);
-                    setErrorMsg(
-                      err?.error || "Failed to update proposal status"
-                    );
-                    setProcessing(false);
-                    return;
+            if (!res.ok) {
+              const err = await res.json().catch(() => null);
+              setErrorMsg(
+                err?.error || "Failed to update proposal status"
+              );
+              setProcessing(false);
+              return;
+            }
+
+            const json = await res.json().catch(() => null);
+            const updatedProposal = json?.proposal || null;
+
+            // Update local state only after server success
+            if (updatedProposal) {
+              setLocalProposal(updatedProposal);
+            } else {
+              setLocalProposal((p) => ({ ...p, status: newStatus }));
+            }
+
+            // Update global task store mapping
+            const tasks = useTaskStore.getState().task;
+            const updated = tasks.map((t) =>
+              t.id === issueId
+                ? {
+                    ...t,
+                    status:
+                      newStatus === "accepted" ? "on-going" : t.status,
                   }
+                : t
+            );
+            useTaskStore.setState({ task: updated });
 
-                  const json = await res.json().catch(() => null);
-                  const updatedProposal = json?.proposal || null;
-
-                  // Update local state only after server success
-                  if (updatedProposal) {
-                    setLocalProposal(updatedProposal);
-                  } else {
-                    setLocalProposal((p) => ({ ...p, status: newStatus }));
-                  }
-
-                  // Update global task store mapping
-                  const tasks = useTaskStore.getState().task;
-                  const updated = tasks.map((t) =>
-                    t.id === issueId
-                      ? {
-                          ...t,
-                          status:
-                            newStatus === "accepted" ? "on-going" : t.status,
-                        }
-                      : t
-                  );
-                  useTaskStore.setState({ task: updated });
-
-                  setProcessing(false);
-                  setConfirmOpen(false);
-                  setPendingAction(null);
-                } catch (err) {
-                  console.error("Error updating proposal status:", err);
-                  setErrorMsg("Server error while updating proposal status");
-                  setProcessing(false);
-                }
-              }}
-            >
-              {processing ? (
-                <span className="inline-flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" /> Processing...
-                </span>
-              ) : (
-                "Confirm"
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            setProcessing(false);
+            setPendingAction(null);
+          } catch (err) {
+            console.error("Error updating proposal status:", err);
+            setErrorMsg("Server error while updating proposal status");
+            setProcessing(false);
+          }
+        }}
+      />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-4">
