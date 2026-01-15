@@ -36,23 +36,24 @@ const ConfirmStatusChangeDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px] bg-cardC text-textNa border-none border border-cardCB">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{message}</DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2">
           <Button
-            variant="outline"
             onClick={() => onOpenChange(false)}
-            className="flex-1"
+            className="flex-1 bg-cardICB/50 hover:bg-cardICB/50 cursor-pointer"
           >
             Cancel
           </Button>
           <Button
             onClick={handleConfirm}
-            className={`flex-1 ${
-              isDeliver ? "bg-[#7c3aed] hover:bg-[#7c3aede8]" : "bg-red-600 hover:bg-red-700"
+            className={`flex-1 cursor-pointer ${
+              isDeliver
+                ? "bg-[#7c3aed] hover:bg-[#7c3aede8]"
+                : "bg-red-600 hover:bg-red-700"
             }`}
           >
             Confirm
