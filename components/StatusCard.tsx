@@ -11,6 +11,7 @@ import { Task } from "@/lib/superbase/type";
 import { useTaskStore } from "@/app/store/useTask";
 import { useOrgIdStore } from "@/app/store/useOrgId";
 import { presentToPast, displayStatusForStatusCard } from "@/lib/status";
+import ConfirmStatusChangeDialog from "@/components/ConfirmStatusChangeDialog";
 
 interface StatusData {
   // use present-tense values for selection/display in the StatusCard UI
@@ -275,95 +276,117 @@ const StatusCard = ({
   const enabled = present === "on-going";
 
   const [open, setOpen] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"deliver" | "cancel" | null>(
+    null
+  );
+
+  const handleStatusChange = (action: "deliver" | "cancel") => {
+    setPendingAction(action);
+    setConfirmDialogOpen(true);
+  };
+
+  const handleConfirmStatusChange = () => {
+    if (!pendingAction) return;
+    const dbStatus = presentToPast(pendingAction);
+    handleOptimisticStatus(task.id, dbStatus as Task["status"]);
+    setPendingAction(null);
+    setOpen(false);
+  };
 
   return (
-    <DropdownMenu open={open && enabled} onOpenChange={(v) => enabled && setOpen(v)}>
-      <DropdownMenuTrigger
-        className={`p-1 rounded ${enabled ? "cursor-pointer" : "cursor-default"} text-[10px] tracking-widest`}
-        onClick={(e) => e.stopPropagation()}
-        onMouseDown={(e) => e.stopPropagation()}
-      >
-        {getStatusImage(status)}
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className="outline-0 border-none w-[200px]"
-        onClick={(e) => e.stopPropagation()}
-        onMouseDown={(e) => e.stopPropagation()}
-      >
-        <DropdownMenuSeparator className="bg-cardCB/50" />
-        {/* Only show Deliver and Cancel controls. Enabled only when status is on-going. */}
-        <>
-          <DropdownMenuItem
-            className={`text-[12px] tracking-widest text-textNc flex items-center gap-2 ${
-              enabled ? "" : "opacity-50 cursor-not-allowed"
-            }`}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!enabled) return;
-              const dbStatus = presentToPast("deliver");
-              handleOptimisticStatus(task.id, dbStatus as Task["status"]);
-              setOpen(false);
-            }}
-            onMouseDown={(e) => e.stopPropagation()}
-            disabled={!enabled}
-          >
-            <span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="kodash-status kodash-delivered"
-              >
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 16V8" />
-                <path d="M8.5 11.5L12 8l3.5 3.5" />
-              </svg>
-            </span>
-            Deliver
-          </DropdownMenuItem>
+    <>
+      <DropdownMenu open={open && enabled} onOpenChange={(v) => enabled && setOpen(v)}>
+        <DropdownMenuTrigger
+          className={`p-1 rounded ${enabled ? "cursor-pointer" : "cursor-default"} text-[10px] tracking-widest`}
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          {getStatusImage(status)}
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          className="outline-0 border-none w-[200px]"
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          <DropdownMenuSeparator className="bg-cardCB/50" />
+          {/* Only show Deliver and Cancel controls. Enabled only when status is on-going. */}
+          <>
+            <DropdownMenuItem
+              className={`text-[12px] tracking-widest text-textNc flex items-center gap-2 ${
+                enabled ? "" : "opacity-50 cursor-not-allowed"
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!enabled) return;
+                handleStatusChange("deliver");
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+              disabled={!enabled}
+            >
+              <span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="kodash-status kodash-delivered"
+                >
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 16V8" />
+                  <path d="M8.5 11.5L12 8l3.5 3.5" />
+                </svg>
+              </span>
+              Deliver
+            </DropdownMenuItem>
 
-          <DropdownMenuItem
-            className={`text-[12px] tracking-widest text-textNc flex items-center gap-2 ${
-              enabled ? "" : "opacity-50 cursor-not-allowed"
-            }`}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!enabled) return;
-              const dbStatus = presentToPast("cancel");
-              handleOptimisticStatus(task.id, dbStatus as Task["status"]);
-              setOpen(false);
-            }}
-            onMouseDown={(e) => e.stopPropagation()}
-            disabled={!enabled}
-          >
-            <span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="kodash-status kodash-cancelled"
-              >
-                <circle cx="12" cy="12" r="9" />
-                <path d="M8 8l8 8" />
-              </svg>
-            </span>
-            Cancel
-          </DropdownMenuItem>
-        </>
-      </DropdownMenuContent>
-    </DropdownMenu>
+            <DropdownMenuItem
+              className={`text-[12px] tracking-widest text-textNc flex items-center gap-2 ${
+                enabled ? "" : "opacity-50 cursor-not-allowed"
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!enabled) return;
+                handleStatusChange("cancel");
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+              disabled={!enabled}
+            >
+              <span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="kodash-status kodash-cancelled"
+                >
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M8 8l8 8" />
+                </svg>
+              </span>
+              Cancel
+            </DropdownMenuItem>
+          </>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <ConfirmStatusChangeDialog
+        open={confirmDialogOpen}
+        onOpenChange={setConfirmDialogOpen}
+        action={pendingAction || "deliver"}
+        onConfirm={handleConfirmStatusChange}
+      />
+    </>
   );
 };
 
