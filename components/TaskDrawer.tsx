@@ -57,7 +57,6 @@ export default function TaskDrawer({
     due_date: "",
   });
 
-
   const handleCreateTask = useTaskStore((state) => state.handleCreateTask);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -90,8 +89,11 @@ export default function TaskDrawer({
   const addFiles = (files: FileList | null) => {
     if (!files) return;
     // prevent duplicate selections by name+size
-    const incoming = Array.from(files).filter((f) =>
-      !attachments.some((a) => a.file.name === f.name && a.file.size === f.size)
+    const incoming = Array.from(files).filter(
+      (f) =>
+        !attachments.some(
+          (a) => a.file.name === f.name && a.file.size === f.size
+        )
     );
 
     const arr = incoming.map((f) => {
@@ -115,23 +117,57 @@ export default function TaskDrawer({
   const startUploadFile = async (file: File, id: string) => {
     // guard: don't start if already uploading or uploaded
     const existing = attachments.find((a) => a.id === id);
-    if (existing && (existing.status === "uploading" || existing.status === "uploaded")) return;
+    if (
+      existing &&
+      (existing.status === "uploading" || existing.status === "uploaded")
+    )
+      return;
 
-    setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, status: "uploading", progress: 0 } : a)));
+    setAttachments((prev) =>
+      prev.map((a) =>
+        a.id === id ? { ...a, status: "uploading", progress: 0 } : a
+      )
+    );
 
-    const { promise, abort } = uploadFile(file, (p) => {
-      // show progress internally but UI only shows spinner
-      setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, progress: p } : a)));
-    }, id);
+    const { promise, abort } = uploadFile(
+      file,
+      (p) => {
+        // show progress internally but UI only shows spinner
+        setAttachments((prev) =>
+          prev.map((a) => (a.id === id ? { ...a, progress: p } : a))
+        );
+      },
+      id
+    );
 
     // store abort so caller can cancel
-    setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, abort } : a)));
+    setAttachments((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, abort } : a))
+    );
 
     try {
       const res: any = await promise;
-      setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, status: "uploaded", progress: 100, file_id: res.file_id, file_url: res.file_url, file_name: res.file_name, abort: undefined } : a)));
+      setAttachments((prev) =>
+        prev.map((a) =>
+          a.id === id
+            ? {
+                ...a,
+                status: "uploaded",
+                progress: 100,
+                file_id: res.file_id,
+                file_url: res.file_url,
+                file_name: res.file_name,
+                abort: undefined,
+              }
+            : a
+        )
+      );
     } catch (err) {
-      setAttachments((prev) => prev.map((a) => (a.id === id ? { ...a, status: "failed", abort: undefined } : a)));
+      setAttachments((prev) =>
+        prev.map((a) =>
+          a.id === id ? { ...a, status: "failed", abort: undefined } : a
+        )
+      );
     }
   };
 
@@ -400,7 +436,23 @@ export default function TaskDrawer({
     switch (status) {
       case "draft":
       case "to-do":
-        return <Circle className="w-3.5 h-3.5" />;
+        return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="kodash-status kodash-draft"
+      >
+        <circle cx="12" cy="12" r="9" />
+        <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none" />
+      </svg>
+    );
       case "active":
       case "in-progress":
         return <Minus className="w-3.5 h-3.5 rotate-90" />;
@@ -410,30 +462,7 @@ export default function TaskDrawer({
     }
   };
 
-  const getStatusColor = (status: any) => {
-    switch (status) {
-      case "draft":
-      case "to-do":
-        return "bg-gray-500/10 text-gray-400 border-gray-500/20 hover:bg-gray-500/20";
-      case "active":
-      case "in-progress":
-        return "bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20";
-      case "complete":
-      case "done":
-        return "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20";
-    }
-  };
-
-  const getPriorityColor = (priority: Task["priority"]) => {
-    switch (priority) {
-      case "high":
-        return "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20";
-      case "medium":
-        return "bg-yellow-500/10 text-yellow-400 border-yellow-500/20 hover:bg-yellow-500/20";
-      case "low":
-        return "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20";
-    }
-  };
+ 
 
   if (!isOpen) return null;
 
@@ -602,11 +631,15 @@ export default function TaskDrawer({
                                   {att.status === "uploading" && (
                                     <div className="flex items-center gap-2 mt-1">
                                       <span className="inline-block w-4 h-4 border-2 border-t-transparent rounded-full animate-spin" />
-                                      <span className="text-xs text-textNd">Uploading...</span>
+                                      <span className="text-xs text-textNd">
+                                        Uploading...
+                                      </span>
                                     </div>
                                   )}
                                   {att.status === "failed" && (
-                                    <div className="text-xs text-red-400 mt-1">Failed to upload</div>
+                                    <div className="text-xs text-red-400 mt-1">
+                                      Failed to upload
+                                    </div>
                                   )}
                                 </div>
                               </div>
@@ -648,10 +681,14 @@ export default function TaskDrawer({
                                 {formatBytes(file.size)}
                               </div>
                               {att.status === "uploading" && (
-                                <div className="flex items-center gap-2 mt-1"><span className="inline-block w-4 h-4 border-2 border-t-transparent rounded-full animate-spin" /></div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="inline-block w-4 h-4 border-2 border-t-transparent rounded-full animate-spin" />
+                                </div>
                               )}
                               {att.status === "failed" && (
-                                <div className="text-xs text-red-400 mt-1">Failed to upload</div>
+                                <div className="text-xs text-red-400 mt-1">
+                                  Failed to upload
+                                </div>
                               )}
                             </div>
                             <div>
@@ -765,9 +802,11 @@ export default function TaskDrawer({
                               Status
                             </label>
                             <div className="text-sm text-textNb bg-cardC/50 border border-cardCB rounded px-3 py-2 capitalize">
-                              {aiParsedData.status === "to-do" || aiParsedData.status === "draft"
+                              {aiParsedData.status === "to-do" ||
+                              aiParsedData.status === "draft"
                                 ? "Todo"
-                                : aiParsedData.status === "in-progress" || aiParsedData.status === "active"
+                                : aiParsedData.status === "in-progress" ||
+                                  aiParsedData.status === "active"
                                 ? "In Progress"
                                 : "Done"}
                             </div>
@@ -792,19 +831,13 @@ export default function TaskDrawer({
                 <div className="flex items-center gap-2 flex-wrap border-t border-cardCB/80 pt-4 abosolute bottom-0 w-full">
                   {/* Status */}
                   <div>
-                    <StatusCardCreate
-                      handleChange={handleChange}
-                      status={formData.status}
-                    ></StatusCardCreate>
+                    <div className=" flex items-center justify-center gap-2 bg-cardICB/50 p-2 px-4 rounded-xl">
+                      {getStatusIcon(formData.status)}{" "}
+                      <p className=" capitalize text-xs">{formData.status}</p>
+                    </div>
                   </div>
 
-                  {/* Priority */}
-                  <div>
-                    <PriorityCardCreate
-                      handleChange={handleChange}
-                      priority={formData.priority}
-                    ></PriorityCardCreate>
-                  </div>
+                
                 </div>
               </div>
 
@@ -837,10 +870,18 @@ export default function TaskDrawer({
                   {userRole === "client" && (
                     <Button
                       onClick={async () => {
-                        if (!formData.title.trim() || isSaving || isAnyUploading) return;
+                        if (
+                          !formData.title.trim() ||
+                          isSaving ||
+                          isAnyUploading
+                        )
+                          return;
                         try {
                           setIsSaving(true);
-                          await handleCreateTask({ ...formData, attachments: uploadedAttachments });
+                          await handleCreateTask({
+                            ...formData,
+                            attachments: uploadedAttachments,
+                          });
                           setIsSaving(false);
 
                           // Close drawer only after creating a NEW task (when `task` is null)
@@ -852,7 +893,9 @@ export default function TaskDrawer({
                           setIsSaving(false);
                         }
                       }}
-                      disabled={!formData.title.trim() || isSaving || isAnyUploading}
+                      disabled={
+                        !formData.title.trim() || isSaving || isAnyUploading
+                      }
                       className="h-7 px-3 text-xs butt"
                     >
                       {task
