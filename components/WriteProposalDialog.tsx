@@ -28,22 +28,52 @@ export default function WriteProposalDialog({
   const [price, setPrice] = useState<string | "">("");
   const [deadline, setDeadline] = useState("");
 
+  const getStatusIcon = (status: any) => {
+    switch (status) {
+      case "draft":
+        return (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="kodash-status kodash-draft"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none" />
+          </svg>
+        );
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl bg-cardC border border-cardCB text-textNa">
+      <DialogContent className="max-w-6xl bg-cardC border border-cardCB text-textNa p-3 md:p-4">
         <DialogHeader>
-          <DialogTitle className="text-sm font-medium">
+          <DialogTitle className="text-sm font-medium text-left text-textNb">
             Create Proposal
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 gap-y-[50px]">
           {/* LEFT: Request (read-only) */}
-          <div className="p-4 space-y-3">
-            <h3 className="font-semibold text-textNb clear-both  text-xl">
-              {task.title}
-            </h3>
-            <p className="text-sm text-textNd mt-2">{task.description}</p>
+          <div className="p flex justify-between flex-col  space-y-3">
+            <div className=" space-y-3">
+              <h3 className="font-semibold text-textNb clear-both  text-xl">
+                {task.title}
+              </h3>
+              <p className="text-sm text-textNd mt-2">{task.description}</p>
+            </div>
+
+            <div className=" flex items-center justify-center gap-2 bg-cardICB/50 p-2 px-4 rounded-xl w-max">
+              {getStatusIcon(task.status)}{" "}
+              <p className=" capitalize text-xs">{task.status}</p>
+            </div>
           </div>
 
           {/* RIGHT: Proposal form */}

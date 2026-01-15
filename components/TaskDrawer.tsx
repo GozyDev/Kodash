@@ -435,34 +435,25 @@ export default function TaskDrawer({
   const getStatusIcon = (status: any) => {
     switch (status) {
       case "draft":
-      case "to-do":
         return (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="kodash-status kodash-draft"
-      >
-        <circle cx="12" cy="12" r="9" />
-        <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none" />
-      </svg>
-    );
-      case "active":
-      case "in-progress":
-        return <Minus className="w-3.5 h-3.5 rotate-90" />;
-      case "complete":
-      case "done":
-        return <Circle className="w-3.5 h-3.5 fill-current" />;
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="kodash-status kodash-draft"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none" />
+          </svg>
+        );
     }
   };
-
- 
 
   if (!isOpen) return null;
 
@@ -836,8 +827,6 @@ export default function TaskDrawer({
                       <p className=" capitalize text-xs">{formData.status}</p>
                     </div>
                   </div>
-
-                
                 </div>
               </div>
 
