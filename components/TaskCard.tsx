@@ -86,7 +86,7 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
               <span className="text-sm font-medium text-textNc capitalize">
                 {displayStatusForTaskCard(task.status).toLowerCase()}
               </span>
-              <StatusCard task={task} status={task.status}></StatusCard>
+              <StatusCard task={task} status={task.status} userRole={userRole}></StatusCard>
             </div>
           </div>
           <h3 className="font-semibold  truncate">{task.title}</h3>

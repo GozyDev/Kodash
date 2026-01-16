@@ -262,9 +262,11 @@ const getStatusImage = (status: Task["status"]) => {
 const StatusCard = ({
   task,
   status,
+  userRole,
 }: {
   task: Task;
   status: Task["status"];
+  userRole: string;
 }) => {
   const handleOptimisticStatus = useTaskStore(
     (state) => state.handleOptimisticStatus
@@ -273,13 +275,13 @@ const StatusCard = ({
 
   // Only allow opening the popout when the present-tense status is "on-going"
   const present = displayStatusForStatusCard(status);
-  const enabled = present === "on-going";
-
+  const enabled = present === "on-going" && userRole === "freelancer";
+  console.log(userRole);
   const [open, setOpen] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [pendingAction, setPendingAction] = useState<"deliver" | "cancel" | null>(
-    null
-  );
+  const [pendingAction, setPendingAction] = useState<
+    "deliver" | "cancel" | null
+  >(null);
 
   const handleStatusChange = (action: "deliver" | "cancel") => {
     setPendingAction(action);
@@ -296,9 +298,14 @@ const StatusCard = ({
 
   return (
     <>
-      <DropdownMenu open={open && enabled} onOpenChange={(v) => enabled && setOpen(v)}>
+      <DropdownMenu
+        open={open && enabled}
+        onOpenChange={(v) => enabled && setOpen(v)}
+      >
         <DropdownMenuTrigger
-          className={`p-1 rounded ${enabled ? "cursor-pointer" : "cursor-default"} text-[10px] tracking-widest`}
+          className={`p-1 rounded ${
+            enabled ? "cursor-pointer" : "cursor-default"
+          } text-[10px] tracking-widest`}
           onClick={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
         >
