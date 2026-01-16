@@ -78,6 +78,11 @@ export async function POST(request: Request) {
       );
     }
 
+
+    const { data, error } = await svc.rpc("debug_auth_uid");
+console.log('Debug',data);
+
+
     // Create workspace (stored in tenants table)
     const { data: tenantData, error: tenantError } = await svc
       .from("tenants")

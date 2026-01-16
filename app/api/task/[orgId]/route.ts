@@ -11,8 +11,9 @@ export async function GET(
   const supabase = await createClient();
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
+  console.log(orgId)
 
-  const query = supabase.from("tasks").select("*");
+  const query = supabase.from("tasks").select("*").eq("tenant_id", orgId);
 
   if (id) {
     const { data, error } = await query.eq("id", id).single();
@@ -44,19 +45,17 @@ export async function POST(
 ) {
   const { orgId } = await params;
   const supabase = await createClient();
-  
+
   // 1. Auth check
   const { data: authData, error: authError } = await supabase.auth.getUser();
   if (authError || !authData.user) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // 2. Permission check: Only CLIENT can create issues/tasks
   const { getUserRole } = await import("@/lib/utils/role");
   const userRole = await getUserRole(authData.user.id, orgId);
+  console.log(userRole)
   if (userRole !== "CLIENT") {
     return NextResponse.json(
       { error: "Only clients can create issues" },
@@ -78,7 +77,7 @@ export async function POST(
         title,
         description,
         priority,
-        status:"draft",
+        status: "draft",
         due_date: duecheck,
         tenant_id: orgId,
         created_by: authData.user.id,
@@ -120,9 +119,14 @@ export async function POST(
       }
 
       if (uniqueInserts.length > 0) {
-        const { error: attachErr } = await supabase.from("request_attachments").insert(uniqueInserts);
+        const { error: attachErr } = await supabase
+          .from("request_attachments")
+          .insert(uniqueInserts);
         if (attachErr) {
-          console.log("Failed to insert request_attachments:", attachErr.message);
+          console.log(
+            "Failed to insert request_attachments:",
+            attachErr.message
+          );
         }
       }
     }
@@ -145,7 +149,7 @@ export async function PATCH(req: Request) {
     title?: string;
     description?: string | null;
   } = {};
-  
+
   if (priority !== undefined) {
     updateObj.priority = priority;
   }
