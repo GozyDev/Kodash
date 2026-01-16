@@ -19,7 +19,6 @@ export default function TaskClient({
   orgId: string;
   userRole: "client" | "freelancer";
 }) {
-  console.log("Role", userRole);
   const task = useTaskStore((state) => state.task);
   const setTask = useTaskStore((state) => state.setTask);
 
@@ -42,8 +41,13 @@ export default function TaskClient({
       const current = useTaskStore.getState().task;
       const currentOrg = useOrgIdStore.getState().orgId;
 
-      // Ensure the store's orgId matches and there is cached data
-      if (current && current.length > 0 && currentOrg === orgId) {
+      // Only use cache if it matches the current org and orgId is set
+      if (
+        current &&
+        current.length > 0 &&
+        currentOrg === orgId &&
+        orgId !== ""
+      ) {
         // Just set loading false; filtered tasks will be derived from store
         setLoading(false);
         return;
@@ -56,7 +60,6 @@ export default function TaskClient({
         console.log(errorMessage);
       } else {
         const data = await res.json();
-        console.log("Data", data);
         setTask(data || []);
       }
     } catch (error) {
@@ -67,7 +70,10 @@ export default function TaskClient({
   }, [orgId]);
 
   // keep the global orgId in sync so other components can use it when checking cache
+  // also clear old tasks immediately when switching orgs to prevent stale data
   useEffect(() => {
+    setLoading(true);
+    setTask([]);
     useOrgIdStore.getState().setOrgId(orgId);
   }, [orgId]);
 
@@ -96,8 +102,6 @@ export default function TaskClient({
               ? [newTask, ...current.filter((t) => t.id !== newTask.id)]
               : [newTask, ...current];
             useTaskStore.setState({ task: next });
-
-            console.log("new task received via subscription:", newTask.id);
           } catch (e) {
             console.error("Failed handling task insert payload", e);
           }
@@ -162,7 +166,7 @@ export default function TaskClient({
     if (filters.priority !== "All") {
       result = result.filter((task) => task.priority === filters.priority);
     }
-    console.log("changed");
+
     setFilteredTasks(result);
   }, [task, filters]);
 
