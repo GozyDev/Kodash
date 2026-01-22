@@ -12,6 +12,7 @@ import { Task, Comment } from "@/lib/superbase/type";
 import { presentToPast } from "@/lib/status";
 import CommentSection from "./CommentSection";
 import ProposalOverview from "./ProposalOverview";
+import { createBrowserClient } from "@supabase/ssr";
 
 // Small helper component for description viewing/editing
 function DescriptionViewer({
@@ -200,133 +201,153 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
   useEffect(() => {
     if (!issueId) return;
 
-    const supabase = createClient(
+    const supabase = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     );
 
-    const channel = supabase
-      .channel(`issue-${issueId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "tasks",
-          filter: `id=eq.${issueId}`,
-        },
-        (payload) => {
-          try {
+    let channel: any;
+
+    const setupRealtime = async () => {
+      // 🔍 PROOF STEP — DO NOT SKIP
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      console.log("realtime user:", user?.id);
+
+      if (!user) {
+        console.error("❌ NO AUTH USER — REALTIME WILL NOT FIRE");
+        return;
+      }
+
+      channel = supabase
+        .channel(`issue-${issueId}`)
+
+        // ---- TASK UPDATE ----
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "tasks",
+            filter: `id=eq.${issueId}`,
+          },
+          (payload) => {
             const updated = payload.new as Task;
-            // update local single-source state
+
             setIssue(updated);
 
-            // update global store
             const current = useTaskStore.getState().task;
             const exists = current.some((t) => t.id === updated.id);
-            const next = exists
-              ? current.map((t) => (t.id === updated.id ? updated : t))
-              : [updated, ...current];
-            useTaskStore.setState({ task: next });
-            console.log("issue updated via realtime:", updated.id);
-          } catch (e) {
-            console.error("Failed handling task update payload", e);
-          }
-        }
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "DELETE",
-          schema: "public",
-          table: "tasks",
-          filter: `id=eq.${issueId}`,
-        },
-        (payload) => {
-          try {
-            const removed = payload.old as Task;
-            setIssue(null);
-            const current = useTaskStore.getState().task;
+
             useTaskStore.setState({
-              task: current.filter((t) => t.id !== removed.id),
+              task: exists
+                ? current.map((t) =>
+                  t.id === updated.id ? updated : t,
+                )
+                : [updated, ...current],
             });
+
+            console.log("issue updated via realtime:", updated.id);
+          },
+        )
+
+        // ---- TASK DELETE ----
+        .on(
+          "postgres_changes",
+          {
+            event: "DELETE",
+            schema: "public",
+            table: "tasks",
+            filter: `id=eq.${issueId}`,
+          },
+          (payload) => {
+            const removed = payload.old as Task;
+
+            setIssue(null);
+
+            useTaskStore.setState({
+              task: useTaskStore
+                .getState()
+                .task.filter((t) => t.id !== removed.id),
+            });
+
             console.log("issue deleted via realtime:", removed.id);
-          } catch (e) {
-            console.error("Failed handling task delete payload", e);
-          }
-        }
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "request_proposal",
-          filter: `request_id=eq.${issueId}`,
-        },
-        (payload) => {
-          try {
+          },
+        )
+
+        // ---- PROPOSAL INSERT ----
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "request_proposal",
+            filter: `request_id=eq.${issueId}`,
+          },
+          (payload) => {
             const newProposal = payload.new as any;
             setProposal(newProposal);
-            // if proposal includes a decision, reflect request status in global tasks
-            if (newProposal?.status) {
+
+            if (newProposal?.status === "accepted") {
               const tasks = useTaskStore.getState().task;
-              const updated = tasks.map((t) =>
-                t.id === issueId
-                  ? {
-                      ...t,
-                      status: (newProposal.status === "accepted"
-                        ? "on-going"
-                        : t.status) as Task["status"],
-                    }
-                  : t
-              );
-              useTaskStore.setState({ task: updated });
+
+              useTaskStore.setState({
+                task: tasks.map((t) =>
+                  t.id === issueId
+                    ? { ...t, status: "on-going" }
+                    : t,
+                ),
+              });
             }
-          } catch (e) {
-            console.error("Failed handling proposal insert payload", e);
-          }
-        }
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "request_proposal",
-          filter: `request_id=eq.${issueId}`,
-        },
-        (payload) => {
-          try {
+          },
+        )
+
+        // ---- PROPOSAL UPDATE ----
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "request_proposal",
+            filter: `request_id=eq.${issueId}`,
+          },
+          (payload) => {
             const updatedProposal = payload.new as any;
             setProposal(updatedProposal);
-            if (updatedProposal?.status) {
-              const tasks = useTaskStore.getState().task;
-              const updated = tasks.map((t) =>
+
+            const tasks = useTaskStore.getState().task;
+
+            useTaskStore.setState({
+              task: tasks.map((t) =>
                 t.id === issueId
                   ? {
-                      ...t,
-                      status: (updatedProposal.status === "accepted"
+                    ...t,
+                    status:
+                      updatedProposal.status === "accepted"
                         ? "on-going"
                         : updatedProposal.status === "canceled"
-                        ? "cancel"
-                        : t.status) as Task["status"],
-                    }
-                  : t
-              );
-              useTaskStore.setState({ task: updated });
-            }
-          } catch (e) {
-            console.error("Failed handling proposal update payload", e);
-          }
-        }
-      )
-      .subscribe();
+                          ? "cancel"
+                          : t.status,
+                  }
+                  : t,
+              ),
+            });
+          },
+        )
+        .subscribe((status) =>
+          console.log("Realtime status:", status),
+        );
+    };
+
+    setupRealtime();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
   }, [issueId]);
+
 
   // No inline editing or debounced updates on this view-only page.
 

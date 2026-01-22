@@ -4,7 +4,7 @@ import { getUserRole } from "@/lib/utils/role";
 
 export async function GET(
   _req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const supabase = await createClient();
@@ -55,7 +55,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const supabase = await createClient();
@@ -69,7 +69,7 @@ export async function PATCH(
 
     const body = await req.json().catch(() => ({}));
     const { status, id: proposalId } = body as { status?: string; id: string };
-    console.log(status);
+
     if (!status || !["accepted", "canceled"].includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
@@ -89,7 +89,6 @@ export async function PATCH(
 
     const userRole = await getUserRole(authData.user.id, taskData.tenant_id);
     if (userRole !== "CLIENT") {
-      console.log("invalid role");
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -100,10 +99,6 @@ export async function PATCH(
       .eq("id", proposalId)
       .select("id, price, currency, due_date, dod, status")
       .single();
-
-    console.log("Proposal", proposalId);
-    console.log("Data", data);
-    console.log("Data", issueId);
 
     if (error) {
       console.log("Failed to update proposal status:", error);

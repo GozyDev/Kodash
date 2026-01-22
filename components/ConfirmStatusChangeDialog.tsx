@@ -41,7 +41,7 @@ const ConfirmStatusChangeDialog = ({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{message}</DialogDescription>
         </DialogHeader>
-        <DialogFooter className="gap-2">
+        <DialogFooter className="flex flex-col gap-2">
           <Button
             onClick={() => onOpenChange(false)}
             className="flex-1 bg-cardICB/50 hover:bg-cardICB/50 cursor-pointer"

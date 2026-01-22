@@ -10,7 +10,8 @@ import TaskFilters from "@/components/TaskFilters";
 import TaskDrawer from "@/components/TaskDrawer";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/superbase/superbase-server";
+import { createBrowserClient } from "@supabase/ssr";
 
 export default function TaskClient({
   orgId,
@@ -82,78 +83,102 @@ export default function TaskClient({
   }, [fetchTasks]);
 
   useEffect(() => {
-    const supabase = createClient(
+    if (!orgId) return;
+
+    const supabase = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     );
-    const channel = supabase
-      .channel("task-channel")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "tasks" },
-        (payload) => {
-          try {
+
+    let channel: any;
+
+    const setupRealtime = async () => {
+      // 🔍 PROOF STEP — DO NOT SKIP
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      console.log("realtime user:", user?.id);
+
+      if (!user) {
+        console.error("❌ NO AUTH USER — REALTIME WILL NOT FIRE");
+        return;
+      }
+
+      channel = supabase
+        .channel(`tasks-${orgId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "tasks",
+            filter: `tenant_id=eq.${orgId}`,
+          },
+          (payload) => {
+            console.log("INSERT realtime fired");
             const newTask = payload.new as Task;
-            const current = useTaskStore.getState().task;
 
-            // If we already have this task, replace it; otherwise insert at top
+            const current = useTaskStore.getState().task;
             const exists = current.some((t) => t.id === newTask.id);
-            const next = exists
-              ? [newTask, ...current.filter((t) => t.id !== newTask.id)]
-              : [newTask, ...current];
-            useTaskStore.setState({ task: next });
-          } catch (e) {
-            console.error("Failed handling task insert payload", e);
-          }
-        }
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "tasks",
-        },
-        (payload) => {
-          try {
-            const updated = payload.new as Task;
-            const current = useTaskStore.getState().task;
 
-            // Replace existing task if present, otherwise insert
-            const exists = current.some((t) => t.id === updated.id);
-            const next = exists
-              ? current.map((t) => (t.id === updated.id ? updated : t))
-              : [updated, ...current];
-            useTaskStore.setState({ task: next });
-
-            console.log("task updated via subscription:", updated.id);
-          } catch (e) {
-            console.error("Failed handling task update payload", e);
-          }
-        }
-      )
-      .on(
-        "postgres_changes",
-        { event: "DELETE", schema: "public", table: "tasks" },
-        (payload) => {
-          try {
-            const removed = payload.old as Task;
-            const current = useTaskStore.getState().task;
             useTaskStore.setState({
-              task: current.filter((t) => t.id !== removed.id),
+              task: exists
+                ? current.map((t) => (t.id === newTask.id ? newTask : t))
+                : [newTask, ...current],
             });
-            console.log("task removed via subscription:", removed.id);
-          } catch (e) {
-            console.error("Failed handling task delete payload", e);
-          }
-        }
-      )
-      .subscribe((status) => console.log(status));
+          },
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "tasks",
+            filter: `tenant_id=eq.${orgId}`,
+          },
+          (payload) => {
+            console.log("UPDATE realtime fired");
+            const updatedTask = payload.new as Task
+            const current = useTaskStore.getState().task
+            const exists = current.some((t) => t.id === updatedTask.id)
+            useTaskStore.setState({
+              task: exists ? current.map((t) => t.id === updatedTask.id ? updatedTask : t) : [updatedTask, ...current],
+            })
+            console.log("WrapedTask")
+          },
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "DELETE",
+            schema: "public",
+            table: "tasks",
+            filter: `tenant_id=eq.${orgId}`,
+          },
+          (payload) => {
+            console.log("DELETE realtime fired");
+            const removed = payload.old as Task;
+
+            useTaskStore.setState({
+              task: useTaskStore
+                .getState()
+                .task.filter((t) => t.id !== removed.id),
+            });
+          },
+        )
+        .subscribe((status) =>
+          console.log("Realtime status:", status),
+        );
+    };
+
+    setupRealtime();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
-  }, []);
+  }, [orgId]);
+
 
   // Apply filters
   useEffect(() => {
@@ -269,10 +294,10 @@ export default function TaskClient({
           onCreateWithStatus={
             userRole === "client"
               ? (status) => {
-                  setSelectedTask(null);
-                  setCreateInitialStatus(status);
-                  setIsDrawerOpen(true);
-                }
+                setSelectedTask(null);
+                setCreateInitialStatus(status);
+                setIsDrawerOpen(true);
+              }
               : undefined
           }
         />

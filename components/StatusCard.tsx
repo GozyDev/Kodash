@@ -275,8 +275,7 @@ const StatusCard = ({
 
   // Only allow opening the popout when the present-tense status is "on-going"
   const present = displayStatusForStatusCard(status);
-  const enabled = present === "on-going" && userRole === "freelancer";
-  console.log(userRole);
+  const enabled = present === "on-going";
   const [open, setOpen] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<

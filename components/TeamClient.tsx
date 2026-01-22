@@ -200,7 +200,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
       {inviteOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
-            className="absolute inset-0 bg-black/60"
+            className="absolute inset-0 bg-black/60 backdrop-blur-2xl"
             onClick={() => setInviteOpen(false)}
             aria-hidden
           />
@@ -235,8 +235,8 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                     >
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="border-cardICB bg-cardICB text-white">
-                      <SelectItem value="Client">Client</SelectItem>
+                    <SelectContent className="border-cardICB bg-cardC text-white">
+                      <SelectItem value="Client" className="">Client</SelectItem>
                       <SelectItem value="Freelancer">Freelancer</SelectItem>
                     </SelectContent>
                   </Select>
@@ -254,7 +254,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                       setEmailError(null);
                     }}
                     type="email"
-                    className="bg-[#0b0d10]"
+                    className="border border-cardCB bg-cardICB/10"
                     aria-label="Email address"
                   />
                   {emailError && (
