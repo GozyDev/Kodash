@@ -63,6 +63,21 @@ export async function POST(
     );
   }
 
+  const { data: membershipsData, error: membershipsError } = await supabase
+    .from("memberships")
+    .select(`
+      profiles("id")
+    `)
+    .eq("tenant_id", orgId);
+
+  if (membershipsError) {
+    console.error("Error fetching memberships:", membershipsError.message);
+    return NextResponse.json({ error: membershipsError.message }, { status: 500 });
+  }
+
+
+  const viewUsers = membershipsData.map(p => p.profiles.id);
+  console.log(viewUsers)
   const body = await req.json();
   const { title, description, priority, status, due_date } = body;
   if (!title || !title.toString().trim()) {
@@ -81,6 +96,7 @@ export async function POST(
         due_date: duecheck,
         tenant_id: orgId,
         created_by: authData.user.id,
+        visible_user_ids: [...viewUsers]
       },
     ])
     .select()

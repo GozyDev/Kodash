@@ -49,6 +49,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
         return;
       }
       const json = await res.json();
+      console.log(json.memberships)
       setMemberships(json.memberships ?? []);
     } catch (err) {
       console.error("Error loading memberships:", err);
