@@ -19,10 +19,19 @@ type Profile = {
   full_name?: string;
   avatar_url?: string;
 };
-
+type Tenants = {
+  id: string,
+  created_by: string
+}
 type Membership = {
   role: string;
   profiles: Profile | null;
+  tenants: Tenants | null
+};
+
+type User = {
+  id: string;
+  email: string | null;
 };
 
 export default function TeamClient({ orgId }: { orgId: string }) {
@@ -34,6 +43,9 @@ export default function TeamClient({ orgId }: { orgId: string }) {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!orgId) return;
@@ -57,6 +69,34 @@ export default function TeamClient({ orgId }: { orgId: string }) {
       setLoading(false);
     }
   }
+
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/auth/user");
+
+        if (!res.ok) {
+          const body = await res.json();
+          throw new Error(body.error || "Failed to fetch user");
+        }
+
+        const data = await res.json();
+        setUser(data.user);
+      } catch (err: any) {
+        setError(err.message);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  console.log(user)
+  const tenantCreatorId = memberships[0]?.tenants?.created_by;
+  const isCreator = tenantCreatorId === user?.id;
 
   const filteredMemberships = memberships.filter((membership) => {
     if (!searchQuery.trim()) return true;
@@ -145,6 +185,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
               {/* User list */}
               <div className="divide-y divide-cardCB">
                 {filteredMemberships.map((membership, index) => {
+                  const isCurrentUser = membership.profiles?.id === user?.id;
                   const profile = membership.profiles;
                   if (!profile) return null;
 
@@ -179,14 +220,15 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                           <div className="text-sm text-textNd capitalize">
                             {membership.role}
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-textNd hover:text-textNa"
-                          >
-                            <LogOut className="w-4 h-4 mr-2" />
-                            Leave
-                          </Button>
+                          {isCurrentUser && !isCreator && (
+                            <Button className="bg-cardICB/50 hover:bg-cardICB/ cursor-pointer" size="sm">
+                              <LogOut className="w-4 h-4 mr-2" />
+                            
+                              Leave
+                            </Button>
+                          )}
+
+
                         </div>
                       </div>
                     </div>
