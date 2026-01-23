@@ -15,10 +15,11 @@ export async function GET(req: Request) {
     .from("memberships")
     .select(`
       role,
-      profiles(*)
+      profiles(*),
+      tenants("id","created_by")
     `)
     .eq("tenant_id", orgId);
-
+    console.log("MembershipDAta",data)
   if (error) {
     console.error("Error fetching memberships:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
