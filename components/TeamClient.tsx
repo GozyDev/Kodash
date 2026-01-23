@@ -125,13 +125,13 @@ export default function TeamClient({ orgId }: { orgId: string }) {
   };
 
   return (
-    <div className="p-12 w-full text-textNa">
-      <div className="max-w-7xl mx-auto">
+    <div className="px-[20px] w-full text-textNa">
+      <div className="mx-auto">
         <div className="mb-6"></div>
 
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 bg-cardC rounded-md px-3 py-2 w-96 border border-cardCB">
+            <div className="flex items-center gap-2 bg-cardC rounded-md px-3 py-1 w-96 border border-cardCB">
               <Search className="w-5 h-5 text-textNd" />
               <Input
                 value={searchQuery}
