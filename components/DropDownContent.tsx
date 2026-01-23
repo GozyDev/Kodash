@@ -51,14 +51,14 @@ const DropDownContent = ({ orgs }: { orgs: Org[] }) => {
   const goToAll = () => router.push("/dashboard/organizations");
 
   return (
-    <DropdownMenu>
+    <DropdownMenu >
       <DropdownMenuTrigger asChild>
         <button className="p-1 rounded-md">
           <ChevronsUpDown className="w-4 h-4 text-gray-400" />
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="bg-cardC border-none text-textNa w-[22rem] min-w-[18rem] text-sm">
+      <DropdownMenuContent align="start" className="bg-cardC border-none text-textNa w-[22rem] min-w-[18rem] text-sm">
         {/* Search input */}
         <div className="px-2 py-2">
           <div className="flex items-center gap-2 bg-cardC rounded-md px-2 py-1">
@@ -131,6 +131,9 @@ const DropDownContent = ({ orgs }: { orgs: Org[] }) => {
               All Organizations
             </button>
           </DropdownMenuItem>
+
+        <DropdownMenuSeparator className="my-2 bg-cardCB" />
+
 
           <DropdownMenuItem className="p-0">
             <button
