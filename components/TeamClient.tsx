@@ -206,24 +206,27 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                             </AvatarFallback>
                           </Avatar>
 
-                          <div className="flex flex-col">
-                            <div className="font-medium text-textNa">
-                              {profile.full_name || profile.email || "Unknown"}
+                          <div className="flex items-end gap-7">
+                            <div className="flex flex-col">
+                              <div className="font-medium text-textNa">
+                                {profile.full_name || profile.email || "Unknown"}
+                              </div>
+                              <div className="text-sm text-textNd">
+                                {profile.email}
+                              </div>
                             </div>
-                            <div className="text-sm text-textNd">
-                              {profile.email}
+                            <div className="text-[10px] tracking-widest text-textNb capitalize bg-cardICB/50 p-1 px-3 rounded-3xl">
+                              <p className="sm">{membership.role}</p>
                             </div>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-6">
-                          <div className="text-sm text-textNd capitalize">
-                            {membership.role}
-                          </div>
+
                           {isCurrentUser && !isCreator && (
-                            <Button className="bg-cardICB/50 hover:bg-cardICB/ cursor-pointer" size="sm">
+                            <Button className="hover:bg-cardICB/ cursor-pointer text-[12px]  bg-red-900/50 tracking-wider">
                               <LogOut className="w-4 h-4 mr-2" />
-                            
+
                               Leave
                             </Button>
                           )}
