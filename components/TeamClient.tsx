@@ -144,12 +144,12 @@ export default function TeamClient({ orgId }: { orgId: string }) {
 
           <div className="flex items-center gap-4">
             <Button
-              variant="default"
-              className="inline-flex items-center gap-2 text-white px-4 py-2 butt"
+
+              className="inline-flex items-center md:gap-2 text-white px-4 py-2 butt"
               onClick={() => setInviteOpen(true)}
             >
               <UserPlus className="w-4 h-4" />
-              Invite Member
+              <p className="hidden md:block">Invite Member</p>
             </Button>
           </div>
         </div>
