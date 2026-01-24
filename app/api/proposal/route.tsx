@@ -68,7 +68,8 @@ export async function POST(req: Request) {
           price,
           request_id: requestId,
           due_date: deadline,
-          // freelancer_id: authData.user.id,
+          freelancer_id: authData.user.id,
+          status:'pending'
         },
       ])
       .select("id, dod, price, request_id, due_date")
