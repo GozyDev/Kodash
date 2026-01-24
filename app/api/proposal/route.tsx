@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     // }
 
     // 5. Create proposal
-    const { data, error } = await supabase
+    const { data: requestData, error } = await supabase
       .from("request_proposal")
       .insert([
         {
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
           request_id: requestId,
           due_date: deadline,
           freelancer_id: authData.user.id,
-          status:'pending'
+          status: 'pending'
         },
       ])
       .select("id, dod, price, request_id, due_date")
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
     }
 
     // 6. Update task status from "draft" to "proposed" if proposal was created successfully
-    if (taskData.status === "draft") {
+    if (taskData.status === "draft" && requestData) {
       const { error: updateError } = await supabase
         .from("tasks")
         .update({ status: "proposed" })
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json(data, { status: 201 });
+    return NextResponse.json(requestData, { status: 201 });
   } catch (err) {
     console.error("Unexpected error:", err);
     return NextResponse.json(

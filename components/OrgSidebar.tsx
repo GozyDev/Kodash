@@ -25,7 +25,7 @@ import Link from "next/link";
 const toolItems = [{ title: "Settings", icon: Settings, url: "/settings" }];
 
 export function OrgSidebar({
-  orgId,
+  orgId,  
   role,
 }: {
   orgId: string;
@@ -47,7 +47,7 @@ export function OrgSidebar({
   return (
     <Sidebar
       className={cn(
-        "bg-bgPrimary border-cardCB",
+        "bg-bgPrimary border-r-cardCB",
         "transition-all duration-300 ease-in-out",
         "shadow-sm backdrop-blur-sm",
         "top-[65px] h-[calc(100vh-65px)]"

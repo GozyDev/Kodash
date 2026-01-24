@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Settings } from "lucide-react";
 import DropDownContent from "./DropDownContent";
 import User from "./User";
+import { SidebarTrigger } from "./ui/sidebar";
 
 type Org = { id: string; name: string; plan?: string };
 
@@ -40,6 +41,9 @@ export default function OrgHeader({
 
           <DropDownContent orgs={orgs} />
         </div>
+
+        <SidebarTrigger className="bg-cardC hover:bg-cardC/50" />
+
       </div>
 
       <div className="flex items-center gap-4">

@@ -3,6 +3,7 @@
 import { ReactNode, useEffect } from "react";
 import { useOrgIdStore } from "@/app/store/useOrgId";
 import { OrgSidebar } from "@/components/OrgSidebar";
+import { SidebarHeader, SidebarTrigger } from "./ui/sidebar";
 
 export default function OrgLayoutClient({
   orgId,
