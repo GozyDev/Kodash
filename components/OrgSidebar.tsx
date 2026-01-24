@@ -38,10 +38,10 @@ export function OrgSidebar({
       : `/dashboard/cl-org/${orgId}`;
 
   const navItems = [
-    { title: "Overview", icon: LayoutGrid, url: basePath },
+    // { title: "Overview", icon: LayoutGrid, url: basePath },`
     { title: "Request", icon: FilePenLine, url: `${basePath}/issues` },
     { title: "Members", icon: Users, url: `${basePath}/team` },
-    { title: "Payment", icon: HandCoins, url: `${basePath}/payments` },
+    // { title: "Payment", icon: HandCoins, url: `${basePath}/payments` },
   ];
 
   return (
