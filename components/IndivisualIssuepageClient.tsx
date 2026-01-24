@@ -369,11 +369,12 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
   }
 
   return (
-    <div className=" text-textNb">
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_200px]">
-        <div className="space-y-8 pb-[20px] px-3 lg:px-6">
-          <div className="bg-cardC w-full h-[40px]"></div>
-          <header className="mb-6 space-y-6 rounded">
+    <div className=" text-textNb ">
+      <div className="flex flex-col-reverse lg:grid gap-6 lg:grid-cols-[minmax(0,2fr)_200px]">
+        <div className="space-y-6 pb-[20px] px-3 lg:px-6">
+          <section className="flex flex-col gap-4 bg-cardICB/10 rounded" >
+            <div className="bg-cardC w-full h-[40px] rounded"/>
+          <header className="mb-6 space-y-6 rounded px-4">
             <Input
               value={issue.title}
               readOnly
@@ -387,6 +388,8 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
               <DescriptionViewer text={issue.description || ""} />
             </div>
           </header>
+          </section>
+         
 
           {/* <CommentSection issueId={issueId} /> */}
 
@@ -480,15 +483,16 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
           )}
         </div>
 
-        <aside className="space-y-4  h-max p-4 lg:p-0 md:sticky top-[74px] right-[10px] ">
-          <section className="rounded border border-cardCB bg-cardC p-2">
+        <aside className="space-y-4  h-max p-4  lg:p-0 sticky top-[60px] right-[10px] flex md:flex-col items-center  border-b border-b-cardCB md:border-none gap-3 bg-bgPrimary/90 backdrop-blur-2xl">
+      
+          <section className="rounded border border-cardCB bg-cardC p-2 w-max md:w-full m-0">
             <div className="flex items-center justify-between">
               <p className=" capitalize ">{issue.status}</p>
               <StatusCard task={issue} status={issue.status}></StatusCard>
             </div>
           </section>
 
-          <section className="rounded border border-cardCB bg-cardC p-2">
+          <section className="rounded border border-cardCB bg-cardC p-2 w-max md:w-full">
             <div className="flex items-start justify-between">
               <p className=" capitalize">{issue.priority}</p>
               <PriorityCard
