@@ -233,7 +233,7 @@ export default function TaskClient({
   }
 
   return (
-    <div className="text-textNb p">
+    <div className="text-textNb ">
       {/* Header */}
       <div className="border-b border-cardCB px-6 pb-4 py-[5px] ">
         <div className="flex items-center justify-between">
@@ -287,7 +287,7 @@ export default function TaskClient({
       {/* {<TaskFilters filters={filters} onFiltersChange={setFilters} />} */}
 
       {/* Task List */}
-      <div className="px-6 py-4">
+      <div className="px-2 md:px-4 py-4">
         <TaskList
           tasks={filteredTasks}
           userRole={userRole}

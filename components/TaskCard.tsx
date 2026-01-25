@@ -150,12 +150,7 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
             />
           </div>
         </div>
-        <div
-          onClick={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
-        >
-          <MoreHorizontal className="w-5 h-5 text-gray-400 flex-shrink-0" />
-        </div>
+     
       </div>
     </motion.div>
   );

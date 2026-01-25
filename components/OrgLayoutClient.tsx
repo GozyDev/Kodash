@@ -26,7 +26,7 @@ export default function OrgLayoutClient({
         <aside>
           <OrgSidebar orgId={orgId} role={role} />
         </aside>
-        <main className="flex-1 pt-[68px]">
+        <main className="flex-1 pt-[68px] ">
           <div className="flex w-full">
             <div className="flex-1">{children}</div>
           </div>

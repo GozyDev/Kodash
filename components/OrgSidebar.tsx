@@ -54,7 +54,7 @@ export function OrgSidebar({
       )}
       collapsible="icon"
     >
-      <SidebarContent className="flex flex-col gap-6">
+      <SidebarContent className="flex flex-col gap-6 border-none">
         {/* Main Navigation Section */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-[11px] uppercase tracking-wider text-muted-foreground/70 font-medium px-3">
