@@ -287,7 +287,7 @@ export default function TaskFilters({ filters, onFiltersChange, userRole }: any)
         <DropdownMenuContent className="w-48 border-cardCB" align="start">
           {/* Status Sub-menu */}
           <DropdownMenuSub  >
-            <DropdownMenuSubTrigger className="text-xs ">
+            <DropdownMenuSubTrigger className="text-xs    ">
               <CircleDashed className="mr-2 h-3.5 w-3.5" />
               <span>Status</span>
             </DropdownMenuSubTrigger>
