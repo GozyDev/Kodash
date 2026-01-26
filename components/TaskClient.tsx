@@ -235,56 +235,10 @@ export default function TaskClient({
   return (
     <div className="text-textNb ">
       {/* Header */}
-      <div className="border-b border-cardCB px-6 pb-4 py-[5px] ">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2 mt-1 text-sm">
-              <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
-                {/* Todo: {task.filter((t) => t.status === "to-do").length} */}
-                All request
-              </span>
-              <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
-                {/* In Progress:{" "}
-                {task.filter((t) => t.status === "in-progress").length} */}
-                Proposed
-              </span>
-              <span className="px-2 py-0.5 rounded border border-cardCB bg-cardC text-textNd">
-                {/* Done: {task.filter((t) => t.status === "done").length} */}
-                Completed
-              </span>
-            </div>
-          </div>
-
-          {userRole === "client" && (
-            <button
-              onClick={() => {
-                setSelectedTask(null);
-                setIsDrawerOpen(true);
-              }}
-              className="butt w-10 h-5 flex items-center justify-center rounded text-sm"
-            >
-              <Plus className="w-3 h-3" />
-            </button>
-          )}
-        </div>
-
-        {/* Progress Bar */}
-        {/* {
-          <div className="mt-4">
-            <div className="w-full bg-cardC rounded-full h-2">
-              <motion.div
-                className="bg-green-500 h-2 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-          </div>
-        } */}
-      </div>
+     
 
       {/* Filters */}
-      {/* {<TaskFilters filters={filters} onFiltersChange={setFilters} />} */}
+       {<TaskFilters filters={filters} onFiltersChange={setFilters} />}
 
       {/* Task List */}
       <div className="px-2 md:px-4 py-4">
