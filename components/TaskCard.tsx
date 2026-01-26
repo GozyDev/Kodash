@@ -72,12 +72,12 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-2">
-            <div
+            {userRole === "freelancer" && <div
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
             >
               <PriorityCard task={task} priority={task.priority}></PriorityCard>
-            </div>
+            </div>}
             <div
               className="flex items-center"
               onClick={(e) => e.stopPropagation()}
@@ -150,7 +150,7 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
             />
           </div>
         </div>
-     
+
       </div>
     </motion.div>
   );
