@@ -275,10 +275,10 @@ const PRIORITY_OPTIONS = [
 
 export default function TaskFilters({ filters, onFiltersChange }: any) {
   return (
-    <div className="flex items-center gap-2 p-4 border-b border-cardCB">
+    <div className="flex items-center gap-2 border-cardCB">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button size="sm" className="h-8 border-dashed gap-1 text-xs font-normal focus:border-none">
+          <Button size="sm" className="h-8 border-dashed gap-1 text-xs font-normal ">
             <Plus className="h-3.5 w-3.5" />
             Add Filter
           </Button>

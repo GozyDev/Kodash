@@ -234,11 +234,13 @@ export default function TaskClient({
 
   return (
     <div className="text-textNb ">
-      {/* Header */}
-     
 
-      {/* Filters */}
-       {<TaskFilters filters={filters} onFiltersChange={setFilters} />}
+      <div className="flex justify-between items-center py-2 p-3 border-b border-b-cardCB">
+        {<TaskFilters filters={filters} onFiltersChange={setFilters} />}
+
+        <button className="butt  px-4 rounded">+</button>
+      </div>
+
 
       {/* Task List */}
       <div className="px-2 md:px-4 py-4">
