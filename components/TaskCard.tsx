@@ -89,7 +89,7 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
               <StatusCard task={task} status={task.status} userRole={userRole}></StatusCard>
             </div>
           </div>
-          <h3 className="font-semibold  truncate">{task.title}</h3>
+          <h3 className="font-semibold text-[15px] md:text-base">{task.title}</h3>
           {task.description && (
             <p className="text-sm text-textNd  mt-1 line-clamp-2">
               {task.description}
