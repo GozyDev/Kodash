@@ -278,7 +278,7 @@ export default function TaskFilters({ filters, onFiltersChange }: any) {
     <div className="flex items-center gap-2 p-4 border-b border-cardCB">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button size="sm" className="h-8 border-dashed gap-1 text-xs font-normal">
+          <Button size="sm" className="h-8 border-dashed gap-1 text-xs font-normal focus:border-none">
             <Plus className="h-3.5 w-3.5" />
             Add Filter
           </Button>
