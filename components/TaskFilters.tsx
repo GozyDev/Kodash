@@ -273,7 +273,7 @@ const PRIORITY_OPTIONS = [
   },
 ];
 
-export default function TaskFilters({ filters, onFiltersChange }: any) {
+export default function TaskFilters({ filters, onFiltersChange, userRole }: any) {
   return (
     <div className="flex items-center gap-2 border-cardCB">
       <DropdownMenu>
@@ -286,8 +286,8 @@ export default function TaskFilters({ filters, onFiltersChange }: any) {
 
         <DropdownMenuContent className="w-48 border-cardCB" align="start">
           {/* Status Sub-menu */}
-          <DropdownMenuSub >
-            <DropdownMenuSubTrigger className="text-xs hover:bg-cardICB">
+          <DropdownMenuSub  >
+            <DropdownMenuSubTrigger className="text-xs ">
               <CircleDashed className="mr-2 h-3.5 w-3.5" />
               <span>Status</span>
             </DropdownMenuSubTrigger>
@@ -308,7 +308,7 @@ export default function TaskFilters({ filters, onFiltersChange }: any) {
           </DropdownMenuSub>
 
           {/* Priority Sub-menu */}
-          <DropdownMenuSub>
+          {userRole === "freelancer" && <DropdownMenuSub>
             <DropdownMenuSubTrigger className="text-xs">
               <SignalHigh className="mr-2 h-3.5 w-3.5" />
               <span>Priority</span>
@@ -327,7 +327,7 @@ export default function TaskFilters({ filters, onFiltersChange }: any) {
                 ))}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
-          </DropdownMenuSub>
+          </DropdownMenuSub>}
         </DropdownMenuContent>
       </DropdownMenu>
 

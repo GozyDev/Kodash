@@ -236,7 +236,7 @@ export default function TaskClient({
     <div className="text-textNb ">
 
       <div className="flex justify-between items-center py-2 p-3 border-b border-b-cardCB">
-        {<TaskFilters filters={filters} onFiltersChange={setFilters} />}
+        {<TaskFilters filters={filters} onFiltersChange={setFilters}  userRole={userRole}/>}
 
         {userRole === "client" && <button className="butt  px-4 rounded" onClick={() => setIsDrawerOpen(true)}>+</button>}
       </div>
