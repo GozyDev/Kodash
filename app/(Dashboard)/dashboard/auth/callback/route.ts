@@ -8,6 +8,7 @@ export async function GET(request: Request) {
   if (!next.startsWith("/")) next = "/";
 
   if (code) {
+    console.log("gottenode",code)
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
@@ -16,9 +17,8 @@ export async function GET(request: Request) {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      console.log("User", user);
       if (user) {
-        const { error: profileError, data: profileData } = await supabase
+         await supabase
           .from("profiles")
           .upsert({
             id: user.id,
@@ -28,8 +28,7 @@ export async function GET(request: Request) {
             avatar_url: user.user_metadata.avatar_url || "",
           });
 
-        console.log("Profile upsert error:", profileError);
-        console.log("Profile upsert data:", profileData);
+       
       }
 
       // ✅ handle redirects depending on environment
