@@ -6,7 +6,7 @@ import { Resend } from "resend";
 // POST /api/workspaces/:id/invite
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const svc = await createClient();
 
@@ -34,8 +34,9 @@ export async function POST(
       return NextResponse.json({ error: "Role is required" }, { status: 400 });
     }
 
-    const workspaceId = params.id;
+    const param = await params;
 
+    const workspaceId = param.id
     const token = randomUUID();
 
     // expire in 24 hours

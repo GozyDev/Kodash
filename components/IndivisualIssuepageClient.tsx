@@ -66,7 +66,7 @@ export type Proposal = {
 type Props = {
   orgId: string;
   issueId: string;
-  userRole:"freelancer"
+  userRole:"freelancer" | "client"
 };
 
 const IndivisualIssuepageClient = ({ orgId, issueId ,userRole }: Props) => {

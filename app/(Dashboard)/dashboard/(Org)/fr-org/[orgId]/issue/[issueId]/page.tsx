@@ -12,6 +12,7 @@ export default async function IndivisualIssuepage({
     <IndivisualIssuepageClient
       orgId={orgId}
       issueId={issueId}
+      userRole = "freelancer"
     ></IndivisualIssuepageClient>
   );
 }
