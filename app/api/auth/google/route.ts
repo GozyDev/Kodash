@@ -3,10 +3,12 @@ import { createClient } from "@/lib/superbase/superbase-server"; // server supab
 
 export async function GET() {
   const supabaseServer = await createClient();
+  const origin = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+  const redirectTo = `${origin.replace(/\/$/, "")}/dashboard/auth/callback`
   const { data, error } = await supabaseServer.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: "http://localhost:3000/dashboard/auth/callback/",
+      redirectTo:redirectTo,
     },
   });
 
