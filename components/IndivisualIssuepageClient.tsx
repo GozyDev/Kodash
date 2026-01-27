@@ -8,7 +8,7 @@ import StatusCard from "./StatusCard";
 import PriorityCard from "./piortyCard";
 import { Input } from "./ui/input";
 import { Loader2, Paperclip } from "lucide-react";
-import { RequestProposal, Task,  } from "@/lib/superbase/type";
+import { Task,  } from "@/lib/superbase/type";
 import { presentToPast } from "@/lib/status";
 import ProposalOverview from "./ProposalOverview";
 import { createBrowserClient } from "@supabase/ssr";

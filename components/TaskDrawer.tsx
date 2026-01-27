@@ -301,7 +301,7 @@ export default function TaskDrawer({
       setAiInput("");
       setAiParsedData(null);
     }
-  }, [task, isOpen]);
+  }, [task, isOpen,initialStatus]);
 
   // Close on Escape key
   useEffect(() => {

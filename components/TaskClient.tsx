@@ -8,6 +8,7 @@ import { Task, } from "@/lib/superbase/type";
 import TaskList from "@/components/TaskList";
 import TaskFilters from "@/components/TaskFilters";
 import TaskDrawer from "@/components/TaskDrawer";
+import { RealtimeChannel } from "@supabase/supabase-js"
 
 import { Loader2 } from "lucide-react";
 
@@ -90,7 +91,7 @@ export default function TaskClient({
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     );
 
-    let channel: any;
+    let channel: RealtimeChannel;
 
     const setupRealtime = async () => {
       // 🔍 PROOF STEP — DO NOT SKIP

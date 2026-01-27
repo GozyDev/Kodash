@@ -18,18 +18,16 @@ interface TaskListProps {
 export default function TaskList({
   tasks,
   userRole,
-  onTaskClick,
-  onCreateWithStatus,
 }: TaskListProps) {
   const groups = useMemo(() => {
-    const byStatus: Record<Task["status"], Task[]> = {
+    const byStatus: Partial<Record<Task["status"], Task[]>> = {
       draft: [],
       propose: [],
       "on-going": [],
       deliver: [],
       complete: [],
       cancel: [],
-    } as Record<Task["status"], Task[]>;
+    } ;
 
     for (const t of tasks) {
       // normalize stored status to present-tense for grouping (DB may store past-tense)
@@ -94,6 +92,9 @@ export default function TaskList({
   return (
     <div className="space-y-6">
       {groups.map((group) => {
+        if (!group.items){
+          return
+        }
         if (group.items.length === 0) return null; // render section only if it has tasks
         const isCollapsed = !!collapsed[group.key];
         return (

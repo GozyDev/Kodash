@@ -74,7 +74,7 @@ export async function POST(
     .select(`
       profiles ( id )
     `)
-    .eq("tenant_id", orgId) as { data: MembershipJoin[] | null; error: any };
+    .eq("tenant_id", orgId) as { data: MembershipJoin[] | null; error:Error };
 
   if (membershipsError) {
     console.error("Error fetching memberships:", membershipsError.message);
