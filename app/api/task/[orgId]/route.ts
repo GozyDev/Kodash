@@ -3,6 +3,12 @@ import { createClient } from "@/lib/superbase/superbase-server";
 import { NextResponse } from "next/server";
 import { Task } from "@/lib/superbase/type";
 
+interface MembershipJoin {
+  profiles: {
+    id: string;
+  } | null;
+}
+
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ orgId: string }> }
@@ -38,7 +44,6 @@ export async function GET(
   return NextResponse.json(data);
 }
 
-// Create Task (POST)
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ orgId: string }> }
@@ -55,7 +60,7 @@ export async function POST(
   // 2. Permission check: Only CLIENT can create issues/tasks
   const { getUserRole } = await import("@/lib/utils/role");
   const userRole = await getUserRole(authData.user.id, orgId);
-  console.log(userRole)
+
   if (userRole !== "CLIENT") {
     return NextResponse.json(
       { error: "Only clients can create issues" },
@@ -63,28 +68,36 @@ export async function POST(
     );
   }
 
+  // 3. Fetch memberships with explicit typing to avoid 'any'
   const { data: membershipsData, error: membershipsError } = await supabase
     .from("memberships")
     .select(`
-      profiles("id")
+      profiles ( id )
     `)
-    .eq("tenant_id", orgId);
+    .eq("tenant_id", orgId) as { data: MembershipJoin[] | null; error: any };
 
   if (membershipsError) {
     console.error("Error fetching memberships:", membershipsError.message);
     return NextResponse.json({ error: membershipsError.message }, { status: 500 });
   }
 
+  // Safely map IDs and filter out any null profiles
+  const viewUsers = membershipsData
+    ? membershipsData
+        .map((m) => m.profiles?.id)
+        .filter((id): id is string => !!id)
+    : [];
 
-  const viewUsers = membershipsData.map(p => p.profiles.id);
-  console.log(viewUsers)
   const body = await req.json();
-  const { title, description, priority, status, due_date } = body;
+  const { title, description, priority, due_date } = body;
+
   if (!title || !title.toString().trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
   }
+
   const duecheck = due_date ? due_date : null;
-  console.log("check", duecheck);
+
+  // 4. Insert the Task
   const { data, error } = await supabase
     .from("tasks")
     .insert([
@@ -96,70 +109,62 @@ export async function POST(
         due_date: duecheck,
         tenant_id: orgId,
         created_by: authData.user.id,
-        visible_user_ids: [...viewUsers]
+        visible_user_ids: viewUsers, // simplified spread
       },
     ])
     .select()
     .single();
 
-  if (error) {
-    console.log(error.message);
-    return NextResponse.json({ error: error.message }, { status: 400 });
+  if (error || !data) {
+    console.error("Task creation error:", error?.message);
+    return NextResponse.json({ error: error?.message || "Failed to create task" }, { status: 400 });
   }
 
-  // If client provided uploaded attachments, insert them into request_attachments
+  // 5. Attachment Processing
   try {
     const attachments = body.attachments;
     if (attachments && Array.isArray(attachments) && attachments.length > 0) {
-      // dedupe by file_url to avoid duplicates
       const seen = new Set<string>();
-      const uniqueInserts: Array<{
-        request_id: string;
-        file_url: string;
-        file_type: string | null;
-        file_size: number | null;
-        file_name?: string | null;
-      }> = [];
-
-      for (const a of attachments) {
-        if (!a || !a.file_url) continue;
-        if (seen.has(a.file_url)) continue;
-        seen.add(a.file_url);
-        uniqueInserts.push({
-          request_id: data.id,
-          file_url: a.file_url,
-          file_type: a.file_type || null,
-          file_size: a.file_size || null,
-          file_name: a.file_name || null,
+      
+      // Explicitly typing the insert array to match your schema
+      const uniqueInserts = attachments
+        .filter((a) => a && a.file_url && !seen.has(a.file_url))
+        .map((a) => {
+          seen.add(a.file_url);
+          return {
+            request_id: data.id, // Now safe because we checked !data above
+            file_url: a.file_url,
+            file_type: a.file_type || null,
+            file_size: a.file_size || null,
+            file_name: a.file_name || null,
+          };
         });
-      }
 
       if (uniqueInserts.length > 0) {
         const { error: attachErr } = await supabase
           .from("request_attachments")
           .insert(uniqueInserts);
+        
         if (attachErr) {
-          console.log(
-            "Failed to insert request_attachments:",
-            attachErr.message
-          );
+          console.error("Failed to insert attachments:", attachErr.message);
         }
       }
     }
-  } catch (e) {
-    console.log("Failed to process attachments:", e);
+  } catch (e: unknown) {
+    // FIX for @typescript-eslint/no-explicit-any
+    const message = e instanceof Error ? e.message : "Unknown error";
+    console.error("Failed to process attachments:", message);
   }
 
   return NextResponse.json(data);
 }
-
 // Update Task (PATCH)
 export async function PATCH(req: Request) {
   const supabase = await createClient();
   const body = await req.json();
   const { id, priority, status, title, description } = body;
   // const duecheck = updates.due_date ? updates.due_date : null;
-  let updateObj: {
+  const updateObj: {
     priority?: Task["priority"];
     status?: Task["status"];
     title?: string;

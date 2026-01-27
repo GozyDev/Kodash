@@ -1,9 +1,10 @@
-import { MessageSquare, Plus, Reply, Upload, File, X } from "lucide-react";
+import { MessageSquare, Plus,Upload, File, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { Comment } from "@/lib/superbase/type";
 import CommentCard from "./CommentCard";
+import Image from "next/image";
 
 const CommentSection = ({ issueId }: { issueId: string }) => {
   const [file, setFile] = useState<File | null>(null);
@@ -52,7 +53,7 @@ const CommentSection = ({ issueId }: { issueId: string }) => {
   const handleAddComment = async () => {
     if (!commentDraft.trim()) return;
     if (!issueId) return;
-    let attachmentUrl: string | null = null;
+  
     try {
       setUploading(true);
 
@@ -127,7 +128,7 @@ const CommentSection = ({ issueId }: { issueId: string }) => {
             <div className="bg-cardICB/30 px-3 py-4 rounded-xl flex items-center justify-between gap-3 relative">
               <div className="flex-1 flex items-center gap-3">
                 {previewUrl ? (
-                  <img
+                  <Image
                     src={previewUrl}
                     alt={file.name}
                     className=" rounded-md object-contain "

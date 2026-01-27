@@ -1,11 +1,24 @@
-import { Task, TaskInsert } from "@/lib/superbase/type";
+import { Task} from "@/lib/superbase/type";
 import { create } from "zustand";
 import { useOrgIdStore } from "./useOrgId";
+
+interface CreateTaskInput {
+  title: string;
+  description?: string;
+  priority: string;
+  due_date?: string | null;
+  attachments?: Array<{
+    file_url: string;
+    file_type?: string | null;
+    file_size?: number | null;
+    file_name?: string | null;
+  }>;
+}
 
 interface TaskStore {
   task: Task[];
   setTask: (data: Task[]) => void;
-  handleCreateTask: (taskdata: any) => Promise<void>;
+  handleCreateTask: (taskdata:CreateTaskInput) => Promise<void>;
   handleOptimisticPriority: (
     id: string,
     newPriority: Task["priority"]

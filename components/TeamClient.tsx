@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,12 +47,9 @@ export default function TeamClient({ orgId }: { orgId: string }) {
 
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!orgId) return;
-    loadMemberships();
-  }, [orgId]);
+ 
 
-  async function loadMemberships() {
+  const loadMemberships = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(`/api/memberships?orgId=${orgId}`);
@@ -61,15 +58,21 @@ export default function TeamClient({ orgId }: { orgId: string }) {
         return;
       }
       const json = await res.json();
-      console.log(json.memberships)
+      console.log(json.memberships);
       setMemberships(json.memberships ?? []);
-    } catch (err) {
-      console.error("Error loading memberships:", err);
+    } catch (err: unknown) {
+      // Handling the error safely for ESLint as we discussed earlier
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error("Error loading memberships:", message);
     } finally {
       setLoading(false);
     }
-  }
+  }, [orgId]);
 
+  useEffect(() => {
+    if (!orgId) return;
+    loadMemberships();
+  }, [orgId , loadMemberships]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -83,7 +86,8 @@ export default function TeamClient({ orgId }: { orgId: string }) {
 
         const data = await res.json();
         setUser(data.user);
-      } catch (err: any) {
+      } catch (err:unknown) {
+        if(err instanceof Error)
         setError(err.message);
         setUser(null);
       } finally {
@@ -240,6 +244,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
               </div>
             </>
           )}
+          {error}
         </div>
       </div>
       {/* Invite modal */}
@@ -273,7 +278,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                   </label>
                   <Select
                     defaultValue={role}
-                    onValueChange={(v) => setRole(v as any)}
+                    onValueChange={(v:"Client"|"Freelancer") => setRole(v)}
                   >
                     <SelectTrigger
                       className="w-full border-cardICB bg-cardICB/10"

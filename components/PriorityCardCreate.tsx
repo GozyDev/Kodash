@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Task } from "@/lib/superbase/type";
-import { useOrgIdStore } from "@/app/store/useOrgId";
+
 
 interface PriorityData {
   name: Task["priority"];
@@ -309,7 +309,7 @@ const PriorityCardCreate = ({
   handleChange: (field: string, value: string) => void;
   priority: Task["priority"];
 }) => {
-  const orgId = useOrgIdStore((state) => state.orgId);
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="p-1 rounded  text-[10px] tracking-widest">

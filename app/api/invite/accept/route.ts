@@ -99,11 +99,18 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    console.error("Accept invite error:", err);
-    return NextResponse.json(
-      { error: "Unexpected server error" },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error("Accept invite error:", err);
+      return NextResponse.json(
+        { error: `server error ${err}` },
+        { status: 500 }
+      );
+    } else {
+      return NextResponse.json(
+        { error: "Unexpected server error" },
+        { status: 500 })
+    }
+
   }
 }

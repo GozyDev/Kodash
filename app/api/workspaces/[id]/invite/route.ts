@@ -41,7 +41,7 @@ export async function POST(
     // expire in 24 hours
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString();
 
-    const payload: Record<string, any> = {
+    const payload: Record<string, string> = {
       workspace_id: workspaceId,
       email,
       role,
@@ -87,7 +87,7 @@ export async function POST(
     }
 
     const resend = new Resend(resendKey);
-    const fromAddress = process.env.RESEND_FROM_EMAIL || "no-reply@kodash.com";
+    // const fromAddress = process.env.RESEND_FROM_EMAIL || "no-reply@kodash.com";
 
     const subject = "You've been invited to a workspace on Kodash";
     const html = `
@@ -113,17 +113,34 @@ export async function POST(
       if (error) {
         throw error;
       }
-    } catch (sendErr: any) {
-      console.error("Resend send error:", sendErr);
-      return NextResponse.json(
-        { error: "Failed to send invite email" },
-        { status: 500 }
-      );
+    } catch (sendErr:unknown) {
+      if(sendErr instanceof Error){
+        console.error("Resend send error:", sendErr);
+        return NextResponse.json(
+          { error:sendErr.message },
+          { status: 500 }
+        );
+      }else{
+        return NextResponse.json(
+          String(sendErr),
+          { status: 500 }
+        );
+      }
+     
     }
 
     return NextResponse.json({ invite: insertData }, { status: 201 });
-  } catch (err: any) {
-    console.error("Unexpected error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
-}
+  } catch (err:unknown) {
+    if(err instanceof Error){
+      console.error("Resend send error:", err);
+      return NextResponse.json(
+        { error:err.message },
+        { status: 500 }
+      );
+    }else{
+      return NextResponse.json(
+        String(err),
+        { status: 500 }
+      );
+    }
+}}

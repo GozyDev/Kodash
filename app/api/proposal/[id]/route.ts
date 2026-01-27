@@ -14,8 +14,7 @@ export async function GET(
     const { data, error } = await supabase
       .from("request_proposal")
       .select("id, price, currency, due_date, dod,status")
-      .eq("request_id", issueId)
-      .limit(1);
+      .eq("request_id", issueId);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -98,7 +97,7 @@ export async function PATCH(
       .update({ status: status.toLocaleLowerCase() })
       .eq("id", proposalId)
       .select("id, price, currency, due_date, dod, status")
-      .single();
+      
 
     if (error) {
       console.log("Failed to update proposal status:", error);

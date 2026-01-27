@@ -1,27 +1,20 @@
 // app/tasks/TaskDrawer.tsx
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Task, TaskInsert, TaskUpdate } from "@/lib/superbase/type";
+import { Task,} from "@/lib/superbase/type";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import {
   X,
-  Save,
+
   Trash2,
   Maximize2,
   Minimize2,
-  Circle,
-  Minus,
+
   Mic,
   MoveUp,
   Check,
@@ -29,8 +22,8 @@ import {
 } from "lucide-react";
 import { useTaskStore } from "@/app/store/useTask";
 import { uploadFile } from "@/lib/upload";
-import StatusCardCreate from "./StatusCardCreate";
-import PriorityCardCreate from "./PriorityCardCreate";
+import Image from "next/image";
+
 
 interface TaskDrawerProps {
   task: Task | null;
@@ -76,7 +69,7 @@ export default function TaskDrawer({
   type Attachment = {
     id: string;
     file: File;
-    preview?: string;
+    preview: string;
     status?: "idle" | "uploading" | "failed" | "uploaded";
     progress?: number;
     file_id?: string;
@@ -146,23 +139,23 @@ export default function TaskDrawer({
     );
 
     try {
-      const res: any = await promise;
+      const res = await promise;
       setAttachments((prev) =>
         prev.map((a) =>
           a.id === id
             ? {
-                ...a,
-                status: "uploaded",
-                progress: 100,
-                file_id: res.file_id,
-                file_url: res.file_url,
-                file_name: res.file_name,
-                abort: undefined,
-              }
+              ...a,
+              status: "uploaded",
+              progress: 100,
+              file_id: res.file_id,
+              file_url: res.file_url,
+              file_name: res.file_name,
+              abort: undefined,
+            }
             : a
         )
       );
-    } catch (err) {
+    } catch  {
       setAttachments((prev) =>
         prev.map((a) =>
           a.id === id ? { ...a, status: "failed", abort: undefined } : a
@@ -207,7 +200,7 @@ export default function TaskDrawer({
     if (att.status === "uploading" && att.abort) {
       try {
         att.abort();
-      } catch {}
+      } catch { }
     }
 
     // if file already uploaded, delete from server
@@ -236,15 +229,21 @@ export default function TaskDrawer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleClose = async () => {
-    // cancel and delete any uploaded or uploading attachments
+
+
+  const handleClose = useCallback(async () => {
+    // 1. Create a copy to work with
     const list = [...attachments];
+  
     for (const att of list) {
+      // Abort active uploads
       if (att.status === "uploading" && att.abort) {
         try {
           att.abort();
-        } catch {}
+        } catch { /* ignore */ }
       }
+  
+      // Server cleanup
       if (att.file_id) {
         try {
           await deleteFileOnServer(att.file_id);
@@ -260,12 +259,15 @@ export default function TaskDrawer({
           console.error("Failed to delete candidate during close", e);
         }
       }
+  
+      // Clean up memory
       if (att.preview) URL.revokeObjectURL(att.preview);
     }
-
+  
     setAttachments([]);
     onClose();
-  };
+  }, [attachments, onClose, setAttachments]); 
+  // ^ These are the dependencies that trigger a function refresh
 
   const formatBytes = (bytes: number) => {
     if (bytes === 0) return "0 B";
@@ -423,16 +425,15 @@ export default function TaskDrawer({
       }
     } catch (error) {
       setAiParsedData({
-        title: `Error: ${
-          error instanceof Error ? error.message : "Failed to send request"
-        }`,
+        title: `Error: ${error instanceof Error ? error.message : "Failed to send request"
+          }`,
       });
     } finally {
       setIsSending(false);
     }
   };
 
-  const getStatusIcon = (status: any) => {
+  const getStatusIcon = (status:string) => {
     switch (status) {
       case "draft":
         return (
@@ -482,9 +483,8 @@ export default function TaskDrawer({
               }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className={`relative w-full max-w-2xl bg-cardC  rounded-lg shadow-2xl pointer-events-auto border border-cardCB flex flex-col  ${
-                isExpanded ? "h-[90vh]" : "max-h-[85vh]"
-              }`}
+              className={`relative w-full max-w-2xl bg-cardC  rounded-lg shadow-2xl pointer-events-auto border border-cardCB flex flex-col  ${isExpanded ? "h-[90vh]" : "max-h-[85vh]"
+                }`}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
@@ -518,9 +518,8 @@ export default function TaskDrawer({
 
               {/* Content */}
               <div
-                className={`flex-1 overflow-y-auto px-5 py-4 ${
-                  isExpanded ? "min-h-0" : ""
-                }`}
+                className={`flex-1 overflow-y-auto px-5 py-4 ${isExpanded ? "min-h-0" : ""
+                  }`}
               >
                 {/* Title - No border, just placeholder */}
                 <div className="mb-4">
@@ -586,7 +585,7 @@ export default function TaskDrawer({
 
                   {attachments.length > 0 && (
                     <div className="mt-3 space-y-2">
-                      {attachments.map((att, idx) => {
+                      {attachments.map((att) => {
                         const file = att.file;
                         const isImage = file.type.startsWith("image/");
 
@@ -606,7 +605,7 @@ export default function TaskDrawer({
                                 aria-label={`Open ${file.name} in new tab`}
                               >
                                 <div className="w-24 h-20 flex-shrink-0 bg-cardC/20 rounded overflow-hidden flex items-center justify-center">
-                                  <img
+                                  <Image
                                     src={att.preview}
                                     alt={file.name}
                                     className="w-full h-full object-contain"
@@ -794,12 +793,12 @@ export default function TaskDrawer({
                             </label>
                             <div className="text-sm text-textNb bg-cardC/50 border border-cardCB rounded px-3 py-2 capitalize">
                               {aiParsedData.status === "to-do" ||
-                              aiParsedData.status === "draft"
+                                aiParsedData.status === "draft"
                                 ? "Todo"
                                 : aiParsedData.status === "in-progress" ||
                                   aiParsedData.status === "active"
-                                ? "In Progress"
-                                : "Done"}
+                                  ? "In Progress"
+                                  : "Done"}
                             </div>
                           </div>
                         )}
@@ -892,8 +891,8 @@ export default function TaskDrawer({
                           ? "Saving..."
                           : "Save"
                         : isSaving
-                        ? "Creating..."
-                        : "Create issue"}
+                          ? "Creating..."
+                          : "Create issue"}
                     </Button>
                   )}
                 </div>

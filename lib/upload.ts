@@ -48,7 +48,7 @@ export function uploadFile(file: File, onProgress?: (p: number) => void, clientI
   };
 
   return { promise, abort } as {
-    promise: Promise<{ file_id: string; file_url: string }>;
+    promise: Promise<{ file_id: string; file_url: string ; file_name?: string }>;
     abort: () => void;
   };
 }

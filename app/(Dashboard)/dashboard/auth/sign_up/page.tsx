@@ -1,4 +1,4 @@
-import { login, signup } from "@/action/auth";
+import {signup } from "@/action/auth";
 import Link from "next/link";
 
 export default function SignUpPage() {

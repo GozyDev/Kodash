@@ -18,7 +18,7 @@ export async function GET() {
   }
   // inside request scope
 
-    const { data: tenants, error: getError } = await svc
+  const { data: tenants, error: getError } = await svc
     .from("memberships")
     .select(
       `
@@ -79,8 +79,8 @@ export async function POST(request: Request) {
     }
 
 
-    const { data, error } = await svc.rpc("debug_auth_uid");
-console.log('Debug',data);
+    const { data } = await svc.rpc("debug_auth_uid");
+    console.log('Debug', data);
 
 
     // Create workspace (stored in tenants table)
@@ -100,7 +100,7 @@ console.log('Debug',data);
 
     // Create membership - use provided role (map to uppercase)
     const membershipRole = String(role).toUpperCase();
-    const { data: membershipData, error: membershipError } = await svc
+    const { error: membershipError } = await svc
       .from("memberships")
       .insert({
         user_id: user.id,
@@ -117,8 +117,10 @@ console.log('Debug',data);
     }
 
     return NextResponse.json({ workspace: tenantData }, { status: 201 });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Unexpected error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    if (err instanceof Error) {
+      return NextResponse.json({ error: err.message }, { status: 500 });
+    }
   }
 }

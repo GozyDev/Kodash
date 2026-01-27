@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { Settings } from "lucide-react";
 import DropDownContent from "./DropDownContent";
 import User from "./User";

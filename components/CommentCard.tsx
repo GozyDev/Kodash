@@ -3,6 +3,7 @@ import { Plus, Reply, File } from "lucide-react";
 import React, { useState } from "react";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
+import Image from "next/image";
 
 const formatTime = (date: string) =>
   new Date(date).toLocaleString(undefined, {
@@ -36,7 +37,7 @@ const CommentCard = ({ comment }: { comment: Comment }) => {
       <div className="px-4 py-2 group">
         <div className="flex justify-between">
           <div className="flex items-center gap-3 ">
-            <img
+            <Image
               src={comment.author?.avatar_url || "/avatar-placeholder.png"}
               alt={comment.author?.full_name}
               className="h-8 w-8 rounded-full object-cover"
@@ -67,7 +68,7 @@ const CommentCard = ({ comment }: { comment: Comment }) => {
         {attachment ? (
           <div className="mt-3 px-4 pb-4">
             {isImage(attachment) ? (
-              <img
+              <Image
                 src={attachment}
                 alt={filenameFromUrl(attachment)}
                 className="max-h-48 w-full rounded-md object-contain"

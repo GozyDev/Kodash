@@ -24,9 +24,16 @@ const NewOrgpage = () => {
         setName("");
         router.push("/dashboard/organizations");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err?.message || "Error");
+    
+      // Check if it's a standard Error object
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        // Fallback for strings or weirdly shaped objects
+        setError(String(err) || "An unexpected error occurred");
+      }
     }
   }
   return (
@@ -54,7 +61,7 @@ const NewOrgpage = () => {
                     className="w-full px-3 py-2 bg-cardC border border-cardCB rounded-md outline-none placeholder-neutral-500 text-neutral-100"
                   />
                   <p className="text-xs text-neutral-500 mt-2">
-                    What's the name of your company or team? You can change this
+                    What&apos;s the name of your company or team? You can change this
                     later.
                   </p>
                 </div>

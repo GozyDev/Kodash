@@ -4,9 +4,9 @@
 import {
   Users,
   Settings,
-  LayoutGrid,
+
   FilePenLine,
-  HandCoins,
+
 } from "lucide-react";
 import {
   Sidebar,

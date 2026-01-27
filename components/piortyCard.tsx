@@ -1,15 +1,15 @@
-import React, { ReactNode, useState } from "react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
+
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Task } from "@/lib/superbase/type";
 import { useTaskStore } from "@/app/store/useTask";
-import { useOrgIdStore } from "@/app/store/useOrgId";
+
 
 interface PriorityData {
   name: Task["priority"];
@@ -315,7 +315,7 @@ const PriorityCard = ({
   const handleOptimisticPriority = useTaskStore(
     (state) => state.handleOptimisticPriority
   );
-  const orgId = useOrgIdStore((state) => state.orgId);
+ 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger 

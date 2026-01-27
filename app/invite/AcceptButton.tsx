@@ -22,7 +22,8 @@ export default function AcceptButton({ token }: { token: string }) {
       }
 
       window.location.assign('http://localhost:3000/dashboard/organizations')
-    } catch (err: any) {
+    } catch (err:unknown) {
+      if(err instanceof Error)
       setError(err?.message || String(err))
     } finally {
       setLoading(false)

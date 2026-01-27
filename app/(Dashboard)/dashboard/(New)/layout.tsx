@@ -1,17 +1,16 @@
 // app/dashboard/organization/[orgId]/layout.tsx
 import type { ReactNode } from "react";
-import OrgHeader from "@/components/OrgHeader";
+
 import { createClient } from "@/lib/superbase/superbase-server";
-import NewHeader from "@/components/NewHeader";
+
 
 export default async function OrgLayout({
   children,
-  params,
+
 }: {
   children: ReactNode;
-  params: Promise<{ orgId: string }>;
+ 
 }) {
-  const { orgId } = await params;
   const supabase = await createClient();
   const { data: orgs, error } = await supabase
     .from("tenants")

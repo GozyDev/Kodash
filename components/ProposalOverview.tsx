@@ -6,13 +6,11 @@ import {
   Calendar,
   CheckCircle2,
   Info,
-  Edit,
-  Trash2,
-  MoreVertical,
+
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTaskStore } from "@/app/store/useTask";
-import { Loader2 } from "lucide-react";
+;
 import type { Proposal } from "./IndivisualIssuepageClient";
 import ConfirmProposalDecisionDialog from "@/components/ConfirmProposalDecisionDialog";
 
@@ -27,8 +25,7 @@ interface ProposalOverviewProps {
 export default function ProposalOverview({
   proposal,
   orgId,
-  onEdit,
-  onWithdraw,
+
   issueId,
 }: ProposalOverviewProps) {
   const [localProposal, setLocalProposal] = useState<Proposal>(proposal);
@@ -50,7 +47,7 @@ export default function ProposalOverview({
         if (!res.ok) return;
         const json = await res.json();
         if (mounted) setRole(json.role || null);
-      } catch (e) {
+      } catch  {
         // ignore
       }
     })();
@@ -297,6 +294,8 @@ export default function ProposalOverview({
           <p className="text-sm text-textNc pl-6">{localProposal.dod}</p>
         </div>
       )}
+
+      {errorMsg}
     </div>
   );
 }

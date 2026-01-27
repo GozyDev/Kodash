@@ -22,8 +22,12 @@ export async function GET(req: Request) {
     if (error)
       return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ projects: data ?? [] });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return NextResponse.json({ error: err.message }, { status: 500 });
+    } else {
+      return NextResponse.json(String(err), { status: 500 });
+    }
   }
 }
 
@@ -44,7 +48,7 @@ export async function POST(req: Request) {
           title,
           description,
           project_password,
-          tenant_id:orgId,
+          tenant_id: orgId,
         },
       ])
       .select()
@@ -53,7 +57,11 @@ export async function POST(req: Request) {
     if (error)
       return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ project: data }, { status: 201 });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return NextResponse.json({ error: err.message }, { status: 500 });
+    } else {
+      return NextResponse.json(String(err), { status: 500 });
+    }
   }
 }

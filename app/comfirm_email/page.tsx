@@ -2,7 +2,7 @@
 import React from 'react'
 import { useSearchParams , useRouter} from "next/navigation";
 import { Mail, CheckCircle, ArrowLeft, RefreshCw } from 'lucide-react'
-import Link from 'next/link'
+
 
 const ConfirmPage = () => {
     const router = useRouter()
@@ -32,7 +32,7 @@ const ConfirmPage = () => {
           <div className="flex items-start gap-3">
             <CheckCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-amber-800 font-medium text-sm mb-1">Didn't receive the email?</p>
+              <p className="text-amber-800 font-medium text-sm mb-1">Didn&apos;t receive the email?</p>
               <ul className="text-amber-700 text-sm space-y-1">
                 <li>• Check your spam or junk folder</li>
                 <li>• Make sure you entered the correct email address</li>

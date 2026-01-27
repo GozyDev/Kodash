@@ -3,14 +3,14 @@
 import { useTaskStore } from "@/app/store/useTask";
 import { useOrgIdStore } from "@/app/store/useOrgId";
 import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Task, TaskInsert, TaskUpdate } from "@/lib/superbase/type";
+import { AnimatePresence } from "framer-motion";
+import { Task, } from "@/lib/superbase/type";
 import TaskList from "@/components/TaskList";
 import TaskFilters from "@/components/TaskFilters";
 import TaskDrawer from "@/components/TaskDrawer";
-import { Button } from "@/components/ui/button";
-import { Plus, Loader2 } from "lucide-react";
-import { createClient } from "@/lib/superbase/superbase-server";
+
+import { Loader2 } from "lucide-react";
+
 import { createBrowserClient } from "@supabase/ssr";
 
 export default function TaskClient({
@@ -68,7 +68,7 @@ export default function TaskClient({
     } finally {
       setLoading(false);
     }
-  }, [orgId]);
+  }, [orgId,setTask]);
 
   // keep the global orgId in sync so other components can use it when checking cache
   // also clear old tasks immediately when switching orgs to prevent stale data
@@ -76,7 +76,7 @@ export default function TaskClient({
     setLoading(true);
     setTask([]);
     useOrgIdStore.getState().setOrgId(orgId);
-  }, [orgId]);
+  }, [orgId,setTask]);
 
   useEffect(() => {
     fetchTasks();
@@ -219,10 +219,7 @@ export default function TaskClient({
     return () => window.removeEventListener("keydown", handleKeyPress); // MATCH event
   }, [userRole]);
 
-  const progress =
-    task.length > 0
-      ? (task.filter((t) => t.status === "complete").length / task.length) * 100
-      : 0;
+
 
   if (loading) {
     return (

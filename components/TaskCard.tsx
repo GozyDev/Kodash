@@ -3,14 +3,14 @@
 
 import { Task } from "@/lib/superbase/type";
 import { motion } from "framer-motion";
-import { Calendar, MoreHorizontal } from "lucide-react";
+import { Calendar} from "lucide-react";
 import PriorityCard from "./piortyCard";
 import WriteProposalDialog from "./WriteProposalDialog";
 import { useState } from "react";
 
 import StatusCard from "./StatusCard";
 import { displayStatusForTaskCard, presentToPast } from "@/lib/status";
-import Link from "next/link";
+
 import { useOrgIdStore } from "@/app/store/useOrgId";
 import { useTaskStore } from "@/app/store/useTask";
 import { useRouter } from "next/navigation";

@@ -3,7 +3,7 @@
 import { ReactNode, useEffect } from "react";
 import { useOrgIdStore } from "@/app/store/useOrgId";
 import { OrgSidebar } from "@/components/OrgSidebar";
-import { SidebarHeader, SidebarTrigger } from "./ui/sidebar";
+
 
 export default function OrgLayoutClient({
   orgId,
@@ -14,11 +14,11 @@ export default function OrgLayoutClient({
   role: "client" | "freelancer";
   children: ReactNode;
 }) {
-  const setOrgId = useOrgIdStore((s) => s.setOrgId);
+  const { setOrgId } = useOrgIdStore()
 
   useEffect(() => {
     setOrgId(orgId);
-  }, [orgId]);
+  }, [orgId,setOrgId],);
 
   return (
     <>

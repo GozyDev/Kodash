@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Plus, ChevronRight, CircleDashed, Circle, PlayCircle, CheckCircle2, XCircle, SignalHigh, SignalMedium, SignalLow, Ban } from "lucide-react";
+import { Plus, CircleDashed, SignalHigh, } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,9 +13,23 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Task } from "@/lib/superbase/type";
+
+
+type StatusOption = {
+  value: Task["status"]; // This ensures it matches your database/Task type
+  label: string;
+  svg: React.JSX.Element;
+};
+
+type PriorityOption = {
+  value: Task["priority"]; // This ensures it matches your database/Task type
+  label: string;
+  svg: React.JSX.Element;
+};
 
 // Define our options based on your specific requirements
-const STATUS_OPTIONS = [
+const STATUS_OPTIONS:StatusOption[] = [
   {
     value: "draft", svg: (
       <svg
@@ -129,7 +143,7 @@ const STATUS_OPTIONS = [
   },
 ];
 
-const PRIORITY_OPTIONS = [
+const PRIORITY_OPTIONS:PriorityOption[] = [
   {
     value: "no priority", svg: (
       <svg
@@ -273,7 +287,19 @@ const PRIORITY_OPTIONS = [
   },
 ];
 
-export default function TaskFilters({ filters, onFiltersChange, userRole }: any) {
+type FilterState = {
+  status: "All" | Task["status"];
+  priority: "All" | Task["priority"];
+};
+
+interface TaskFiltersProp {
+  filters: FilterState;
+  // This is the specific type for a useState setter function
+  onFiltersChange: React.Dispatch<React.SetStateAction<FilterState>>;
+  userRole: string;
+}
+
+export default function TaskFilters({ filters, onFiltersChange, userRole }:TaskFiltersProp) {
   return (
     <div className="flex items-center gap-2 border-cardCB">
       <DropdownMenu>

@@ -61,7 +61,7 @@ export default function LoginPage() {
         {/* Signup Link Section */}
         <div className="mt-6 text-center">
           <p className="text-sm text-textNc/70">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href="/dashboard/auth/sign_up"
               className="text-primaryC hover:text-primaryHC font-medium transition-colors"

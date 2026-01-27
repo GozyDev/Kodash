@@ -1,18 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+
 import { useOrgIdStore } from "@/app/store/useOrgId";
 import { useTaskStore } from "@/app/store/useTask";
 import StatusCard from "./StatusCard";
 import PriorityCard from "./piortyCard";
 import { Input } from "./ui/input";
-import { LinkIcon, Loader2, Paperclip } from "lucide-react";
-import { Task, Comment } from "@/lib/superbase/type";
+import { Loader2, Paperclip } from "lucide-react";
+import { RequestProposal, Task,  } from "@/lib/superbase/type";
 import { presentToPast } from "@/lib/status";
-import CommentSection from "./CommentSection";
 import ProposalOverview from "./ProposalOverview";
 import { createBrowserClient } from "@supabase/ssr";
+import Image from "next/image";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 // Small helper component for description viewing/editing
 function DescriptionViewer({
@@ -65,9 +66,10 @@ export type Proposal = {
 type Props = {
   orgId: string;
   issueId: string;
+  userRole:"freelancer"
 };
 
-const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
+const IndivisualIssuepageClient = ({ orgId, issueId ,userRole }: Props) => {
   const tasks = useTaskStore((state) => state.task);
   const setTask = useTaskStore((state) => state.setTask);
   const setOrgId = useOrgIdStore((state) => state.setOrgId);
@@ -206,7 +208,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     );
 
-    let channel: any;
+    let channel: RealtimeChannel;
 
     const setupRealtime = async () => {
       // 🔍 PROOF STEP — DO NOT SKIP
@@ -287,7 +289,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
             filter: `request_id=eq.${issueId}`,
           },
           (payload) => {
-            const newProposal = payload.new as any;
+            const newProposal = payload.new as Proposal;
             setProposal(newProposal);
 
             if (newProposal?.status === "accepted") {
@@ -314,7 +316,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
             filter: `request_id=eq.${issueId}`,
           },
           (payload) => {
-            const updatedProposal = payload.new as any;
+            const updatedProposal = payload.new as Proposal;
             setProposal(updatedProposal);
 
             const tasks = useTaskStore.getState().task;
@@ -424,7 +426,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
                         <div className="flex items-center gap-3 truncate">
                           {isImage ? (
                             <div className="w-24 h-20 flex-shrink-0 bg-cardC/20 rounded overflow-hidden flex items-center justify-center">
-                              <img
+                              <Image
                                 src={a.file_url}
                                 alt={a.file_name || "attachment"}
                                 className="w-full h-full object-contain"
@@ -488,7 +490,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId }: Props) => {
           <section className="rounded border border-cardCB bg-cardC p-2 w-max md:w-full m-0">
             <div className="flex items-center justify-between">
               <p className=" capitalize ">{issue.status}</p>
-              <StatusCard task={issue} status={issue.status}></StatusCard>
+              <StatusCard task={issue} status={issue.status} userRole={userRole}></StatusCard>
             </div>
           </section>
 

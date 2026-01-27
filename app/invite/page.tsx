@@ -47,7 +47,7 @@ export default async function InvitePage({ searchParams }: Props) {
     const redirect = encodeURIComponent(`/invite?token=${token}`);
     return (
       <div className="p-6">
-        <h1 className="text-xl font-semibold">You've been invited</h1>
+        <h1 className="text-xl font-semibold">You&apos;ve been invited</h1>
         <p className="mt-2">Email: {invite.email}</p>
         <p className="mt-1">Workspace ID: {invite.workspace_id}</p>
         <div className="mt-4 space-x-3">

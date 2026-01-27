@@ -6,9 +6,7 @@ import {
   StickyNote,
   FolderKanban,
   Users,
-  Search,
   Settings,
-  Sparkles,
 } from "lucide-react";
 import {
   Sidebar,
@@ -16,7 +14,6 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,

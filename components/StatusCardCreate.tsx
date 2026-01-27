@@ -1,14 +1,14 @@
-import React, { ReactNode, useState } from "react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
+
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Task } from "@/lib/superbase/type";
-import { useOrgIdStore } from "@/app/store/useOrgId";
+
 import { displayStatusForStatusCard } from "@/lib/status";
 
 interface StatusData {
@@ -244,7 +244,7 @@ const StatusCardCreate = ({
   handleChange: (field: string, value: string) => void;
   status: Task["status"];
 }) => {
-  const orgId = useOrgIdStore((state) => state.orgId);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="p-1 rounded text-[10px] tracking-widest">

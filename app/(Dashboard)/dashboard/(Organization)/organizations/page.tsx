@@ -5,9 +5,6 @@ import { Boxes, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type projects = {
-  count: number;
-};
 
 export default function OrganizationsPage() {
   const [orgs, setOrgs] = useState<Workspace[]>([]);

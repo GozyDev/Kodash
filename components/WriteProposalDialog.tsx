@@ -28,7 +28,7 @@ export default function WriteProposalDialog({
   const [price, setPrice] = useState<string | "">("");
   const [deadline, setDeadline] = useState("");
 
-  const getStatusIcon = (status: any) => {
+  const getStatusIcon = (status:string) => {
     switch (status) {
       case "draft":
         return (

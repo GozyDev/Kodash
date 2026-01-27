@@ -2,8 +2,7 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import OrgHeader from "@/components/OrgHeader";
-import { OrgSidebar } from "@/components/OrgSidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider,} from "@/components/ui/sidebar";
 import { createClient } from "@/lib/superbase/superbase-server";
 import OrgLayoutClient from "@/components/OrgLayoutClient";
 import { getUserRole } from "@/lib/utils/role";
@@ -38,7 +37,9 @@ export default async function OrgLayout({
   if (error) {
     console.log("Error", error.message);
   }
-
+if(!orgs){
+  return
+}
   return (
     <SidebarProvider>
       <OrgHeader orgs={orgs} orgId={orgId} />
