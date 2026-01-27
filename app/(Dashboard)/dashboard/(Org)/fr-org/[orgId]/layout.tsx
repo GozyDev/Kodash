@@ -42,8 +42,10 @@ if(!orgs){
 }
   return (
     <SidebarProvider>
-      <OrgHeader orgs={orgs} orgId={orgId} />
-      <OrgLayoutClient orgId={orgId} role="freelancer" children={children}></OrgLayoutClient>
-    </SidebarProvider>
+    <OrgHeader orgs={orgs} orgId={orgId} />
+    <OrgLayoutClient orgId={orgId} role="freelancer">
+      {children}
+    </OrgLayoutClient>
+  </SidebarProvider>
   );
 }

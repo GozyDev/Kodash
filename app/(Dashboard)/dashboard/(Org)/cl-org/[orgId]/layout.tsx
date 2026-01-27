@@ -2,7 +2,7 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import OrgHeader from "@/components/OrgHeader";
-import { SidebarProvider} from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { createClient } from "@/lib/superbase/superbase-server";
 import OrgLayoutClient from "@/components/OrgLayoutClient";
 import { getUserRole } from "@/lib/utils/role";
@@ -16,7 +16,7 @@ export default async function OrgLayout({
 }) {
   const { orgId } = await params;
   const supabase = await createClient();
-  
+
   // Get authenticated user
   const { data: authData, error: authError } = await supabase.auth.getUser();
   if (authError || !authData.user) {
@@ -38,14 +38,16 @@ export default async function OrgLayout({
     console.log("Error", error.message);
   }
 
-  if(!orgs){
+  if (!orgs) {
     return
   }
 
   return (
     <SidebarProvider>
       <OrgHeader orgs={orgs} orgId={orgId} />
-      <OrgLayoutClient orgId={orgId} role="client" children={children}></OrgLayoutClient>
+      <OrgLayoutClient orgId={orgId} role="client">
+        {children}
+      </OrgLayoutClient>
     </SidebarProvider>
   );
 }
