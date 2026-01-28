@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { Settings } from "lucide-react";
+
 import User from "./User";
 
 const OrganizationHeader = async () => {

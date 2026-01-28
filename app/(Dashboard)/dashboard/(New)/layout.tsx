@@ -2,6 +2,7 @@
 import type { ReactNode } from "react";
 
 import { createClient } from "@/lib/superbase/superbase-server";
+import NewHeader from "@/components/NewHeader";
 
 
 export default async function OrgLayout({
@@ -30,7 +31,7 @@ export default async function OrgLayout({
   return (
     <>
       {/* OrgHeader can be a server component that accepts org */}
-      
+      <NewHeader/>
       <main>{children}</main>
     </>
   );

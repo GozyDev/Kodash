@@ -1,12 +1,12 @@
 import React from "react";
 import Image from "next/image";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import { Settings } from "lucide-react";
+
+import User from "./User";
 
 const NewHeader = () => {
   return (
-    <header className="flex justify-between items-center  text-neutral-100 px-6 py-3 border-b border-cardCB/80 backdrop-blur-sm fixed top-0 left-0 w-full">
+    <header className="flex justify-between items-center  text-neutral-100 px-2 md:px-6 py-3 border-b border-cardCB/80 backdrop-blur-sm fixed top-0 left-0 w-full">
       {/* Left Section - Logo and Breadcrumb */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
@@ -31,32 +31,15 @@ const NewHeader = () => {
       {/* Right Section - User Menu */}
       <div className="flex items-center gap-4">
         {/* Navigation Icons */}
-        <div className="flex items-center gap-3 mr-2">
+        <div className="flex items-center gap-3">
           <button className="p-2 text-sm font-light border border-gray-800 rounded-lg hover:bg-gray-800 transition-colors group">
             Feedback
           </button>
-          <button className="p-2 rounded-lg hover:bg-gray-800 transition-colors group">
-            <Settings className="w-5 h-5 text-gray-400 group-hover:text-gray-300" />
-          </button>
+         
         </div>
 
         {/* User Avatar with Dropdown */}
-        <div className="flex items-center gap-3 pl-3 border-l border-gray-700/50">
-          <div className="relative group cursor-pointer">
-            <Avatar className="w-9 h-9 border-2 border-transparent group-hover:border-blue-500 transition-all duration-200">
-              <AvatarImage
-                src="https://github.com/shadcn.png"
-                alt="User Avatar"
-              />
-              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-medium">
-                JD
-              </AvatarFallback>
-            </Avatar>
-
-            {/* Online Status Indicator */}
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-neutral-900"></div>
-          </div>
-        </div>
+         <User />
       </div>
     </header>
   );

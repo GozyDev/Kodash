@@ -1,5 +1,5 @@
 "use client";
-import NewHeader from "@/components/NewHeader";
+
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -39,7 +39,7 @@ const NewOrgpage = () => {
   return (
     <div>
       <div className="flex  justify-center h-screen px-4 md:px-6   py-[120px]">
-        <NewHeader/>
+        
         <div className="bg-cardC/60 text-neutral-100 rounded-lg w-full max-w-3xl shadow-lg border border-neutral-800 h-max">
           <div className="p-6 space-y-4">
             <div>
