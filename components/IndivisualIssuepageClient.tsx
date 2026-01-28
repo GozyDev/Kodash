@@ -355,9 +355,15 @@ const IndivisualIssuepageClient = ({ orgId, issueId ,userRole }: Props) => {
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-textNd" />
-      </div>
+       <div className="flex items-center justify-center h-[90vh]">
+              <Image
+                src="/Logo.png"
+                alt="Kodash Logo"
+                width={100}
+                height={100}
+                className="mb-5 animate-pulse"
+              />
+            </div>
     );
   }
 
@@ -430,6 +436,8 @@ const IndivisualIssuepageClient = ({ orgId, issueId ,userRole }: Props) => {
                                 src={a.file_url}
                                 alt={a.file_name || "attachment"}
                                 className="w-full h-full object-contain"
+                                width={96}
+                                height={80}
                               />
                             </div>
                           ) : (
