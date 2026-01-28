@@ -4,13 +4,13 @@ import { useTaskStore } from "@/app/store/useTask";
 import { useOrgIdStore } from "@/app/store/useOrgId";
 import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
-import { Task, } from "@/lib/superbase/type";
+import { Task } from "@/lib/superbase/type";
 import TaskList from "@/components/TaskList";
 import TaskFilters from "@/components/TaskFilters";
 import TaskDrawer from "@/components/TaskDrawer";
-import { RealtimeChannel } from "@supabase/supabase-js"
+import { RealtimeChannel } from "@supabase/supabase-js";
 
-import { Loader2 } from "lucide-react";
+import Image from "next/image";
 
 import { createBrowserClient } from "@supabase/ssr";
 
@@ -69,7 +69,7 @@ export default function TaskClient({
     } finally {
       setLoading(false);
     }
-  }, [orgId,setTask]);
+  }, [orgId, setTask]);
 
   // keep the global orgId in sync so other components can use it when checking cache
   // also clear old tasks immediately when switching orgs to prevent stale data
@@ -77,7 +77,7 @@ export default function TaskClient({
     setLoading(true);
     setTask([]);
     useOrgIdStore.getState().setOrgId(orgId);
-  }, [orgId,setTask]);
+  }, [orgId, setTask]);
 
   useEffect(() => {
     fetchTasks();
@@ -140,13 +140,17 @@ export default function TaskClient({
           },
           (payload) => {
             console.log("UPDATE realtime fired");
-            const updatedTask = payload.new as Task
-            const current = useTaskStore.getState().task
-            const exists = current.some((t) => t.id === updatedTask.id)
+            const updatedTask = payload.new as Task;
+            const current = useTaskStore.getState().task;
+            const exists = current.some((t) => t.id === updatedTask.id);
             useTaskStore.setState({
-              task: exists ? current.map((t) => t.id === updatedTask.id ? updatedTask : t) : [updatedTask, ...current],
-            })
-            console.log("WrapedTask")
+              task: exists
+                ? current.map((t) =>
+                    t.id === updatedTask.id ? updatedTask : t,
+                  )
+                : [updatedTask, ...current],
+            });
+            console.log("WrapedTask");
           },
         )
         .on(
@@ -168,9 +172,7 @@ export default function TaskClient({
             });
           },
         )
-        .subscribe((status) =>
-          console.log("Realtime status:", status),
-        );
+        .subscribe((status) => console.log("Realtime status:", status));
     };
 
     setupRealtime();
@@ -179,7 +181,6 @@ export default function TaskClient({
       if (channel) supabase.removeChannel(channel);
     };
   }, [orgId]);
-
 
   // Apply filters
   useEffect(() => {
@@ -220,25 +221,40 @@ export default function TaskClient({
     return () => window.removeEventListener("keydown", handleKeyPress); // MATCH event
   }, [userRole]);
 
-
-
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-64">
-        <Loader2 className="w-6 h-6 animate-spin" />
+      <div className="flex items-center justify-center h-[90vh]">
+        <Image
+          src="/Logo.png"
+          alt="Kodash Logo"
+          width={100}
+          height={100}
+          className="mb-5 animate-pulse"
+        />
       </div>
     );
   }
 
   return (
     <div className="text-textNb ">
-
       <div className="flex justify-between items-center py-2 p-3 border-b border-b-cardCB">
-        {<TaskFilters filters={filters} onFiltersChange={setFilters}  userRole={userRole}/>}
+        {
+          <TaskFilters
+            filters={filters}
+            onFiltersChange={setFilters}
+            userRole={userRole}
+          />
+        }
 
-        {userRole === "client" && <button className="butt  px-4 rounded" onClick={() => setIsDrawerOpen(true)}>+</button>}
+        {userRole === "client" && (
+          <button
+            className="butt  px-4 rounded"
+            onClick={() => setIsDrawerOpen(true)}
+          >
+            +
+          </button>
+        )}
       </div>
-
 
       {/* Task List */}
       <div className="px-2 md:px-4 py-4">
@@ -248,10 +264,10 @@ export default function TaskClient({
           onCreateWithStatus={
             userRole === "client"
               ? (status) => {
-                setSelectedTask(null);
-                setCreateInitialStatus(status);
-                setIsDrawerOpen(true);
-              }
+                  setSelectedTask(null);
+                  setCreateInitialStatus(status);
+                  setIsDrawerOpen(true);
+                }
               : undefined
           }
         />
