@@ -5,10 +5,10 @@ import User from "./User";
 
 const OrganizationHeader = async () => {
   return (
-    <header className="flex justify-between items-center  text-neutral-100 px-6 py-3 border-b border-cardCB/80 backdrop-blur-sm">
+    <header className="flex justify-between items-center  text-neutral-100 px-2 md:px-6 py-3 border-b border-cardCB/80 backdrop-blur-sm">
       {/* Left Section - Logo and Breadcrumb */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center ">
           <div className="">
             <Image
               src="/Logo.png"
@@ -30,13 +30,11 @@ const OrganizationHeader = async () => {
       {/* Right Section - User Menu */}
       <div className="flex items-center gap-4">
         {/* Navigation Icons */}
-        <div className="flex items-center gap-3 mr-2">
+        <div className="flex items-center gap-3">
           <button className="p-2 text-sm font-light border border-gray-800 rounded-lg hover:bg-gray-800 transition-colors group">
             Feedback
           </button>
-          <button className="p-2 rounded-lg hover:bg-gray-800 transition-colors group">
-            <Settings className="w-5 h-5 text-gray-400 group-hover:text-gray-300" />
-          </button>
+         
         </div>
 
         {/* User Avatar with Dropdown */}
