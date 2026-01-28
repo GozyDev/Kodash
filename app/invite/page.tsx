@@ -1,6 +1,7 @@
 import React from "react";
 import { createClient } from "@/lib/superbase/superbase-server";
 import AcceptButton from "@/app/invite/AcceptButton";
+import Image from "next/image";
 
 type Props = {
   searchParams?: { token?: string };
@@ -11,7 +12,15 @@ export default async function InvitePage({ searchParams }: Props) {
 
   if (!token) {
     return (
-      <div className="p-6">
+      <div className="p-6 text-textNa h-screen flex flex-col justify-center items-center">
+        <Image
+          src="/Logo.png"
+          alt="Kodash Logo"
+          width={100}
+          height={100}
+          className="mb-5"
+        />
+
         <h1 className="text-xl font-semibold">Invalid invite link</h1>
         <p className="mt-2">No invite token was provided.</p>
       </div>
@@ -32,7 +41,14 @@ export default async function InvitePage({ searchParams }: Props) {
 
   if (inviteError || !invite) {
     return (
-      <div className="p-6">
+      <div className="p-6 text-textNa h-screen flex flex-col justify-center items-center">
+        <Image
+          src="/Logo.png"
+          alt="Kodash Logo"
+          width={100}
+          height={100}
+          className="mb-5"
+        />
         <h1 className="text-xl font-semibold">Invite expired or invalid</h1>
         <p className="mt-2">This invite is either invalid or has expired.</p>
       </div>
@@ -72,7 +88,9 @@ export default async function InvitePage({ searchParams }: Props) {
   if ((user.email || "").toLowerCase() !== (invite.email || "").toLowerCase()) {
     return (
       <div className="p-6">
-        <h1 className="text-xl font-semibold">This invite is not for your email</h1>
+        <h1 className="text-xl font-semibold">
+          This invite is not for your email
+        </h1>
         <p className="mt-2">Signed in as: {user.email}</p>
         <p className="mt-1">Invite for: {invite.email}</p>
       </div>
