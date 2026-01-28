@@ -33,6 +33,7 @@ export async function POST(
     if (!role) {
       return NextResponse.json({ error: "Role is required" }, { status: 400 });
     }
+    console.log(email)
 
     const param = await params;
 
@@ -109,7 +110,7 @@ export async function POST(
         html,
       });
 
-      console.log("Resend response:", { data, error });
+      console.log("Resend response:", { data, error } ,"yh");
 
       if (error) {
         throw error;
