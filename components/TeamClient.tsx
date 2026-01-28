@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { UserPlus, Search, LogOut, X } from "lucide-react";
+import Image from "next/image";
 
 type Profile = {
   id: string;
@@ -160,7 +161,15 @@ export default function TeamClient({ orgId }: { orgId: string }) {
 
         <div className="bg-cardC/60 border border-cardCB rounded-lg overflow-hidden">
           {loading && (
-            <div className="p-8 text-center text-neutral-400">Loading...</div>
+             <div className="flex items-center justify-center h-[90vh]">
+                    <Image
+                      src="/Logo.png"
+                      alt="Kodash Logo"
+                      width={100}
+                      height={100}
+                      className="mb-5 animate-pulse"
+                    />
+                  </div>
           )}
 
           {!loading && filteredMemberships.length === 0 && (
