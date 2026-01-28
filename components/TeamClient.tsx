@@ -129,13 +129,13 @@ export default function TeamClient({ orgId }: { orgId: string }) {
   };
 
   return (
-    <div className="px-[20px] w-full text-textNa">
+    <div className="px-2 md:px-[20px] w-full text-textNa">
       <div className="mx-auto">
         <div className="mb-6"></div>
 
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 bg-cardC rounded-md px-3 py-1 w-96 border border-cardCB">
+        <div className="flex items-center gap-3 md:gap-6  mb-6 ">
+         
+            <div className="flex items-center gap-2 bg-cardC rounded-md px-3 py-1 flex-1 md:flex-none md:w-96 border border-cardCB">
               <Search className="w-5 h-5 text-textNd" />
               <Input
                 value={searchQuery}
@@ -144,9 +144,9 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                 className="bg-transparent outline-none border-0 px-2 text-textNb placeholder:text-textNd focus-visible:ring-0"
               />
             </div>
-          </div>
+          
 
-          <div className="flex items-center gap-4">
+          
             <Button
 
               className="inline-flex items-center md:gap-2 text-white px-4 py-2 butt"
@@ -155,7 +155,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
               <UserPlus className="w-4 h-4" />
               <p className="hidden md:block">Invite Member</p>
             </Button>
-          </div>
+          
         </div>
 
         <div className="bg-cardC/60 border border-cardCB rounded-lg overflow-hidden">
