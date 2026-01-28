@@ -81,7 +81,7 @@ export default async function InvitePage({ searchParams }: Props) {
 
   // Client component for accepting the invite
   return (
-    <div className="p-6">
+    <div className="p-6 text-textNa">
       <h1 className="text-xl font-semibold">Accept workspace invite</h1>
       <p className="mt-2">You are signing in as {user.email}</p>
       <p className="mt-1">Workspace ID: {invite.workspace_id}</p>
