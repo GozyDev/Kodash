@@ -1,4 +1,5 @@
 import {signup } from "@/action/auth";
+import Google from "@/components/Google";
 import Link from "next/link";
 
 export default function SignUpPage() {
@@ -45,14 +46,18 @@ export default function SignUpPage() {
           </div>
         </div>
 
+        <Google />
+
+    
         <div className="flex gap-3 mt-6">
           <button
             formAction={signup}
-            className="flex-1 bg-primaryC text-white py-2 px-4 rounded-md hover:bg-primaryHC transition-colors font-medium"
+            className="flex-1 butt text-white py-2 px-4 rounded-md hover:bg-primaryHC transition-colors font-medium"
           >
             Sign up
           </button>
         </div>
+
 
         {/* Login Link - Only Addition */}
         <div className="mt-6 text-center">

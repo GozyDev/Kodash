@@ -40,7 +40,9 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const PUBLIC_PATHS = [
+    "/comfirm_email",
     "/dashboard/auth/sign_in",
+    "/dashboard/auth/sign_up",
     "/dashboard/auth/callback", // explicit callback
     "/auth", // general auth pages
     "/auth/", // if you have /auth/v1/callback
