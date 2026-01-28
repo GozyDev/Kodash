@@ -2,7 +2,7 @@
 
 import React, { Suspense } from 'react'
 import { useSearchParams, useRouter } from "next/navigation";
-import { Mail, CheckCircle, ArrowLeft, RefreshCw } from 'lucide-react'
+import {CheckCircle, ArrowLeft, RefreshCw } from 'lucide-react'
 import Image from 'next/image';
 
 // 1. ISOLATE LOGIC: Move the main logic into a separate component
