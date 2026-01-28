@@ -1,6 +1,5 @@
 import Image from "next/image";
 
-
 import { Settings } from "lucide-react";
 import DropDownContent from "./DropDownContent";
 import User from "./User";
@@ -26,22 +25,21 @@ export default function OrgHeader({
             height={35}
             className="text-white"
           />
-       
         </div>
 
+
         <div className="flex items-center gap-1">
-          <p className="font-medium text-sm text-gray-100">
+        <span className="font-light text-gray-300/50 text-sm">/</span>
+          <p className="font-medium text-sm text-gray-100 ml-2">
             {/* show active org name if present */}
             {orgs.find((o) => o.id === orgId)?.name ?? "Organizations"}
           </p>
 
-         
-
-          <DropDownContent orgs={orgs} /> 
+          <DropDownContent orgs={orgs} />
+        
         </div>
 
         <SidebarTrigger className="bg-cardC hover:bg-cardC/50" />
-
       </div>
 
       <div className="flex items-center gap-2">
@@ -49,7 +47,6 @@ export default function OrgHeader({
           <button className="p-2 text-[12px] md:text-sm font-light border border-gray-800 rounded-lg hover:bg-gray-800">
             Feedback
           </button>
-       
         </div>
 
         <User />
