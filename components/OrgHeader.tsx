@@ -1,6 +1,5 @@
 import Image from "next/image";
 
-import { Settings } from "lucide-react";
 import DropDownContent from "./DropDownContent";
 import User from "./User";
 import { SidebarTrigger } from "./ui/sidebar";
