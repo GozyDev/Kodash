@@ -301,7 +301,7 @@ interface TaskFiltersProp {
 
 export default function TaskFilters({ filters, onFiltersChange, userRole }:TaskFiltersProp) {
   return (
-    <div className="flex items-center gap-2 border-cardCB">
+    <div className="flex flex-wrap items-center gap-2 border-cardCB">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button size="sm" className="h-8 border-dashed gap-1 text-xs font-normal ">
@@ -356,6 +356,8 @@ export default function TaskFilters({ filters, onFiltersChange, userRole }:TaskF
           </DropdownMenuSub>}
         </DropdownMenuContent>
       </DropdownMenu>
+
+   
 
       {/* Optional: Show active filters as badges if needed */}
       {filters.status !== "All" && (
