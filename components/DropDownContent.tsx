@@ -58,7 +58,7 @@ const DropDownContent = ({ orgs }: { orgs: Org[] }) => {
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="bg-cardC border-none text-textNa w-[22rem] min-w-[18rem] text-sm">
+      <DropdownMenuContent align="center" className="bg-cardC border-none text-textNa md:w-[22rem] min-w-[18rem] text-sm ml-[30px]">
         {/* Search input */}
         <div className="px-2 py-2">
           <div className="flex items-center gap-2 bg-cardC rounded-md px-2 py-1">
