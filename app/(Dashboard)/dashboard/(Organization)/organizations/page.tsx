@@ -61,7 +61,7 @@ export default function OrganizationsPage() {
   );
 
   return (
-    <div className="min-h-screen px-4 md:px-6 py-6 pt-12 md:py-12 text-textNa">
+    <div className="min-h-screen px-4 md:px-6 py-6 pt-10 md:py-12 text-textNa">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-xl md:text-3xl font-semibold">Your Workspaces</h1>
