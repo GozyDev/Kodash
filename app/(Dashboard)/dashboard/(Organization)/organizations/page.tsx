@@ -1,7 +1,7 @@
 "use client";
 
 import { Membership, Workspace } from "@/lib/superbase/type";
-import { Boxes, ChevronRight } from "lucide-react";
+import { Boxes, ChevronRight, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -103,9 +103,9 @@ export default function OrganizationsPage() {
           </div>
           <button
             onClick={() => router.push("/dashboard/new")}
-            className="inline-flex items-center gap-2  text-textNa px-4 py-2 rounded-md butt h-[100%]"
+            className="inline-flex items-center md:gap-2 text-white px-4 py-2 butt rounded"
           >
-            <span className="md:text-2xl leading-none">+</span>
+            <span className="md:text-2xl leading-none"><Plus strokeWidth={2.5} className="w-5 h-5"/></span>
             <span className=" hidden md:block">New Workspace</span>
           </button>
         </div>

@@ -133,15 +133,15 @@ export default function TeamClient({ orgId }: { orgId: string }) {
       <div className="mx-auto">
         <div className="mb-6"></div>
 
-        <div className="flex items-center gap-3 md:gap-6  mb-6 ">
+        <div className="flex items-center justify-between md:justify-start gap-1 md:gap-6  mb-6 ">
          
-            <div className="flex items-center gap-2 bg-cardC rounded-md px-3 py-1 flex-1 md:flex-none md:w-96 border border-cardCB">
+            <div className="flex items-center gap-2 border bg-cardC/50 border-cardCB rounded-md px-3  w-96">
               <Search className="w-5 h-5 text-textNd" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search members..."
-                className="bg-transparent outline-none border-0 px-2 text-textNb placeholder:text-textNd focus-visible:ring-0"
+                className="bg-transparent placeholder-neutral-500 outline-none w-full text-textNb"
               />
             </div>
           
@@ -149,10 +149,10 @@ export default function TeamClient({ orgId }: { orgId: string }) {
           
             <Button
 
-              className="inline-flex items-center md:gap-2 text-white px-4 py-2 butt"
+              className="inline-flex items-center md:gap-2 text-white px-4 py-2 butt rounded"
               onClick={() => setInviteOpen(true)}
             >
-              <UserPlus className="w-4 h-4" />
+              <UserPlus className="w-5 h-5"strokeWidth={2.5} />
               <p className="hidden md:block">Invite Member</p>
             </Button>
           
@@ -229,9 +229,9 @@ export default function TeamClient({ orgId }: { orgId: string }) {
 
                           {isCurrentUser && !isCreator && (
                             <Button className="hover:bg-cardICB/ cursor-pointer text-[12px]  bg-red-900/50 tracking-wider">
-                              <LogOut className="w-4 h-4 mr-2" />
+                              <LogOut className="w-4 h-4 md:mr-2 " />
 
-                              Leave
+                              <span className="hidden md:block">Leave</span>
                             </Button>
                           )}
 
