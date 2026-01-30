@@ -21,13 +21,13 @@ type Profile = {
   avatar_url?: string;
 };
 type Tenants = {
-  id: string,
-  created_by: string
-}
+  id: string;
+  created_by: string;
+};
 type Membership = {
   role: string;
   profiles: Profile | null;
-  tenants: Tenants | null
+  tenants: Tenants | null;
 };
 
 type User = {
@@ -47,8 +47,6 @@ export default function TeamClient({ orgId }: { orgId: string }) {
   const [user, setUser] = useState<User | null>(null);
 
   const [error, setError] = useState<string | null>(null);
-
- 
 
   const loadMemberships = useCallback(async () => {
     setLoading(true);
@@ -73,7 +71,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
   useEffect(() => {
     if (!orgId) return;
     loadMemberships();
-  }, [orgId , loadMemberships]);
+  }, [orgId, loadMemberships]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -87,9 +85,8 @@ export default function TeamClient({ orgId }: { orgId: string }) {
 
         const data = await res.json();
         setUser(data.user);
-      } catch (err:unknown) {
-        if(err instanceof Error)
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) setError(err.message);
         setUser(null);
       } finally {
         setLoading(false);
@@ -99,7 +96,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
     fetchUser();
   }, []);
 
-  console.log(user)
+  console.log(user);
   const tenantCreatorId = memberships[0]?.tenants?.created_by;
   const isCreator = tenantCreatorId === user?.id;
 
@@ -130,46 +127,46 @@ export default function TeamClient({ orgId }: { orgId: string }) {
   };
 
   return (
-    <div className="px-2 md:px-[20px] w-full text-textNa">
-      <div className="mx-auto">
-        <div className="mb-6"></div>
+    <div className="px-2  md:px-[20px] py-[10px] w-full text-textNa">
+      <div className="mx-auto space-y-6">
+        <div className="uppercase tracking-wider text-sm">
+          {" "}
+          <p className="py-1 px-2 bg-cardC w-max rounded">
+            {isCreator ? "created" : "invited"}
+          </p>
+        </div>
 
-        <div className="flex items-center justify-between md:justify-start gap-10 md:gap-6  mb-6 ">
-         
-            <div className="flex items-center gap-2 border bg-cardC/50 border-cardCB rounded-md px-3 flex-1  md:w-96 md:flex-none">
-              <Search className="w-5 h-5 text-textNd" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search members..."
-                className="bg-transparent placeholder-neutral-500 outline-none w-full text-textNb"
-              />
-            </div>
-          
+        <div className="flex items-center justify-between md:justify-start gap-10 md:gap-6   ">
+          <div className="flex items-center gap-2 border bg-cardC/50 border-cardCB rounded-md px-3 flex-1  md:w-96 md:flex-none">
+            <Search className="w-5 h-5 text-textNd" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search members..."
+              className="bg-transparent placeholder-neutral-500 outline-none w-full text-textNb"
+            />
+          </div>
 
-          
-            <Button
-
-              className="inline-flex items-center md:gap-2 text-white px-4 py-2 butt rounded"
-              onClick={() => setInviteOpen(true)}
-            >
-              <UserPlus className="w-5 h-5"strokeWidth={2.5} />
-              <p className="hidden md:block">Invite Member</p>
-            </Button>
-          
+          <Button
+            className="inline-flex items-center md:gap-2 text-white px-4 py-2 butt rounded"
+            onClick={() => setInviteOpen(true)}
+          >
+            <UserPlus className="w-5 h-5" strokeWidth={2.5} />
+            <p className="hidden md:block">Invite Member</p>
+          </Button>
         </div>
 
         <div className="bg-cardC/60 border border-cardCB rounded-lg overflow-hidden">
           {loading && (
-             <div className="flex items-center justify-center h-[90vh]">
-                    <Image
-                      src="/Logo.png"
-                      alt="Kodash Logo"
-                      width={100}
-                      height={100}
-                      className="mb-5 animate-pulse"
-                    />
-                  </div>
+            <div className="flex items-center justify-center h-[90vh]">
+              <Image
+                src="/Logo.png"
+                alt="Kodash Logo"
+                width={100}
+                height={100}
+                className="mb-5 animate-pulse"
+              />
+            </div>
           )}
 
           {!loading && filteredMemberships.length === 0 && (
@@ -222,7 +219,9 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                           <div className="flex flex-col md:flex-row justify-start gap-2 md:gap-7 md:items-end">
                             <div className="flex flex-col">
                               <div className="font-medium text-textNa">
-                                {profile.full_name || profile.email || "Unknown"}
+                                {profile.full_name ||
+                                  profile.email ||
+                                  "Unknown"}
                               </div>
                               <div className="text-sm text-textNd">
                                 {profile.email}
@@ -235,7 +234,6 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                         </div>
 
                         <div className="flex items-center gap-6">
-
                           {isCurrentUser && !isCreator && (
                             <Button className="hover:bg-cardICB/ cursor-pointer text-[12px]  bg-red-900/50 tracking-wider">
                               <LogOut className="w-4 h-4 md:mr-2 " />
@@ -243,8 +241,6 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                               <span className="hidden md:block">Leave</span>
                             </Button>
                           )}
-
-
                         </div>
                       </div>
                     </div>
@@ -287,7 +283,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                   </label>
                   <Select
                     defaultValue={role}
-                    onValueChange={(v:"Client"|"Freelancer") => setRole(v)}
+                    onValueChange={(v: "Client" | "Freelancer") => setRole(v)}
                   >
                     <SelectTrigger
                       className="w-full border-cardICB bg-cardICB/10"
@@ -296,7 +292,9 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="border-cardICB bg-cardC text-white">
-                      <SelectItem value="Client" className="">Client</SelectItem>
+                      <SelectItem value="Client" className="">
+                        Client
+                      </SelectItem>
                       <SelectItem value="Freelancer">Freelancer</SelectItem>
                     </SelectContent>
                   </Select>
@@ -354,14 +352,14 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                             role,
                             workspaceId: orgId,
                           }),
-                        }
+                        },
                       );
 
                       if (!res.ok) {
                         const err = await res.json().catch(() => ({}));
                         console.error("Invite API error:", err);
                         setEmailError(
-                          err?.error || "Failed to send invitation"
+                          err?.error || "Failed to send invitation",
                         );
                         return;
                       }
