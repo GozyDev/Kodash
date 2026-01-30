@@ -6,7 +6,6 @@ import { useOrgIdStore } from "@/app/store/useOrgId";
 import { useTaskStore } from "@/app/store/useTask";
 import StatusCard from "./StatusCard";
 import PriorityCard from "./piortyCard";
-import { Input } from "./ui/input";
 import { Loader2, Paperclip } from "lucide-react";
 import { Task } from "@/lib/superbase/type";
 import { presentToPast } from "@/lib/status";
@@ -376,7 +375,9 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
           <section className="flex flex-col gap-4 bg-cardICB/10 rounded">
             <div className="bg-cardC w-full h-[40px] rounded" />
             <header className="mb-6 space-y-4  rounded px-4">
-             <p className="font-bold  uppercase tracking-wider">{issue.title}</p>
+              <p className="font-bold  uppercase tracking-wider">
+                {issue.title}
+              </p>
               <div>
                 {/* Description display with expandable/collapsible behavior */}
                 {/* Show Textarea for editing when focused; otherwise show truncated text with toggle */}
@@ -437,7 +438,9 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
                             {" "}
                             {/* Ensures the container can shrink */}
                             <div className="w-full max-w-[200px] md:max-w-[300px]">
-                              <p className=" truncate">{a.file_name || a.file_url}</p>
+                              <p className=" truncate">
+                                {a.file_name || a.file_url}
+                              </p>
                             </div>
                             <div className="text-xs text-textNd">
                               {a.file_type ? `${a.file_type} • ` : ""}
@@ -494,15 +497,17 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
             </div>
           </section>
 
-          <section className="rounded border border-cardCB bg-cardC p-2 w-max md:w-full">
-            <div className="flex items-start justify-between">
-              <p className=" capitalize">{issue.priority}</p>
-              <PriorityCard
-                task={issue}
-                priority={issue.priority}
-              ></PriorityCard>
-            </div>
-          </section>
+          {userRole === "freelancer" && (
+            <section className="rounded border border-cardCB bg-cardC p-2 w-max md:w-full">
+              <div className="flex items-start justify-between">
+                <p className=" capitalize">{issue.priority}</p>
+                <PriorityCard
+                  task={issue}
+                  priority={issue.priority}
+                ></PriorityCard>
+              </div>
+            </section>
+          )}
         </aside>
       </div>
     </div>
