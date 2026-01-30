@@ -1,6 +1,6 @@
 // components/OrgSidebar.tsx
 "use client";
-
+import Image from "next/image";
 import {
   Users,
   Settings,
@@ -14,9 +14,11 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
@@ -47,19 +49,22 @@ export function OrgSidebar({
   return (
     <Sidebar
       className={cn(
-        "bg-bgPrimary border-r-cardCB",
+        "bg-bgPrimary border-r border-r-cardCB",
         "transition-all duration-300 ease-in-out",
         "shadow-sm backdrop-blur-sm",
         "top-[65px] h-[calc(100vh-65px)]"
       )}
       collapsible="icon"
     >
+      <SidebarHeader className="text-textNa flex flex-row py-3 md:hidden items-center">
+        <Image src="/Logo.png" alt="KodashLogo" width={45} height={45}></Image>
+        <p className=" uppercase">kodash</p>
+      </SidebarHeader>
+      <div className="border-b border-b-cardCB md:hidden"></div>
       <SidebarContent className="flex flex-col gap-6 border-none">
         {/* Main Navigation Section */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-[11px] uppercase tracking-wider text-muted-foreground/70 font-medium px-3">
-            Navigation
-          </SidebarGroupLabel>
+          
           <SidebarGroupContent className="mt-3">
             <SidebarMenu>
               {navItems.map((item) => {
