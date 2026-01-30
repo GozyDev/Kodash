@@ -134,9 +134,9 @@ export default function TeamClient({ orgId }: { orgId: string }) {
       <div className="mx-auto">
         <div className="mb-6"></div>
 
-        <div className="flex items-center justify-between md:justify-start gap-1 md:gap-6  mb-6 ">
+        <div className="flex items-center justify-between md:justify-start gap-10 md:gap-6  mb-6 ">
          
-            <div className="flex items-center gap-2 border bg-cardC/50 border-cardCB rounded-md px-3  w-96">
+            <div className="flex items-center gap-2 border bg-cardC/50 border-cardCB rounded-md px-3 flex-1  md:w-96 md:flex-none">
               <Search className="w-5 h-5 text-textNd" />
               <Input
                 value={searchQuery}
@@ -205,10 +205,10 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                   return (
                     <div
                       key={profile.id || index}
-                      className="p-4 hover:bg-cardC transition-colors"
+                      className="p-2 py-4 md:p-4 hover:bg-cardC transition-colors"
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
+                        <div className="flex  gap-4">
                           <Avatar className="w-10 h-10 border-2 border-cardCB">
                             <AvatarImage
                               src={profile.avatar_url || undefined}
@@ -219,7 +219,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                             </AvatarFallback>
                           </Avatar>
 
-                          <div className="flex items-end gap-7">
+                          <div className="flex flex-col md:flex-row justify-start gap-2 md:gap-7 md:items-end">
                             <div className="flex flex-col">
                               <div className="font-medium text-textNa">
                                 {profile.full_name || profile.email || "Unknown"}
@@ -228,7 +228,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                                 {profile.email}
                               </div>
                             </div>
-                            <div className="text-[10px] tracking-widest text-textNb capitalize bg-cardICB/50 p-1 px-3 rounded-3xl">
+                            <div className="text-[10px] tracking-widest text-textNb capitalize bg-cardICB/50 p-1 px-3 rounded-3xl w-max h-max">
                               <p className="sm">{membership.role}</p>
                             </div>
                           </div>
