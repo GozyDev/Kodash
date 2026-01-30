@@ -436,7 +436,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
                           <div className="">
                             {" "}
                             {/* Ensures the container can shrink */}
-                            <div className="w-full max-w-[200px]">
+                            <div className="w-full max-w-[200px] md:max-w-[300px]">
                               <p className=" truncate">{a.file_name || a.file_url}</p>
                             </div>
                             <div className="text-xs text-textNd">
