@@ -8,7 +8,7 @@ import StatusCard from "./StatusCard";
 import PriorityCard from "./piortyCard";
 import { Input } from "./ui/input";
 import { Loader2, Paperclip } from "lucide-react";
-import { Task,  } from "@/lib/superbase/type";
+import { Task } from "@/lib/superbase/type";
 import { presentToPast } from "@/lib/status";
 import ProposalOverview from "./ProposalOverview";
 import { createBrowserClient } from "@supabase/ssr";
@@ -66,10 +66,10 @@ export type Proposal = {
 type Props = {
   orgId: string;
   issueId: string;
-  userRole:"freelancer" | "client"
+  userRole: "freelancer" | "client";
 };
 
-const IndivisualIssuepageClient = ({ orgId, issueId ,userRole }: Props) => {
+const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
   const tasks = useTaskStore((state) => state.task);
   const setTask = useTaskStore((state) => state.setTask);
   const setOrgId = useOrgIdStore((state) => state.setOrgId);
@@ -155,7 +155,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId ,userRole }: Props) => {
   }, [issueId]);
 
   const handleOptimisticStatus = useTaskStore(
-    (state) => state.handleOptimisticStatus
+    (state) => state.handleOptimisticStatus,
   );
 
   // Fetch proposal for this issue on mount
@@ -245,9 +245,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId ,userRole }: Props) => {
 
             useTaskStore.setState({
               task: exists
-                ? current.map((t) =>
-                  t.id === updated.id ? updated : t,
-                )
+                ? current.map((t) => (t.id === updated.id ? updated : t))
                 : [updated, ...current],
             });
 
@@ -297,9 +295,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId ,userRole }: Props) => {
 
               useTaskStore.setState({
                 task: tasks.map((t) =>
-                  t.id === issueId
-                    ? { ...t, status: "on-going" }
-                    : t,
+                  t.id === issueId ? { ...t, status: "on-going" } : t,
                 ),
               });
             }
@@ -325,22 +321,20 @@ const IndivisualIssuepageClient = ({ orgId, issueId ,userRole }: Props) => {
               task: tasks.map((t) =>
                 t.id === issueId
                   ? {
-                    ...t,
-                    status:
-                      updatedProposal.status === "accepted"
-                        ? "on-going"
-                        : updatedProposal.status === "canceled"
-                          ? "cancel"
-                          : t.status,
-                  }
+                      ...t,
+                      status:
+                        updatedProposal.status === "accepted"
+                          ? "on-going"
+                          : updatedProposal.status === "canceled"
+                            ? "cancel"
+                            : t.status,
+                    }
                   : t,
               ),
             });
           },
         )
-        .subscribe((status) =>
-          console.log("Realtime status:", status),
-        );
+        .subscribe((status) => console.log("Realtime status:", status));
     };
 
     setupRealtime();
@@ -350,20 +344,19 @@ const IndivisualIssuepageClient = ({ orgId, issueId ,userRole }: Props) => {
     };
   }, [issueId]);
 
-
   // No inline editing or debounced updates on this view-only page.
 
   if (loading) {
     return (
-       <div className="flex items-center justify-center h-[90vh]">
-              <Image
-                src="/Logo.png"
-                alt="Kodash Logo"
-                width={100}
-                height={100}
-                className="mb-5 animate-pulse"
-              />
-            </div>
+      <div className="flex items-center justify-center h-[90vh]">
+        <Image
+          src="/Logo.png"
+          alt="Kodash Logo"
+          width={100}
+          height={100}
+          className="mb-5 animate-pulse"
+        />
+      </div>
     );
   }
 
@@ -380,24 +373,23 @@ const IndivisualIssuepageClient = ({ orgId, issueId ,userRole }: Props) => {
     <div className=" text-textNb ">
       <div className="flex flex-col-reverse lg:grid gap-6 lg:grid-cols-[minmax(0,2fr)_200px]">
         <div className="space-y-6 pb-[20px] px-3 lg:px-6">
-          <section className="flex flex-col gap-4 bg-cardICB/10 rounded" >
-            <div className="bg-cardC w-full h-[40px] rounded"/>
-          <header className="mb-6 space-y-6 rounded px-4">
-            <Input
-              value={issue.title}
-              readOnly
-              className="text-xl font-semibold bg-transparent border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto"
-              placeholder="Issue title..."
-            />
-            <div>
-              {/* Description display with expandable/collapsible behavior */}
-              {/* Show Textarea for editing when focused; otherwise show truncated text with toggle */}
-              {/** Local UI state manages expansion and edit mode */}
-              <DescriptionViewer text={issue.description || ""} />
-            </div>
-          </header>
+          <section className="flex flex-col gap-4 bg-cardICB/10 rounded">
+            <div className="bg-cardC w-full h-[40px] rounded" />
+            <header className="mb-6 space-y-6 rounded px-4">
+              <Input
+                value={issue.title}
+                readOnly
+                className="text-xl font-semibold bg-transparent border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto"
+                placeholder="Issue title..."
+              />
+              <div>
+                {/* Description display with expandable/collapsible behavior */}
+                {/* Show Textarea for editing when focused; otherwise show truncated text with toggle */}
+                {/** Local UI state manages expansion and edit mode */}
+                <DescriptionViewer text={issue.description || ""} />
+              </div>
+            </header>
           </section>
-         
 
           {/* <CommentSection issueId={issueId} /> */}
 
@@ -429,7 +421,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId ,userRole }: Props) => {
                         }}
                         className="flex items-center justify-between bg-cardC/50 border border-cardCB rounded px-3 py-2 text-sm cursor-pointer"
                       >
-                        <div className="flex items-center gap-3 truncate">
+                        <div className="flex items-center gap-3 ">
                           {isImage ? (
                             <div className="w-24 h-20 flex-shrink-0 bg-cardC/20 rounded overflow-hidden flex items-center justify-center">
                               <Image
@@ -441,14 +433,16 @@ const IndivisualIssuepageClient = ({ orgId, issueId ,userRole }: Props) => {
                               />
                             </div>
                           ) : (
-                            <div className="w-24 h-20 flex-shrink-0 bg-cardC/20 rounded flex items-center justify-center text-xs text-textNd">
+                            <div className="w-20 h-20 flex-shrink-0 bg-cardC/20 rounded flex items-center justify-center text-xs text-textNd">
                               <Paperclip />
                             </div>
                           )}
 
-                          <div className="truncate">
-                            <div className="font-medium text-textNb truncate">
-                              {a.file_name || a.file_url}
+                          <div className="min-w-0 flex-1">
+                            {" "}
+                            {/* Ensures the container can shrink */}
+                            <div className="font-medium text-textNb truncate text-xs sm:text-sm md:text-base ">
+                              <p>{a.file_name || a.file_url}</p>
                             </div>
                             <div className="text-xs text-textNd">
                               {a.file_type ? `${a.file_type} • ` : ""}
@@ -494,11 +488,14 @@ const IndivisualIssuepageClient = ({ orgId, issueId ,userRole }: Props) => {
         </div>
 
         <aside className="space-y-4  h-max p-4  lg:p-0 sticky top-[60px] right-[10px] flex md:flex-col items-center  border-b border-b-cardCB md:border-none gap-3 bg-bgPrimary/90 backdrop-blur-2xl">
-      
           <section className="rounded border border-cardCB bg-cardC p-2 w-max md:w-full m-0">
             <div className="flex items-center justify-between">
               <p className=" capitalize ">{issue.status}</p>
-              <StatusCard task={issue} status={issue.status} userRole={userRole}></StatusCard>
+              <StatusCard
+                task={issue}
+                status={issue.status}
+                userRole={userRole}
+              ></StatusCard>
             </div>
           </section>
 

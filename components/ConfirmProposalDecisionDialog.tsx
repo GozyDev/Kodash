@@ -35,7 +35,7 @@ const ConfirmProposalDecisionDialog = ({
   };
 
   return (
-    <div className="p-4">
+    <div className="">
         <Dialog open={open} onOpenChange={onOpenChange}>
           <DialogContent className="sm:max-w-[425px] bg-cardC text-textNa  border-cardCB">
             <DialogHeader>

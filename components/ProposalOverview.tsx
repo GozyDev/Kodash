@@ -116,7 +116,7 @@ export default function ProposalOverview({
   const dodItems = parseDOD();
 
   return (
-    <div className="rounded-xl border border-cardCB bg-cardC p-6 space-y-6">
+    <div className="rounded-xl border border-cardCB bg-cardC p-3 md:p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-base font-medium text-textNb">Proposal Overview</h3>
@@ -234,7 +234,7 @@ export default function ProposalOverview({
       />
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 gap-4">
         {/* Price Card */}
         <div className="rounded-lg border border-cardCB bg-cardC/50 p-4">
           <div className="flex items-center gap-2 mb-2">
