@@ -375,13 +375,8 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
         <div className="space-y-6 pb-[20px] px-3 lg:px-6">
           <section className="flex flex-col gap-4 bg-cardICB/10 rounded">
             <div className="bg-cardC w-full h-[40px] rounded" />
-            <header className="mb-6 space-y-6 rounded px-4">
-              <Input
-                value={issue.title}
-                readOnly
-                className="text-xl font-semibold bg-transparent border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 h-auto"
-                placeholder="Issue title..."
-              />
+            <header className="mb-6 space-y-4  rounded px-4">
+             <p className="font-bold  uppercase tracking-wider">{issue.title}</p>
               <div>
                 {/* Description display with expandable/collapsible behavior */}
                 {/* Show Textarea for editing when focused; otherwise show truncated text with toggle */}
@@ -419,9 +414,9 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
                             window.open(a.file_url, "_blank");
                           }
                         }}
-                        className="flex items-center justify-between bg-cardC/50 border border-cardCB rounded px-3 py-2 text-sm cursor-pointer"
+                        className="flex items-center justify-between bg-cardC/50 border border-cardCB rounded px-2 md:px-3 py-2 text-sm cursor-pointer"
                       >
-                        <div className="flex items-center gap-3 ">
+                        <div className="flex items-center gap-2">
                           {isImage ? (
                             <div className="w-24 h-20 flex-shrink-0 bg-cardC/20 rounded overflow-hidden flex items-center justify-center">
                               <Image
@@ -438,11 +433,11 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
                             </div>
                           )}
 
-                          <div className="min-w-0 flex-1">
+                          <div className="">
                             {" "}
                             {/* Ensures the container can shrink */}
-                            <div className="font-medium text-textNb truncate text-xs sm:text-sm md:text-base ">
-                              <p>{a.file_name || a.file_url}</p>
+                            <div className="w-full max-w-[200px]">
+                              <p className=" truncate">{a.file_name || a.file_url}</p>
                             </div>
                             <div className="text-xs text-textNd">
                               {a.file_type ? `${a.file_type} • ` : ""}
