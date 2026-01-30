@@ -8,6 +8,7 @@ import TaskCard from "./TaskCard";
 import { useMemo, useState, useCallback } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
+
 interface TaskListProps {
   tasks: Task[];
   userRole: "client" | "freelancer";
@@ -78,12 +79,12 @@ export default function TaskList({
 
   if (!hasAny) {
     return (
-      <div className="text-center py-12">
-        <div className="text-gray-400 text-lg">No requests found</div>
-        <div className="text-gray-500 text-sm mt-2">
+      <div className="flex  gap-3 justify-center items-center flex-col h-[70vh]">
+        <img src="/linear.png" alt="request logo" className="w-[100px] grayscale-75"></img>
+        <div className="text-textNb capitalize">
           {userRole === "client"
             ? "Create your first request to get started"
-            : "No requests available yet"}
+            : "No requests made yet"}
         </div>
       </div>
     );
