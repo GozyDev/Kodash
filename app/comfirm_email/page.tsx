@@ -12,14 +12,14 @@ const ConfirmContent = () => {
   const eml = searchParams.get("eml");
 
   return (
-    <div className="max-w-2xl w-full bg-cardC rounded-2xl shadow-lg p-8 text-center">
+    <div className="max-w-2xl w-full bg-cardC rounded-2xl shadow-lg px-2 py-4 md:p-8 text-center">
       {/* Success Icon */}
      <Image
               src="/Logo.png"
               alt="Kodash Logo"
               width={100}
               height={100}
-              className="mb-5"
+              className="mb-5 mx-auto"
             />
 
       {/* Header */}
@@ -28,28 +28,28 @@ const ConfirmContent = () => {
       </h1>
 
       {/* Description */}
-      <p className=" mb-6 leading-relaxed text-textNc">
+      <p className=" mb-6 text-sm leading-relaxed text-textNc">
         {` We've sent a confirmation link to ${eml || 'your email'} .`}
         Please click the link in the email to verify your account and complete your registration.
       </p>
 
       {/* Important Note */}
-      <div className="bg-cardICB/50 border border-cardCB rounded-lg p-4 mb-6 text-left">
+      <div className="bg-cardICB/50 border border-cardCB rounded-lg p-2 md:p-4 mb-6 text-left text-sm">
         <div className="flex items-start gap-3">
           <CheckCircle className="w-5 h-5 text-primaryC mt-0.5 flex-shrink-0" />
           <div>
             <p className="text-textNb font-medium text-sm mb-1">Didn&apos;t receive the email?</p>
             <ul className="text-textNc text-sm space-y-1">
-              <li>• Check your spam or junk folder</li>
-              <li>• Make sure you entered the correct email address</li>
-              <li>• Wait a few minutes - it might take a moment to arrive</li>
+              <li> Check your spam or junk folder</li>
+              <li> Make sure you entered the correct email address</li>
+              <li> Wait a few minutes - it might take a moment to arrive</li>
             </ul>
           </div>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-row md:flex-row-reverse gap-3">
+      <div className="flex flex-col-reverse md:flex-row-reverse gap-3">
         <button className="w-full butt text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
           <RefreshCw className="w-5 h-5" />
           Resend Confirmation Email
