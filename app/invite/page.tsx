@@ -2,6 +2,7 @@ import React from "react";
 import { createClient } from "@/lib/superbase/superbase-server";
 import AcceptButton from "@/app/invite/AcceptButton";
 import Image from "next/image";
+import { workerData } from "worker_threads";
 
 type Props = {
   searchParams?: { token?: string };
@@ -87,7 +88,14 @@ export default async function InvitePage({ searchParams }: Props) {
   // Authenticated: verify email matches
   if ((user.email || "").toLowerCase() !== (invite.email || "").toLowerCase()) {
     return (
-      <div className="p-6">
+      <div className="p-6 text-textNa h-screen flex flex-col justify-center items-center ">
+           <Image
+        src="/Logo.png"
+        alt="Kodash Logo"
+        width={100}
+        height={100}
+        className="mb-5"
+      />
         <h1 className="text-xl font-semibold">
           This invite is not for your email
         </h1>
@@ -97,12 +105,32 @@ export default async function InvitePage({ searchParams }: Props) {
     );
   }
 
+  let worspaceName;
+
+  if (invite && user) {
+    const { data,error: workspaceError } = await svc
+      .from("tenants")
+      .select("name")
+      .eq("id", invite.workspace_id)
+      .maybeSingle();
+
+      if(data){
+        worspaceName = data.name
+      }
+  }
   // Client component for accepting the invite
   return (
-    <div className="p-6 text-textNa">
+    <div className="p-6 text-textNa h-screen flex flex-col justify-center items-center">
+      <Image
+        src="/Logo.png"
+        alt="Kodash Logo"
+        width={100}
+        height={100}
+        className="mb-5"
+      />
       <h1 className="text-xl font-semibold">Accept workspace invite</h1>
-      <p className="mt-2">You are signing in as {user.email}</p>
-      <p className="mt-1">Workspace ID: {invite.workspace_id}</p>
+      <p className="mt-2 text-textNb">You are signing in as {user.email}</p>
+      <p className="mt-1 text-textNb">to {worspaceName} workspace</p>
       <AcceptButton token={token} />
     </div>
   );
