@@ -130,7 +130,7 @@ export default async function InvitePage({ searchParams }: Props) {
       />
       <h1 className="text-xl font-semibold">Accept workspace invite</h1>
       <p className="mt-2 text-textNb">You are signing in as {user.email}</p>
-      <p className="mt-1 text-textNb">to {worspaceName} workspace</p>
+      <p className="mt-1 text-textNb">to {worspaceName} workspace as a {invite.role}</p> 
       <AcceptButton token={token} />
     </div>
   );

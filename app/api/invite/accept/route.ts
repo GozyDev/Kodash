@@ -98,7 +98,7 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ workspaceID:invite.workspace_id, role:invite.role, success: true });
   } catch (err: unknown) {
     if (err instanceof Error) {
       console.error("Accept invite error:", err);
