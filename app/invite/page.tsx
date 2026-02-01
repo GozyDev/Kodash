@@ -2,7 +2,7 @@ import React from "react";
 import { createClient } from "@/lib/superbase/superbase-server";
 import AcceptButton from "@/app/invite/AcceptButton";
 import Image from "next/image";
-import { workerData } from "worker_threads";
+
 
 type Props = {
   searchParams?: { token?: string };
@@ -108,7 +108,7 @@ export default async function InvitePage({ searchParams }: Props) {
   let worspaceName;
 
   if (invite && user) {
-    const { data,error: workspaceError } = await svc
+    const { data} = await svc
       .from("tenants")
       .select("name")
       .eq("id", invite.workspace_id)
