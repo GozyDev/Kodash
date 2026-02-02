@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { poppins } from "@/lib/font";
+import { ToastContainer } from "react-toastify";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -12,5 +13,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <div className={`${poppins.className} antialiased `}>{children}</div>;
+  return (
+    <div className={`${poppins.className} antialiased `}>
+      {children}
+      <ToastContainer theme="dark" position="bottom-right" />
+    </div>
+  );
 }
