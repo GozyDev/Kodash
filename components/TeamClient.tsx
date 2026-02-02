@@ -15,6 +15,7 @@ import { UserPlus, Search, LogOut, X } from "lucide-react";
 import Image from "next/image";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { createBrowserClient } from "@supabase/ssr";
+import { toast } from "react-toastify";
 
 type Profile = {
   id: string;
@@ -27,7 +28,7 @@ type Tenants = {
   created_by: string;
 };
 type Membership = {
-  id:string
+  id: string;
   role: string;
   profiles: Profile | null;
   tenants: Tenants | null;
@@ -129,6 +130,9 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                 if (membership) {
                   // Use functional update to avoid stale state issues
                   setMemberships((prev) => [...prev, membership]);
+                  toast.success(
+                    `${membership.profiles?.full_name || "A new member"} joined the team!`,
+                  );
                 }
               }
             } catch (err) {
@@ -151,7 +155,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
 
             // Remove the member from the UI state immediately
             setMemberships((prev) =>
-              prev.filter((m:Membership) => m.id !== deletedId),
+              prev.filter((m: Membership) => m.id !== deletedId),
             );
           },
         )
@@ -164,7 +168,6 @@ export default function TeamClient({ orgId }: { orgId: string }) {
       if (channel) supabase.removeChannel(channel);
     };
   }, [orgId]); // Removed 'memberships' from deps to prevent loop
-
 
   const tenantCreatorId = memberships[0]?.tenants?.created_by;
   const isCreator = tenantCreatorId === user?.id;
@@ -432,6 +435,10 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                         );
                         return;
                       }
+
+                       toast.success(
+                    `Invite sent successfully to ${email}`,
+                  );
 
                       setInviteOpen(false);
                       setEmail("");

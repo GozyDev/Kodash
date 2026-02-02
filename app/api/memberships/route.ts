@@ -11,16 +11,19 @@ export async function GET(req: Request) {
   if (membershipId) {
     const { data, error } = await svc
       .from("memberships")
-      .select(`
-        id
+      .select(
+        `
+        id,
         role,
         profiles(*),
         tenants("id","created_by")
-      `)
+      `,
+      )
       .eq("id", membershipId)
       .single();
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error)
+      return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ membership: data });
   }
 
@@ -28,17 +31,18 @@ export async function GET(req: Request) {
   if (orgId) {
     const { data, error } = await svc
       .from("memberships")
-      .select(`
+      .select(
+        `
         id,
         role,
         profiles(*),
         tenants("id","created_by")
-      `)
+      `,
+      )
       .eq("tenant_id", orgId);
 
-    if (error){
-      console.log(error)
-       return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
     return NextResponse.json({ memberships: data ?? [] });
   }
