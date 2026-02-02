@@ -260,6 +260,7 @@ export default function TaskClient({
       <div className="px-2 md:px-4 py-4">
         <TaskList
           tasks={filteredTasks}
+          totalTasksCount={task.length}
           userRole={userRole}
           onCreateWithStatus={
             userRole === "client"

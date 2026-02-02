@@ -8,9 +8,9 @@ import TaskCard from "./TaskCard";
 import { useMemo, useState, useCallback } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
-
 interface TaskListProps {
   tasks: Task[];
+  totalTasksCount: number;
   userRole: "client" | "freelancer";
   onTaskClick?: (task: Task) => void;
   onCreateWithStatus?: (status: Task["status"]) => void;
@@ -18,6 +18,7 @@ interface TaskListProps {
 
 export default function TaskList({
   tasks,
+  totalTasksCount,
   userRole,
 }: TaskListProps) {
   const groups = useMemo(() => {
@@ -28,7 +29,7 @@ export default function TaskList({
       deliver: [],
       complete: [],
       cancel: [],
-    } ;
+    };
 
     for (const t of tasks) {
       // normalize stored status to present-tense for grouping (DB may store past-tense)
@@ -74,14 +75,15 @@ export default function TaskList({
   const toggle = useCallback((key: string) => {
     setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
-
-  const hasAny = tasks.length > 0;
-
-  if (!hasAny) {
+  if (totalTasksCount === 0) {
     return (
-      <div className="flex  gap-3 justify-center items-center flex-col h-[70vh]">
-        <img src="/linear.png" alt="request logo" className="w-[100px] grayscale-75"></img>
-        <div className="text-textNb capitalize">
+      <div className="flex gap-3 justify-center items-center flex-col h-[60vh] border-2 border-dashed border-cardCB rounded-lg m-4">
+        <img
+          src="/linear.png"
+          alt="no tasks"
+          className="w-[100px] grayscale-80"
+        />
+        <div className="text-textNb capitalize text-center">
           {userRole === "client"
             ? "Create your first request to get started"
             : "No requests made yet"}
@@ -90,11 +92,42 @@ export default function TaskList({
     );
   }
 
+  // STATE 2: Tasks exist, but the FILTER result is empty
+  if (tasks.length === 0) {
+    return (
+      <div className="flex gap-3 justify-center items-center flex-col h-[60vh] border-2 border-dashed border-cardCB rounded-lg m-4">
+        <div className="bg-cardC p-4 rounded-full">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-textNd"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <div className="text-center">
+          <h3 className="text-textNa font-medium">No matches found</h3>
+          <p className="text-textNd text-sm mt-1">
+            Try adjusting your filters to find what you're looking for.
+          </p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       {groups.map((group) => {
-        if (!group.items){
-          return
+        if (!group.items) {
+          return;
         }
         if (group.items.length === 0) return null; // render section only if it has tasks
         const isCollapsed = !!collapsed[group.key];
