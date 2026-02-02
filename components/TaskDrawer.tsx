@@ -490,7 +490,7 @@ export default function TaskDrawer({
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-cardCB/80">
                 <div className="flex items-center gap-2 text-sm text-textNd">
-                  <span className="text-textNb">New issue</span>
+                  <span className="text-textNb">New Request</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Button
@@ -892,7 +892,7 @@ export default function TaskDrawer({
                           : "Save"
                         : isSaving
                           ? "Creating..."
-                          : "Create issue"}
+                          : "Create Request"}
                     </Button>
                   )}
                 </div>
