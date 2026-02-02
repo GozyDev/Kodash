@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/select";
 import { UserPlus, Search, LogOut, X } from "lucide-react";
 import Image from "next/image";
+import { RealtimeChannel } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 
 type Profile = {
   id: string;
@@ -25,6 +27,7 @@ type Tenants = {
   created_by: string;
 };
 type Membership = {
+  id:string
   role: string;
   profiles: Profile | null;
   tenants: Tenants | null;
@@ -57,7 +60,6 @@ export default function TeamClient({ orgId }: { orgId: string }) {
         return;
       }
       const json = await res.json();
-      console.log(json.memberships);
       setMemberships(json.memberships ?? []);
     } catch (err: unknown) {
       // Handling the error safely for ESLint as we discussed earlier
@@ -96,7 +98,74 @@ export default function TeamClient({ orgId }: { orgId: string }) {
     fetchUser();
   }, []);
 
-  console.log(user);
+  useEffect(() => {
+    if (!orgId) return;
+
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    );
+
+    let channel: RealtimeChannel;
+
+    const setupRealtime = async () => {
+      channel = supabase
+        .channel(`memberhip${orgId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "memberships",
+            filter: `tenant_id=eq.${orgId}`,
+          },
+          async (payload) => {
+            // --- THE CHANGE IS HERE ---
+            // Call your internal API instead of calling Supabase directly
+            try {
+              const res = await fetch(`/api/memberships?id=${payload.new.id}`);
+              if (res.ok) {
+                const { membership } = await res.json();
+                if (membership) {
+                  // Use functional update to avoid stale state issues
+                  setMemberships((prev) => [...prev, membership]);
+                }
+              }
+            } catch (err) {
+              console.error("Error fetching new member details:", err);
+            }
+          },
+        )
+        // --- DELETE LISTENER (The new addition) ---
+        .on(
+          "postgres_changes",
+          {
+            event: "DELETE",
+            schema: "public",
+            table: "memberships",
+            filter: `tenant_id=eq.${orgId}`,
+          },
+          (payload) => {
+            // payload.old contains the record that was just removed
+            const deletedId = payload.old.id;
+
+            // Remove the member from the UI state immediately
+            setMemberships((prev) =>
+              prev.filter((m:Membership) => m.id !== deletedId),
+            );
+          },
+        )
+        .subscribe((stat) => console.log(stat));
+    };
+
+    setupRealtime();
+
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [orgId]); // Removed 'memberships' from deps to prevent loop
+
+
   const tenantCreatorId = memberships[0]?.tenants?.created_by;
   const isCreator = tenantCreatorId === user?.id;
 
