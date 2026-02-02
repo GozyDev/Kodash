@@ -42,7 +42,7 @@ export default function AcceptButton({ token }: { token: string }) {
       <button
         onClick={handleAccept}
         disabled={loading}
-        className="px-4 py-2 bg-green-600 text-white rounded"
+        className="px-4 py-2  butt text-white rounded"
       >
         {loading ? "Accepting…" : "Accept Invite"}
       </button>

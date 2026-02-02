@@ -3,7 +3,6 @@ import { createClient } from "@/lib/superbase/superbase-server";
 import AcceptButton from "@/app/invite/AcceptButton";
 import Image from "next/image";
 
-
 type Props = {
   searchParams?: { token?: string };
 };
@@ -63,22 +62,23 @@ export default async function InvitePage({ searchParams }: Props) {
   if (!user) {
     const redirect = encodeURIComponent(`/invite?token=${token}`);
     return (
-      <div className="p-6">
+      <div className="p-6 text-textNa h-screen flex flex-col justify-center items-center">
+        <Image
+          src="/Logo.png"
+          alt="Kodash Logo"
+          width={100}
+          height={100}
+          className="mb-5"
+        />
         <h1 className="text-xl font-semibold">You&apos;ve been invited</h1>
         <p className="mt-2">Email: {invite.email}</p>
-        <p className="mt-1">Workspace ID: {invite.workspace_id}</p>
+        <p className="mt-1 capitalize">Resigter to kodask to accept the invitation</p>
         <div className="mt-4 space-x-3">
           <a
-            href={`/auth/sign_in?redirectTo=${redirect}`}
-            className="inline-block px-4 py-2 bg-blue-600 text-white rounded"
+            href={`/api/auth/google?redirectTo=${redirect}`}
+            className="inline-block px-4 py-2    text-white rounded"
           >
             Sign in
-          </a>
-          <a
-            href={`/auth/sign_up?redirectTo=${redirect}`}
-            className="inline-block px-4 py-2 border rounded"
-          >
-            Sign up
           </a>
         </div>
       </div>
@@ -89,13 +89,13 @@ export default async function InvitePage({ searchParams }: Props) {
   if ((user.email || "").toLowerCase() !== (invite.email || "").toLowerCase()) {
     return (
       <div className="p-6 text-textNa h-screen flex flex-col justify-center items-center ">
-           <Image
-        src="/Logo.png"
-        alt="Kodash Logo"
-        width={100}
-        height={100}
-        className="mb-5"
-      />
+        <Image
+          src="/Logo.png"
+          alt="Kodash Logo"
+          width={100}
+          height={100}
+          className="mb-5"
+        />
         <h1 className="text-xl font-semibold">
           This invite is not for your email
         </h1>
@@ -108,15 +108,15 @@ export default async function InvitePage({ searchParams }: Props) {
   let worspaceName;
 
   if (invite && user) {
-    const { data} = await svc
+    const { data } = await svc
       .from("tenants")
       .select("name")
       .eq("id", invite.workspace_id)
       .maybeSingle();
 
-      if(data){
-        worspaceName = data.name
-      }
+    if (data) {
+      worspaceName = data.name;
+    }
   }
   // Client component for accepting the invite
   return (
@@ -130,7 +130,9 @@ export default async function InvitePage({ searchParams }: Props) {
       />
       <h1 className="text-xl font-semibold">Accept workspace invite</h1>
       <p className="mt-2 text-textNb">You are signing in as {user.email}</p>
-      <p className="mt-1 text-textNb">to {worspaceName} workspace as a {invite.role}</p> 
+      <p className="mt-1 text-textNb">
+        to {worspaceName} workspace as a {invite.role}
+      </p>
       <AcceptButton token={token} />
     </div>
   );
