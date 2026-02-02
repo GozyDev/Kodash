@@ -129,7 +129,7 @@ export default function TaskList({
         <div className="text-center">
           <h3 className="text-textNa font-medium">No matches found</h3>
           <p className="text-textNd text-sm mt-1">
-            Try adjusting your filters to find what you're looking for.
+            Try adjusting your filters to find what you&apos;re looking for.
           </p>
         </div>
       </div>
