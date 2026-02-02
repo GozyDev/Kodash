@@ -262,6 +262,7 @@ export default function TaskClient({
           tasks={filteredTasks}
           totalTasksCount={task.length}
           userRole={userRole}
+          onOpenDrawer={setIsDrawerOpen}
           onCreateWithStatus={
             userRole === "client"
               ? (status) => {

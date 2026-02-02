@@ -11,6 +11,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 interface TaskListProps {
   tasks: Task[];
   totalTasksCount: number;
+  onOpenDrawer: React.Dispatch<React.SetStateAction<boolean>>;
   userRole: "client" | "freelancer";
   onTaskClick?: (task: Task) => void;
   onCreateWithStatus?: (status: Task["status"]) => void;
@@ -20,6 +21,7 @@ export default function TaskList({
   tasks,
   totalTasksCount,
   userRole,
+  onOpenDrawer,
 }: TaskListProps) {
   const groups = useMemo(() => {
     const byStatus: Partial<Record<Task["status"], Task[]>> = {
@@ -84,9 +86,19 @@ export default function TaskList({
           className="w-[100px] grayscale-80"
         />
         <div className="text-textNb capitalize text-center">
-          {userRole === "client"
-            ? "Create your first request to get started"
-            : "No requests made yet"}
+          {userRole === "client" ? (
+            <div className="space-y-3">
+              <p className=" capitalize">No request made</p>
+              <button
+                onClick={() => onOpenDrawer(true)}
+                className=" bg-cardC text-textNc py-2 px-5 rounded capitalize cursor-pointer"
+              >
+                Write a new request
+              </button>
+            </div>
+          ) : (
+            <p>No requests made yet</p>
+          )}
         </div>
       </div>
     );
