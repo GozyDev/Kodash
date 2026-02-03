@@ -3,7 +3,7 @@
 
 import { Task } from "@/lib/superbase/type";
 import { motion } from "framer-motion";
-import { Calendar} from "lucide-react";
+import { Calendar } from "lucide-react";
 import PriorityCard from "./piortyCard";
 import WriteProposalDialog from "./WriteProposalDialog";
 import { useState } from "react";
@@ -26,7 +26,7 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
 
   const orgId = useOrgIdStore((state) => state.orgId);
   const handleOptimisticStatus = useTaskStore(
-    (state) => state.handleOptimisticStatus
+    (state) => state.handleOptimisticStatus,
   );
 
   const getStatusColor = (status: Task["status"]) => {
@@ -72,12 +72,17 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-2">
-            {userRole === "freelancer" && <div
-              onClick={(e) => e.stopPropagation()}
-              onMouseDown={(e) => e.stopPropagation()}
-            >
-              <PriorityCard task={task} priority={task.priority}></PriorityCard>
-            </div>}
+            {userRole === "freelancer" && (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+              >
+                <PriorityCard
+                  task={task}
+                  priority={task.priority}
+                ></PriorityCard>
+              </div>
+            )}
             <div
               className="flex items-center"
               onClick={(e) => e.stopPropagation()}
@@ -86,10 +91,16 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
               <span className="text-sm font-medium text-textNc capitalize">
                 {displayStatusForTaskCard(task.status).toLowerCase()}
               </span>
-              <StatusCard task={task} status={task.status} userRole={userRole}></StatusCard>
+              <StatusCard
+                task={task}
+                status={task.status}
+                userRole={userRole}
+              ></StatusCard>
             </div>
           </div>
-          <h3 className="font-semibold text-[15px] md:text-base">{task.title}</h3>
+          <h3 className="font-semibold text-[15px] md:text-base uppercase">
+            {task.title}
+          </h3>
           {task.description && (
             <p className="text-sm text-textNd  mt-1 line-clamp-2">
               {task.description}
@@ -102,11 +113,7 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
             </div>
           )}
           {/* Only show "Write Proposal" for freelancers on draft requests */}
-         
-
-         
         </div>
-
       </div>
     </motion.div>
   );
