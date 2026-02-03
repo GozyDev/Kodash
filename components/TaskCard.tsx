@@ -102,53 +102,9 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
             </div>
           )}
           {/* Only show "Write Proposal" for freelancers on draft requests */}
-          {task.status === "draft" && userRole === "freelancer" && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setOpenProposal(true);
-              }}
-              onMouseDown={(e) => e.stopPropagation()}
-              className="text-sm bg-cardC py-1 px-3 mt-[20px] rounded-lg text-textNd"
-            >
-              Write Proposal
-            </button>
-          )}
+         
 
-          <div
-            onClick={(e) => e.stopPropagation()}
-            onMouseDown={(e) => e.stopPropagation()}
-          >
-            <WriteProposalDialog
-              open={openProposal}
-              onOpenChange={setOpenProposal}
-              task={task}
-              onSubmit={async (proposal) => {
-                try {
-                  const response = await fetch("/api/proposal", {
-                    method: "POST",
-                    headers: { "Content-type": "application/json" },
-                    body: JSON.stringify({ ...proposal, requestId: task.id }),
-                  });
-
-                  if (response.ok) {
-                    // If proposal was created successfully and task is draft, update status to proposed
-                    if (task.status === "draft") {
-                      // convert present-tense selection to past-tense for DB
-                      const dbStatus = presentToPast("propose");
-                      handleOptimisticStatus(task.id, dbStatus as Task["status"]);
-                    }
-                    setOpenProposal(false);
-                  } else {
-                    const error = await response.json();
-                    console.error("Failed to create proposal:", error);
-                  }
-                } catch (err) {
-                  console.error("Error creating proposal:", err);
-                }
-              }}
-            />
-          </div>
+         
         </div>
 
       </div>

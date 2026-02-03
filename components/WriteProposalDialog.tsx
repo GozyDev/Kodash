@@ -53,7 +53,7 @@ export default function WriteProposalDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl bg-cardC border border-cardCB text-textNa p-3 md:p-4">
+      <DialogContent className="max-w-6xl bg-cardC border border-cardCB text-textNa p-3 md:p-4 ">
         <DialogHeader>
           <DialogTitle className="text-sm font-medium text-left text-textNb">
             Create Proposal
@@ -62,12 +62,13 @@ export default function WriteProposalDialog({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 gap-y-[50px]">
           {/* LEFT: Request (read-only) */}
-          <div className="p flex justify-between flex-col  space-y-3">
+          <div className="p justify-between flex-col  space-y-3 hidden md:flex">
             <div className=" space-y-3">
               <h3 className="font-semibold text-textNb clear-both  text-xl">
                 {task.title}
               </h3>
-              <p className="text-sm text-textNd mt-2">{task.description}</p>
+              <p className="text-sm text-textNd mt-2">{task.description?.slice(0,110)}....</p>
+              <small className="text-primaryC hover:text-primaryHC cursor-pointer">veiw request</small>
             </div>
 
             <div className=" flex items-center justify-center gap-2 bg-cardICB/50 p-2 px-4 rounded-xl w-max">
@@ -86,8 +87,8 @@ export default function WriteProposalDialog({
                 Definition of Done
               </label>
               <textarea
-                className="w-full border-b border-cardCB bg-transparent p-2 focus:outline-none text-sm text-textNb"
-                rows={7}
+                className="w-full border-b border-cardCB bg-transparent p-2 focus:outline-none text-sm text-textNb tracking-wider"
+                rows={5}
                 value={dod}
                 onChange={(e) => setDod(e.target.value)}
               />

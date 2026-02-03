@@ -13,6 +13,7 @@ import ProposalOverview from "./ProposalOverview";
 import { createBrowserClient } from "@supabase/ssr";
 import Image from "next/image";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import WriteProposalDialog from "./WriteProposalDialog";
 
 // Small helper component for description viewing/editing
 function DescriptionViewer({
@@ -72,7 +73,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
   const tasks = useTaskStore((state) => state.task);
   const setTask = useTaskStore((state) => state.setTask);
   const setOrgId = useOrgIdStore((state) => state.setOrgId);
-
+  const [openProposal, setOpenProposal] = useState(false);
   const [issue, setIssue] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
   const [proposal, setProposal] = useState<Proposal | null>(null);
@@ -387,6 +388,44 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
             </header>
           </section>
 
+          <div
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <WriteProposalDialog
+              open={openProposal}
+              onOpenChange={setOpenProposal}
+              task={issue}
+              onSubmit={async (proposal) => {
+                try {
+                  const response = await fetch("/api/proposal", {
+                    method: "POST",
+                    headers: { "Content-type": "application/json" },
+                    body: JSON.stringify({ ...proposal, requestId: issue.id }),
+                  });
+
+                  if (response.ok) {
+                    // If proposal was created successfully and task is draft, update status to proposed
+                    if (issue.status === "draft") {
+                      // convert present-tense selection to past-tense for DB
+                      const dbStatus = presentToPast("propose");
+                      handleOptimisticStatus(
+                        issue.id,
+                        dbStatus as Task["status"],
+                      );
+                    }
+                    setOpenProposal(false);
+                  } else {
+                    const error = await response.json();
+                    console.error("Failed to create proposal:", error);
+                  }
+                } catch (err) {
+                  console.error("Error creating proposal:", err);
+                }
+              }}
+            />
+          </div>
+
           {/* <CommentSection issueId={issueId} /> */}
 
           <section className="py-4 space-y-10">
@@ -498,7 +537,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
           </section>
 
           {userRole === "freelancer" && (
-            <section className="rounded border border-cardCB bg-cardC p-2 w-max md:w-full">
+            <section className="rounded border border-cardCB bg-cardC p-2 w-max md:w-full m-0">
               <div className="flex items-start justify-between">
                 <p className=" capitalize">{issue.priority}</p>
                 <PriorityCard
@@ -508,6 +547,21 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
               </div>
             </section>
           )}
+
+          <div className="w-full m">
+            {issue.status === "draft" && userRole === "freelancer" && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenProposal(true);
+                }}
+                onMouseDown={(e) => e.stopPropagation()}
+                className="w-full py-2 butt"
+              >
+                Write Proposal
+              </button>
+            )}
+          </div>
         </aside>
       </div>
     </div>
