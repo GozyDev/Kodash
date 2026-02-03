@@ -105,7 +105,7 @@
     },
     {
       value: "canceled", svg: (
-        <svg
+         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="14"
           height="14"
@@ -115,11 +115,12 @@
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="kodash-status kodash-completed"
+          className="kodash-status kodash-cancelled"
         >
           <circle cx="12" cy="12" r="9" />
-          <path d="M8.5 12.5l2.5 2.5 4.5-5" />
+          <path d="M8 8l8 8" />
         </svg>
+        
       ), label: "Canceled"
     },
     {
@@ -134,10 +135,10 @@
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="kodash-status kodash-cancelled"
+          className="kodash-status kodash-completed"
         >
           <circle cx="12" cy="12" r="9" />
-          <path d="M8 8l8 8" />
+          <path d="M8.5 12.5l2.5 2.5 4.5-5" />
         </svg>
       ), label: "Completed"
     },
