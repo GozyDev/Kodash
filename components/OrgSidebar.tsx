@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
-const toolItems = [{ title: "Settings", icon: Settings, url: "/settings" }];
+// const toolItems = [{ title: "Settings", icon: Settings, url: "/settings" }];
 
 export function OrgSidebar({
   orgId,  
@@ -120,7 +120,7 @@ export function OrgSidebar({
               })}
             </SidebarMenu>
 
-            <SidebarMenu>
+            {/* <SidebarMenu>
               {toolItems.map((item) => {
                 const isActive = pathname === item.url;
                 return (
@@ -143,7 +143,7 @@ export function OrgSidebar({
                           ]
                         )}
                       >
-                        {/* Active indicator */}
+                       
                         {isActive && (
                           <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-accent rounded-r-full" />
                         )}
@@ -169,7 +169,7 @@ export function OrgSidebar({
                   </SidebarMenuItem>
                 );
               })}
-            </SidebarMenu>
+            </SidebarMenu> */}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
