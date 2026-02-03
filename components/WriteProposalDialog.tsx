@@ -68,7 +68,7 @@ export default function WriteProposalDialog({
                 {task.title}
               </h3>
               <p className="text-sm text-textNd mt-2">{task.description?.slice(0,110)}....</p>
-              <small className="text-primaryC hover:text-primaryHC cursor-pointer">veiw request</small>
+              <small className="text-primaryC hover:text-primaryHC cursor-pointer" onClick={()=>onOpenChange(false)}>veiw request</small>
             </div>
 
             <div className=" flex items-center justify-center gap-2 bg-cardICB/50 p-2 px-4 rounded-xl w-max">
