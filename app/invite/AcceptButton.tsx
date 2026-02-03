@@ -25,9 +25,9 @@ export default function AcceptButton({ token }: { token: string }) {
       const { workspaceID, role } = await res.json();
 
       if (role === "FREELANCER") {
-        window.location.assign(`${redirectTo}/dashboard/fl-org/${workspaceID}/issues`);
+        window.location.assign(`${redirectTo}/dashboard/fl-org/${workspaceID}/requests`);
       }else{
-        window.location.assign(`${redirectTo}/dashboard/cl-org/${workspaceID}/issues`);
+        window.location.assign(`${redirectTo}/dashboard/cl-org/${workspaceID}/requests`);
 
       }
     } catch (err: unknown) {
