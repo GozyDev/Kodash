@@ -6,7 +6,7 @@ import { displayStatusForStatusCard } from "@/lib/status";
 import { motion, AnimatePresence } from "framer-motion";
 import TaskCard from "./TaskCard";
 import { useMemo, useState, useCallback } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, ListFilter } from "lucide-react";
 
 interface TaskListProps {
   tasks: Task[];
@@ -107,24 +107,9 @@ export default function TaskList({
   // STATE 2: Tasks exist, but the FILTER result is empty
   if (tasks.length === 0) {
     return (
-      <div className="flex gap-3 justify-center items-center flex-col h-[60vh] border-2 border-dashed border-cardCB rounded-lg m-4">
+      <div className="flex gap-3 justify-center items-center flex-col h-[70vh] border-2 border-dashed border-cardCB rounded-lg m-4">
         <div className="bg-cardC p-4 rounded-full">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-textNd"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
+          <ListFilter size={40} />
         </div>
         <div className="text-center">
           <h3 className="text-textNa font-medium">No matches found</h3>
