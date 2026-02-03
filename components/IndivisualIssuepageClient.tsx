@@ -548,7 +548,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
             </section>
           )}
 
-          <div className="w-full m">
+          
             {issue.status === "draft" && userRole === "freelancer" && (
               <button
                 onClick={(e) => {
@@ -561,7 +561,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
                 Write Proposal
               </button>
             )}
-          </div>
+        
         </aside>
       </div>
     </div>
