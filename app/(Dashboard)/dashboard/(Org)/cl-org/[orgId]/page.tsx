@@ -1,5 +1,5 @@
-"use client";
+import AnalyticClient from "@/components/AnalyticClient";
 
 export default function OrgProjectsPage() {
-  return <p>Analytic pending</p>;
+  return <AnalyticClient></AnalyticClient>;
 }
