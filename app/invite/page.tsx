@@ -76,7 +76,7 @@ export default async function InvitePage({ searchParams }: Props) {
         <div className="mt-4 space-x-3">
           <a
             href={`/api/auth/google?redirectTo=${redirect}`}
-            className="inline-block px-4 py-2    text-white rounded"
+            className="inline-block px-4 py-2  butt  text-white rounded"
           >
             Sign in
           </a>
