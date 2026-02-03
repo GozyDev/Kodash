@@ -58,7 +58,7 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
       : `/dashboard/cl-org/${orgId}`;
 
   const handleCardClick = () => {
-    router.push(`${basePath}/issue/${task.id}`);
+    router.push(`${basePath}/request/${task.id}`);
   };
 
   return (
