@@ -104,7 +104,7 @@ export async function PATCH(
 
     if (error) {
       console.log("Failed to update proposal status:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: error.message }, { status: 500 });  
     }
 
     const updated = data && data.length > 0 ? data[0] : null;
