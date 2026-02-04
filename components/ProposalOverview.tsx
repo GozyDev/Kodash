@@ -3,7 +3,6 @@
 import { Button } from "./ui/button";
 import { DollarSign, Calendar, CheckCircle2, Info } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useTaskStore } from "@/app/store/useTask";
 import type { Proposal } from "./IndivisualIssuepageClient";
 import ConfirmProposalDecisionDialog from "@/components/ConfirmProposalDecisionDialog";
 
