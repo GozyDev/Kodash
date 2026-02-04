@@ -57,8 +57,8 @@ function DescriptionViewer({
 export type Proposal = {
   id: string;
   price: number | string | null;
-  currency: string | null;
-  due_date: string | null;
+  currency?: string;
+  due_date?: string;
   dod: string | null;
   status: "pending" | "canceled" | "accepted";
 };
@@ -76,7 +76,8 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
   const [openProposal, setOpenProposal] = useState(false);
   const [issue, setIssue] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
-  const [proposal, setProposal] = useState<Proposal | null>(null);
+  const [proposal, setProposal] = useState<Proposal[] | null>(null);
+  console.log(proposal);
   const [attachments, setAttachments] = useState<
     {
       file_url: string;
@@ -288,7 +289,25 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
           },
           (payload) => {
             const newProposal = payload.new as Proposal;
-            setProposal(newProposal);
+            setProposal((prev) => {
+              // If prev is null, default to an empty array
+              const currentProposals = prev || [];
+
+              // Check for existing to avoid duplicates
+              const exists = currentProposals.some(
+                (p) => p.id === newProposal.id,
+              );
+
+              if (exists) {
+                // Update existing
+                return currentProposals.map((p) =>
+                  p.id === newProposal.id ? newProposal : p,
+                );
+              }
+
+              // Add new
+              return [...currentProposals, newProposal];
+            });
 
             if (newProposal?.status === "accepted") {
               const tasks = useTaskStore.getState().task;
@@ -313,7 +332,17 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
           },
           (payload) => {
             const updatedProposal = payload.new as Proposal;
-            setProposal(updatedProposal);
+
+            setProposal((prev) => {
+              // 1. Handle the 'null' possibility (safe fallback to empty array)
+              const safePrev = prev ?? [];
+
+              // 2. Map through the array:
+              // If IDs match, return the new data. Otherwise, keep the old data.
+              return safePrev.map((p) =>
+                p.id === updatedProposal.id ? updatedProposal : p,
+              );
+            });
 
             const tasks = useTaskStore.getState().task;
 
@@ -325,9 +354,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
                       status:
                         updatedProposal.status === "accepted"
                           ? "on-going"
-                          : updatedProposal.status === "canceled"
-                            ? "cancel"
-                            : t.status,
+                          : t.status,
                     }
                   : t,
               ),
@@ -343,8 +370,20 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
       if (channel) supabase.removeChannel(channel);
     };
   }, [issueId]);
+  const canWriteProposal = useMemo(() => {
+    if (userRole !== "freelancer") return false;
 
-  // No inline editing or debounced updates on this view-only page.
+    // If there are no proposals at all, they can write one
+    if (!proposal || proposal.length === 0) return true;
+
+    // Check if there are any proposals that are NOT canceled
+    // (i.e., if any are 'pending' or 'accepted', they cannot write a new one)
+    const hasActiveOrPending = proposal.some(
+      (p) => p.status === "pending" || p.status === "accepted",
+    );
+
+    return !hasActiveOrPending;
+  }, [userRole, proposal]);
 
   if (loading) {
     return (
@@ -548,20 +587,18 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
             </section>
           )}
 
-          
-            {issue.status === "draft" && userRole === "freelancer" && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpenProposal(true);
-                }}
-                onMouseDown={(e) => e.stopPropagation()}
-                className=" md:w-full px-2 py-2 butt"
-              >
-                Write Proposal
-              </button>
-            )}
-        
+          {canWriteProposal && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenProposal(true);
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+              className="md:w-full px-2 py-2 butt"
+            >
+              Write Proposal
+            </button>
+          )}
         </aside>
       </div>
     </div>

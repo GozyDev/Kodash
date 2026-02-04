@@ -5,14 +5,11 @@ import { Task } from "@/lib/superbase/type";
 import { motion } from "framer-motion";
 import { Calendar } from "lucide-react";
 import PriorityCard from "./piortyCard";
-import WriteProposalDialog from "./WriteProposalDialog";
-import { useState } from "react";
-
 import StatusCard from "./StatusCard";
-import { displayStatusForTaskCard, presentToPast } from "@/lib/status";
+import { displayStatusForTaskCard } from "@/lib/status";
 
 import { useOrgIdStore } from "@/app/store/useOrgId";
-import { useTaskStore } from "@/app/store/useTask";
+
 import { useRouter } from "next/navigation";
 
 interface TaskCardProps {
@@ -22,12 +19,10 @@ interface TaskCardProps {
 
 export default function TaskCard({ task, userRole }: TaskCardProps) {
   const router = useRouter();
-  const [openProposal, setOpenProposal] = useState(false);
+  
 
   const orgId = useOrgIdStore((state) => state.orgId);
-  const handleOptimisticStatus = useTaskStore(
-    (state) => state.handleOptimisticStatus,
-  );
+  
 
   const getStatusColor = (status: Task["status"]) => {
     const normalized = displayStatusForTaskCard(status);

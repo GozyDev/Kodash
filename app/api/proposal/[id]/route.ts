@@ -20,7 +20,10 @@ export async function GET(
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const proposal = data && data.length > 0 ? data[0] : null;
+    const proposal = data
+
+
+ 
 
     // If proposal exists, update task status from "draft" to "proposed"
     if (proposal) {
