@@ -176,7 +176,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
         setProposal(proposalData);
 
         // If proposal exists and task status is draft, update to proposed
-        if (proposalData) {
+        if (proposalData.length > 0) {
           const currentTask = tasks.find((t) => t.id === issueId);
           if (currentTask && currentTask.status === "draft") {
             // Use optimistic update to change status from draft to proposed (DB past-tense)

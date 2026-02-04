@@ -22,11 +22,11 @@ export async function GET(
 
     const proposal = data
 
-
+    console.log(proposal)
  
 
     // If proposal exists, update task status from "draft" to "proposed"
-    if (proposal) {
+    if (proposal.length > 0) {
       // Get the current task status
       const { data: task, error: taskError } = await supabase
         .from("tasks")
