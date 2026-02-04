@@ -563,7 +563,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
           )}
         </div>
 
-        <aside className="space-y-4  h-max p-4  lg:p-0 sticky top-[60px] right-[10px] flex lg:flex-col items-center  border-b border-b-cardCB md:border-none gap-3 bg-bgPrimary/90 backdrop-blur-2xl">
+        <aside className="space-y-4  h-max p-4  lg:p-0 sticky top-[60px] right-[10px] flex lg:flex-col items-center  border-b border-b-cardCB md:border-none gap-3 bg-bgPrimary/90 backdrop-blur-2xl flex-wrap">
           <section className="rounded border border-cardCB bg-cardC p-2 w-max md:w-full m-0">
             <div className="flex items-center justify-between">
               <p className=" capitalize ">{issue.status}</p>
