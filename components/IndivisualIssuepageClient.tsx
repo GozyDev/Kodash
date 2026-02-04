@@ -217,7 +217,6 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
         data: { user },
       } = await supabase.auth.getUser();
 
-      console.log("realtime user:", user?.id);
 
       if (!user) {
         console.error("❌ NO AUTH USER — REALTIME WILL NOT FIRE");
