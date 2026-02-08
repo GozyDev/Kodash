@@ -4,10 +4,9 @@ import Image from "next/image";
 import {
   Users,
   // Settings,
-
   FilePenLine,
   LayoutGrid,
-
+  Banknote,
 } from "lucide-react";
 import {
   Sidebar,
@@ -26,7 +25,7 @@ import Link from "next/link";
 // const toolItems = [{ title: "Settings", icon: Settings, url: "/settings" }];
 
 export function OrgSidebar({
-  orgId,  
+  orgId,
   role,
 }: {
   orgId: string;
@@ -39,7 +38,7 @@ export function OrgSidebar({
       : `/dashboard/cl-org/${orgId}`;
 
   const navItems = [
-  { title: "Overview", icon: LayoutGrid, url: basePath },
+    { title: "Overview", icon: LayoutGrid, url: basePath },
     { title: "Request", icon: FilePenLine, url: `${basePath}/requests` },
     { title: "Members", icon: Users, url: `${basePath}/team` },
     // { title: "Payment", icon: HandCoins, url: `${basePath}/payments` },
@@ -51,7 +50,7 @@ export function OrgSidebar({
         "bg-bgPrimary border-r border-r-cardCB",
         "transition-all duration-300 ease-in-out",
         "shadow-sm backdrop-blur-sm",
-        "top-[65px] h-[calc(100vh-65px)]"
+        "top-[65px] h-[calc(100vh-65px)]",
       )}
       collapsible="icon"
     >
@@ -63,7 +62,6 @@ export function OrgSidebar({
       <SidebarContent className="flex flex-col gap-6 border-none">
         {/* Main Navigation Section */}
         <SidebarGroup>
-          
           <SidebarGroupContent className="mt-3">
             <SidebarMenu>
               {navItems.map((item) => {
@@ -85,7 +83,7 @@ export function OrgSidebar({
                           "rounded-xl px-3 py-2.5",
                           "text-sm transition-all duration-200",
                           "group relative hover:text-textNb",
-                          isActive ? "text-textNb" : "text-muted-foreground"
+                          isActive ? "text-textNb" : "text-muted-foreground",
                         )}
                       >
                         {/* Active indicator */}
@@ -97,11 +95,11 @@ export function OrgSidebar({
                           className={cn(
                             "w-4 h-4 transition-transform duration-200",
                             "group-hover:scale-110",
-                            isActive ? "text-accent" : "text-muted-foreground"
+                            isActive ? "text-accent" : "text-muted-foreground",
                           )}
                         />
 
-                        <span className="text-md" >{item.title}</span>
+                        <span className="text-md">{item.title}</span>
 
                         {/* Hover gradient effect */}
                         <div
@@ -110,7 +108,7 @@ export function OrgSidebar({
                             "bg-gradient-to-r from-accent/5 to-transparent",
                             "opacity-0 hover:opacity-100",
                             "transition-opacity duration-200",
-                            "pointer-events-none"
+                            "pointer-events-none",
                           )}
                         />
                       </Link>
@@ -170,6 +168,19 @@ export function OrgSidebar({
                 );
               })}
             </SidebarMenu> */}
+
+            {role === "freelancer" && (
+              <SidebarMenu className="">
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <button className=" butt w-full py-2  rounded flex gap-2 items-center">
+                      <Banknote size={20} />{" "}
+                      <span className=" md:text-[12px]">Connect Bank</span>
+                    </button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            )}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
