@@ -38,9 +38,6 @@ export async function GET(
     console.log("Error", error);
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
-
-  console.log("Api DATA", data);
-
   return NextResponse.json(data);
 }
 

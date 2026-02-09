@@ -21,6 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import onboardFreelancer from "@/action/strpe";
 
 // const toolItems = [{ title: "Settings", icon: Settings, url: "/settings" }];
 
@@ -173,7 +174,7 @@ export function OrgSidebar({
               <SidebarMenu className="">
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <button className=" butt w-full py-2  rounded flex gap-2 items-center">
+                    <button  onClick={()=>onboardFreelancer({returnTo:pathname})} className=" butt w-full py-2  rounded flex gap-2 items-center">
                       <Banknote size={20} />{" "}
                       <span className=" md:text-[12px]">Connect Bank</span>
                     </button>
