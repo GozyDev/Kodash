@@ -67,8 +67,8 @@ const DeliveryDetailsDialog = ({
     const incoming = Array.from(files).filter(
       (f) =>
         !attachments.some(
-          (a) => a.file.name === f.name && a.file.size === f.size
-        )
+          (a) => a.file.name === f.name && a.file.size === f.size,
+        ),
     );
 
     const arr = incoming.map((f) => {
@@ -100,23 +100,23 @@ const DeliveryDetailsDialog = ({
 
     setAttachments((prev) =>
       prev.map((a) =>
-        a.id === id ? { ...a, status: "uploading", progress: 0 } : a
-      )
+        a.id === id ? { ...a, status: "uploading", progress: 0 } : a,
+      ),
     );
 
     const { promise, abort } = uploadFile(
       file,
       (p) => {
         setAttachments((prev) =>
-          prev.map((a) => (a.id === id ? { ...a, progress: p } : a))
+          prev.map((a) => (a.id === id ? { ...a, progress: p } : a)),
         );
       },
-      id
+      id,
     );
 
     // Store abort so caller can cancel
     setAttachments((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, abort } : a))
+      prev.map((a) => (a.id === id ? { ...a, abort } : a)),
     );
 
     try {
@@ -133,14 +133,14 @@ const DeliveryDetailsDialog = ({
                 file_name: res.file_name,
                 abort: undefined,
               }
-            : a
-        )
+            : a,
+        ),
       );
     } catch {
       setAttachments((prev) =>
         prev.map((a) =>
-          a.id === id ? { ...a, status: "failed", abort: undefined } : a
-        )
+          a.id === id ? { ...a, status: "failed", abort: undefined } : a,
+        ),
       );
     }
   };
@@ -225,11 +225,9 @@ const DeliveryDetailsDialog = ({
     }
 
     // Check if all attachments are uploaded
-    const failedAttachments = attachments.filter(
-      (a) => a.status === "failed"
-    );
+    const failedAttachments = attachments.filter((a) => a.status === "failed");
     const uploadingAttachments = attachments.filter(
-      (a) => a.status === "uploading"
+      (a) => a.status === "uploading",
     );
 
     if (uploadingAttachments.length > 0) {
@@ -238,7 +236,9 @@ const DeliveryDetailsDialog = ({
     }
 
     if (failedAttachments.length > 0) {
-      alert("Some attachments failed to upload. Please remove them and try again.");
+      alert(
+        "Some attachments failed to upload. Please remove them and try again.",
+      );
       return;
     }
 
@@ -271,7 +271,8 @@ const DeliveryDetailsDialog = ({
         <DialogHeader>
           <DialogTitle>Deliver {taskTitle}</DialogTitle>
           <DialogDescription>
-            Provide delivery details including your message, attachments, and relevant links.
+            Provide delivery details including your message, attachments, and
+            relevant links.
           </DialogDescription>
         </DialogHeader>
 
@@ -292,13 +293,10 @@ const DeliveryDetailsDialog = ({
 
           {/* Attachments section */}
           <div>
-            <label className="text-sm font-medium text-textNa mb-2 block">
-              Attachments
-            </label>
-            <div
+            <button
               onDrop={handleDrop}
               onDragOver={handleDragOver}
-              className="border-2 border-dashed border-cardCB rounded-lg p-4 text-center cursor-pointer hover:border-cardICB transition-colors"
+              className="bg-cardICB/50 rounded py-2 px-3 flex items-center gap-2"
               onClick={() => fileInputRef.current?.click()}
             >
               <input
@@ -309,11 +307,9 @@ const DeliveryDetailsDialog = ({
                 className="hidden"
                 disabled={isDisabled}
               />
-              <Paperclip className="mx-auto mb-2 text-textNc" size={24} />
-              <p className="text-sm text-textNc">
-                Drag and drop files here or click to select
-              </p>
-            </div>
+              <p className="text-sm">Attachment</p>
+              <Paperclip className=" text-textNc" size={14} />
+            </button>
 
             {/* Attachments list */}
             {attachments.length > 0 && (
@@ -346,7 +342,9 @@ const DeliveryDetailsDialog = ({
                         </div>
                       )}
                       {att.status === "failed" && (
-                        <p className="text-xs text-red-500 mt-1">Upload failed</p>
+                        <p className="text-xs text-red-500 mt-1">
+                          Upload failed
+                        </p>
                       )}
                     </div>
 
