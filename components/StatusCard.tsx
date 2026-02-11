@@ -11,6 +11,7 @@ import { useTaskStore } from "@/app/store/useTask";
 
 import { presentToPast, displayStatusForStatusCard } from "@/lib/status";
 import ConfirmStatusChangeDialog from "@/components/ConfirmStatusChangeDialog";
+import DeliveryDetailsDialog from "@/components/DeliveryDetailsDialog";
 
 
 
@@ -273,13 +274,19 @@ const StatusCard = ({
   const enabled = present === "on-going" && userRole === "freelancer";
   const [open, setOpen] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [deliveryDialogOpen, setDeliveryDialogOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<
     "deliver" | "cancel" | null
   >(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleStatusChange = (action: "deliver" | "cancel") => {
     setPendingAction(action);
-    setConfirmDialogOpen(true);
+    if (action === "deliver") {
+      setDeliveryDialogOpen(true);
+    } else {
+      setConfirmDialogOpen(true);
+    }
   };
 
   const handleConfirmStatusChange = () => {
@@ -288,6 +295,45 @@ const StatusCard = ({
     handleOptimisticStatus(task.id, dbStatus as Task["status"]);
     setPendingAction(null);
     setOpen(false);
+  };
+
+  const handleDeliverySubmit = async (data: {
+    message: string;
+    attachments: Array<{
+      file_id?: string;
+      file_url?: string;
+      file_name?: string;
+    }>;
+    links: Array<{ url: string; label: string }>;
+  }) => {
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`/api/proposal/${task.id}/deliver`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          taskId: task.id,
+          message: data.message,
+          attachments: data.attachments,
+          links: data.links,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to submit delivery");
+      }
+
+      // Update local state to reflect delivered status
+      handleOptimisticStatus(task.id, "delivered");
+      setPendingAction(null);
+      setOpen(false);
+    } catch (error) {
+      console.error("Delivery submission error:", error);
+      throw error;
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -382,10 +428,18 @@ const StatusCard = ({
       </DropdownMenu>
 
       <ConfirmStatusChangeDialog
-        open={confirmDialogOpen}
+        open={confirmDialogOpen && pendingAction === "cancel"}
         onOpenChange={setConfirmDialogOpen}
-        action={pendingAction || "deliver"}
+        action="cancel"
         onConfirm={handleConfirmStatusChange}
+      />
+
+      <DeliveryDetailsDialog
+        open={deliveryDialogOpen && pendingAction === "deliver"}
+        onOpenChange={setDeliveryDialogOpen}
+        onSubmit={handleDeliverySubmit}
+        loading={isSubmitting}
+        taskTitle={task.title}
       />
     </>
   );
