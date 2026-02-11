@@ -1,4 +1,4 @@
-// app/api/stripe/check-status/route.ts
+
 import { stripe } from "@/lib/stripe";
 import { createClient } from "@/lib/superbase/superbase-server";
 import { NextResponse } from "next/server";

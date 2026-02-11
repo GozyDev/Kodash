@@ -50,3 +50,30 @@ export default async function onboardFreelancer({
 
   redirect(accountLink.url);
 }
+
+
+export async function getStripeDashboardLink() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Not authenticated");
+
+  // 1. Get the Stripe ID from DB
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("stripe_connect_id")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile?.stripe_connect_id) {
+    throw new Error("No Stripe account found");
+  }
+
+  // 2. Generate the Login Link
+  // This creates a one-time use link that logs them into their Express Dashboard
+  const loginLink = await stripe.accounts.createLoginLink(
+    profile.stripe_connect_id
+  );
+
+  return loginLink.url;
+}

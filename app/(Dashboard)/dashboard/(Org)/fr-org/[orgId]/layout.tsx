@@ -30,6 +30,14 @@ export default async function OrgLayout({
     redirect("/dashboard/organizations");
   }
 
+  const { data: profile } = await supabase
+  .from("profiles")
+  .select("stripe_onboarding_status,email")
+  .eq("id", authData.user.id)
+  .single();
+
+  console.log("Profile",profile)
+
   const { data: orgs, error } = await supabase
     .from("tenants")
     .select("id, name, plan");
@@ -43,7 +51,7 @@ if(!orgs){
   return (
     <SidebarProvider>
     <OrgHeader orgs={orgs} orgId={orgId} />
-    <OrgLayoutClient orgId={orgId} role="freelancer">
+    <OrgLayoutClient orgId={orgId} role="freelancer" stripeStatus={profile?.stripe_onboarding_status || "not_started"}>
       {children}
     </OrgLayoutClient>
   </SidebarProvider>

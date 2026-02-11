@@ -7,6 +7,8 @@ import {
   FilePenLine,
   LayoutGrid,
   Banknote,
+  AlertCircle,
+  ExternalLink,
 } from "lucide-react";
 import {
   Sidebar,
@@ -21,16 +23,18 @@ import {
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import onboardFreelancer from "@/action/strpe";
+import onboardFreelancer, { getStripeDashboardLink } from "@/action/strpe";
 
 // const toolItems = [{ title: "Settings", icon: Settings, url: "/settings" }];
 
 export function OrgSidebar({
   orgId,
   role,
+  stripeStatus,
 }: {
   orgId: string;
   role: "client" | "freelancer";
+  stripeStatus: string;
 }) {
   const pathname = usePathname();
   const basePath =
@@ -44,6 +48,15 @@ export function OrgSidebar({
     { title: "Members", icon: Users, url: `${basePath}/team` },
     // { title: "Payment", icon: HandCoins, url: `${basePath}/payments` },
   ];
+
+  const handleDashboardClick = async () => {
+    try {
+      const url = await getStripeDashboardLink();
+      window.open(url, "_blank"); // Open Stripe Dashboard in new tab
+    } catch (error) {
+      console.error("Failed to load dashboard", error);
+    }
+  };
 
   return (
     <Sidebar
@@ -171,13 +184,53 @@ export function OrgSidebar({
             </SidebarMenu> */}
 
             {role === "freelancer" && (
-              <SidebarMenu className="">
+              <SidebarMenu className="mt-auto">
+                {" "}
+                {/* mt-auto pushes it to bottom if you want */}
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <button  onClick={()=>onboardFreelancer({returnTo:pathname})} className=" butt w-full py-2  rounded flex gap-2 items-center">
-                      <Banknote size={20} />{" "}
-                      <span className=" md:text-[12px]">Connect Bank</span>
-                    </button>
+                    {/* LOGIC BRANCHING:
+                  We use a ternary or if-else logic here to swap the button 
+                */}
+
+                    {/* CASE 1: COMPLETED */}
+                    {stripeStatus === "completed" ? (
+                      <button
+                        onClick={handleDashboardClick}
+                        className="w-full py-2 rounded-xl flex gap-3 items-center px-3 text-emerald-500 hover:bg-emerald-500/10 transition-colors"
+                      >
+                        <ExternalLink size={18} />
+                        <span className="font-medium text-sm">
+                          Payout Dashboard
+                        </span>
+                      </button>
+                    ) : /* CASE 2: PENDING (Account exists, but details missing) */
+                    stripeStatus === "pending" ? (
+                      <button
+                        onClick={() =>
+                          onboardFreelancer({ returnTo: pathname })
+                        }
+                        className="w-full py-2 rounded-xl flex gap-3 items-center px-3 text-amber-500 hover:bg-amber-500/10 transition-colors"
+                      >
+                        <AlertCircle size={18} />
+                        <span className="font-medium text-sm">
+                          Finish Setup
+                        </span>
+                      </button>
+                    ) : (
+                      /* CASE 3: NOT STARTED (Default) */
+                      <button
+                        onClick={() =>
+                          onboardFreelancer({ returnTo: pathname })
+                        }
+                        className="w-full py-2 rounded-xl flex gap-3 items-center px-3 hover:bg-accent/10 transition-colors"
+                      >
+                        <Banknote size={18} />
+                        <span className="font-medium text-sm">
+                          Connect Bank
+                        </span>
+                      </button>
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
