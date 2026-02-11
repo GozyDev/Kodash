@@ -200,7 +200,7 @@ export function OrgSidebar({
                         className="w-full py-2 rounded-xl flex gap-3 items-center px-3 text-emerald-500 hover:bg-emerald-500/10 transition-colors"
                       >
                         <ExternalLink size={18} />
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-[12px]">
                           Payout Dashboard
                         </span>
                       </button>
@@ -213,7 +213,7 @@ export function OrgSidebar({
                         className="w-full py-2 rounded-xl flex gap-3 items-center px-3 text-amber-500 hover:bg-amber-500/10 transition-colors"
                       >
                         <AlertCircle size={18} />
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-[12px]">
                           Finish Setup
                         </span>
                       </button>
@@ -226,7 +226,7 @@ export function OrgSidebar({
                         className="w-full py-2 rounded-xl flex gap-3 items-center px-3 hover:bg-accent/10 transition-colors"
                       >
                         <Banknote size={18} />
-                        <span className="font-medium text-sm">
+                        <span className="font-medium text-[12px]">
                           Connect Bank
                         </span>
                       </button>

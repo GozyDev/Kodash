@@ -40,12 +40,15 @@ export default async function onboardFreelancer({
     throw new Error("NEXT_PUBLIC_APP_URL not set");
   }
 
+  // Add stripe_return parameter to mark this as a Stripe redirect
+  const returnUrl = `${origin}/${returnTo}${returnTo.includes("?") ? "&" : "?"}stripe_return=true`;
+
   // Create onboarding link
   const accountLink = await stripe.accountLinks.create({
     account: account.id,
     type: "account_onboarding",
-    refresh_url: `${origin}/${returnTo}`,
-    return_url: `${origin}/${returnTo}`,
+    refresh_url: returnUrl,
+    return_url: returnUrl,
   });
 
   redirect(accountLink.url);
