@@ -22,7 +22,6 @@ export async function GET(
 
     const proposal = data
 
-    console.log(proposal)
  
 
     // If proposal exists, update task status from "draft" to "proposed"
