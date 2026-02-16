@@ -87,6 +87,8 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
     }[]
   >([]);
   const [attachmentsLoading, setAttachmentsLoading] = useState(true);
+  const [stripeOnboardingStatus, setStripeOnboardingStatus] = useState<string | null>(null);
+  const [stripeCheckLoaded, setStripeCheckLoaded] = useState(false);
 
   // keep single-source state: `issue` drives all displayed values
 
@@ -154,6 +156,32 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
       mounted = false;
     };
   }, [issueId]);
+
+  // Check Stripe onboarding status for freelancers
+  useEffect(() => {
+    if (userRole !== "freelancer") return;
+
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/stripe/check_status");
+        const data = await res.json();
+        if (mounted) {
+          setStripeOnboardingStatus(data.status || null);
+          setStripeCheckLoaded(true);
+        }
+      } catch (error) {
+        console.error("Failed to check Stripe status:", error);
+        if (mounted) {
+          setStripeCheckLoaded(true);
+        }
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [userRole]);
 
   const handleOptimisticStatus = useTaskStore(
     (state) => state.handleOptimisticStatus,
@@ -372,6 +400,9 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
   const canWriteProposal = useMemo(() => {
     if (userRole !== "freelancer") return false;
 
+    // If Stripe is not completed, cannot write proposal
+    if (stripeOnboardingStatus !== "completed") return false;
+
     // If there are no proposals at all, they can write one
     if (!proposal || proposal.length === 0) return true;
 
@@ -382,7 +413,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
     );
 
     return !hasActiveOrPending;
-  }, [userRole, proposal]);
+  }, [userRole, proposal, stripeOnboardingStatus]);
 
   if (loading) {
     return (
@@ -594,6 +625,20 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
               }}
               onMouseDown={(e) => e.stopPropagation()}
               className="md:w-full px-2 py-2 butt"
+            >
+              Write Proposal
+            </button>
+          )}
+
+          {userRole === "freelancer" && stripeCheckLoaded && stripeOnboardingStatus !== "completed" && !canWriteProposal && (
+            <button
+              disabled
+              title={
+                stripeOnboardingStatus === "pending"
+                  ? "Complete your Stripe setup to write proposals"
+                  : "Connect your bank account with Stripe to write proposals"
+              }
+              className="md:w-full px-2 py-2 butt opacity-50 cursor-not-allowed"
             >
               Write Proposal
             </button>

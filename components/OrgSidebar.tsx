@@ -9,6 +9,7 @@ import {
   Banknote,
   AlertCircle,
   ExternalLink,
+  HandCoins,
 } from "lucide-react";
 import {
   Sidebar,
@@ -46,7 +47,7 @@ export function OrgSidebar({
     { title: "Overview", icon: LayoutGrid, url: basePath },
     { title: "Request", icon: FilePenLine, url: `${basePath}/requests` },
     { title: "Members", icon: Users, url: `${basePath}/team` },
-    // { title: "Payment", icon: HandCoins, url: `${basePath}/payments` },
+    { title: "Payment", icon: HandCoins, url: `${basePath}/payments` },
   ];
 
   const handleDashboardClick = async () => {

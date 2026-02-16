@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { poppins } from "@/lib/font";
 import "./globals.css";
-
+// import NetworkStatus from "@/components/NetworkStatus";
 
 
 export const metadata: Metadata = {
@@ -19,6 +19,7 @@ export default function RootLayout({
       <body
         className={`${poppins.className} antialiased bg-bgPrimary`}
       >
+        {/* <NetworkStatus /> */}
         {children}
       </body>
     </html>

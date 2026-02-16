@@ -5,8 +5,6 @@ import { useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 
-const STRIPE_CHECK_FLAG = "stripe_onboarding_checked";
-
 export default function StripeReturnListener() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -15,23 +13,18 @@ export default function StripeReturnListener() {
 
   useEffect(() => {
     const checkStripeStatus = async () => {
-      // Only run check if we have NOT already checked in this session
+      // Only run check if we have NOT already checked in this mount (prevents React Strict Mode double-call)
       if (hasChecked.current) return;
       hasChecked.current = true;
 
       // Check for stripe_return parameter - only run status check if present
       const stripeReturn = searchParams?.get("stripe_return");
-      
-      // Also check sessionStorage to prevent running check if already done this session
-      const alreadyChecked = sessionStorage.getItem(STRIPE_CHECK_FLAG);
 
-      if (!stripeReturn || alreadyChecked) {
+      if (!stripeReturn) {
         return;
       }
 
       try {
-        // Set the flag before making the request to prevent duplicate checks
-        sessionStorage.setItem(STRIPE_CHECK_FLAG, "true");
 
         // Call check status API
         const res = await fetch("/api/stripe/check_status");

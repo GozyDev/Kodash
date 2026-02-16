@@ -44,6 +44,32 @@ export async function POST(req: Request) {
       );
     }
 
+    // 3.5. Stripe onboarding check - verify freelancer has completed Stripe setup
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select("stripe_connect_id, stripe_onboarding_status")
+      .eq("id", authData.user.id)
+      .single();
+
+    if (profileError || !profileData) {
+      return NextResponse.json(
+        { error: "Unable to verify Stripe status" },
+        { status: 500 }
+      );
+    }
+
+    // Check if Stripe account exists and is fully completed
+    if (!profileData.stripe_connect_id || profileData.stripe_onboarding_status !== "completed") {
+      return NextResponse.json(
+        { 
+          error: "Complete your Stripe onboarding before submitting proposals",
+          stripeStatus: profileData.stripe_onboarding_status || "not_started",
+          requiresOnboarding: true
+        },
+        { status: 403 }
+      );
+    }
+
     // 4. Check if proposal already exists for this freelancer and request
     // const { data: existingProposal } = await supabase
     //   .from("request_proposal")

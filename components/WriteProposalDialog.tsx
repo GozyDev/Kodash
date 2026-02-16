@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Task } from "@/lib/superbase/type";
 import { useState } from "react";
 import { Calendar, DollarSign, FileText } from "lucide-react";
+import StripeOnboardingRequiredDialog from "./StripeOnboardingRequiredDialog";
+import onboardFreelancer from "@/action/strpe";
 
 interface WriteProposalDialogProps {
   open: boolean;
@@ -27,6 +29,47 @@ export default function WriteProposalDialog({
   const [dod, setDod] = useState("");
   const [price, setPrice] = useState<string | "">("");
   const [deadline, setDeadline] = useState("");
+  const [showStripeRequiredDialog, setShowStripeRequiredDialog] = useState(false);
+  const [stripeStatus, setStripeStatus] = useState<string | null>(null);
+  const [isCheckingStripe, setIsCheckingStripe] = useState(false);
+
+  const checkStripeAndSubmit = async () => {
+    setIsCheckingStripe(true);
+    try {
+      // Check Stripe status
+      const res = await fetch("/api/stripe/check_status");
+      const data = await res.json();
+
+      if (data.status !== "completed") {
+        setStripeStatus(data.status);
+        setShowStripeRequiredDialog(true);
+        return;
+      }
+
+      // Stripe is complete, proceed with proposal submission
+      onSubmit({
+        dod,
+        price: Number(price),
+        deadline,
+      });
+    } catch (error) {
+      console.error("Failed to check Stripe status:", error);
+      // If check fails, show dialog to be safe
+      setShowStripeRequiredDialog(true);
+    } finally {
+      setIsCheckingStripe(false);
+    }
+  };
+
+  const handleContinueToOnboarding = async () => {
+    try {
+      await onboardFreelancer({
+        returnTo: `dashboard/issues/${task.id}`,
+      });
+    } catch (error) {
+      console.error("Failed to redirect to onboarding:", error);
+    }
+  };
 
   const getStatusIcon = (status:string) => {
     switch (status) {
@@ -125,18 +168,20 @@ export default function WriteProposalDialog({
             {/* Submit */}
             <Button
               className="w-full butt"
-              onClick={() =>
-                onSubmit({
-                  dod,
-                  price: Number(price),
-                  deadline,
-                })
-              }
+              disabled={isCheckingStripe}
+              onClick={checkStripeAndSubmit}
             >
-              Submit Proposal
+              {isCheckingStripe ? "Checking..." : "Submit Proposal"}
             </Button>
           </div>
         </div>
+
+        <StripeOnboardingRequiredDialog
+          open={showStripeRequiredDialog}
+          onOpenChange={setShowStripeRequiredDialog}
+          onContinueToOnboarding={handleContinueToOnboarding}
+          status={stripeStatus || "not_started"}
+        />
       </DialogContent>
     </Dialog>
   );
