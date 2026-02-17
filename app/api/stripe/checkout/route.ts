@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/superbase/superbase-server";
 import Stripe from "stripe";
-import { error } from "console";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -16,8 +15,6 @@ export async function POST(req: Request) {
       .select("*, freelancer:freelancer_id(id, email)")
       .eq("id", proposalId)
       .single();
-
-    console.log("Proposal", proposal.dod);
 
     if (propError || !proposal)
       return NextResponse.json(
@@ -40,18 +37,19 @@ export async function POST(req: Request) {
     }
 
     const { data: RequestData, error: RequestError } = await supabase
-      .from("tasks") 
+      .from("tasks")
       .select("title")
       .eq("id", issueId)
       .single();
 
     if (!RequestData || RequestError) {
-   
       return NextResponse.json(
         { error: "Can't find the request details for payment" },
         { status: 404 },
       );
-    } 
+
+  
+    }
     const origin = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
 
     // 3. Create Stripe Checkout Session
@@ -71,15 +69,7 @@ export async function POST(req: Request) {
           quantity: 1,
         },
       ],
-      //   payment_intent_data: {
-      //     // You take 10% fee
-      //     application_fee_amount: Math.round(proposal.price * 100 * 0.10),
-      //     transfer_data: {
-      //       // --- FIX 2: Use the correct variable name ---
-      //       // You fetched 'stripe_connect_id' from DB, but were using '.stripe_account_id'
-      //       destination: freelancerProfile.stripe_connect_id,
-      //     },
-      //   },
+
       metadata: {
         issueId: issueId,
         proposalId: proposalId,
@@ -88,6 +78,9 @@ export async function POST(req: Request) {
       success_url: `${origin}/dashboard/issues/${issueId}?payment=success`,
       cancel_url: `${origin}/${returnTo}`,
     });
+
+    console.log("The ID for our Escrow is:", session.payment_intent);
+    console.log("The ID for our Escrow is:", session);
 
     return NextResponse.json({ url: session.url });
   } catch (err: any) {
