@@ -24,7 +24,7 @@ import {
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import onboardFreelancer, { getStripeDashboardLink } from "@/action/strpe";
+import { getStripeDashboardLink } from "@/action/strpe";
 
 // const toolItems = [{ title: "Settings", icon: Settings, url: "/settings" }];
 
@@ -56,6 +56,24 @@ export function OrgSidebar({
       window.open(url, "_blank"); // Open Stripe Dashboard in new tab
     } catch (error) {
       console.error("Failed to load dashboard", error);
+    }
+  };
+
+  const startOnboarding = async (returnTo: string) => {
+    try {
+      const res = await fetch("/api/stripe/onboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ returnTo }),
+      });
+      const data = await res.json();
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        console.error("No onboarding url returned", data);
+      }
+    } catch (err) {
+      console.error("Failed to start onboarding", err);
     }
   };
 
@@ -208,9 +226,7 @@ export function OrgSidebar({
                     ) : /* CASE 2: PENDING (Account exists, but details missing) */
                     stripeStatus === "pending" ? (
                       <button
-                        onClick={() =>
-                          onboardFreelancer({ returnTo: pathname })
-                        }
+                        onClick={() => startOnboarding(pathname)}
                         className="w-full py-2 rounded-xl flex gap-3 items-center px-3 text-amber-500 hover:bg-amber-500/10 transition-colors"
                       >
                         <AlertCircle size={18} />
@@ -221,9 +237,7 @@ export function OrgSidebar({
                     ) : (
                       /* CASE 3: NOT STARTED (Default) */
                       <button
-                        onClick={() =>
-                          onboardFreelancer({ returnTo: pathname })
-                        }
+                        onClick={() => startOnboarding(pathname)}
                         className="w-full py-2 rounded-xl flex gap-3 items-center px-3 hover:bg-accent/10 transition-colors"
                       >
                         <Banknote size={18} />

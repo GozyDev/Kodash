@@ -16,7 +16,7 @@ export default async function OrgLayout({
 }) {
   const { orgId } = await params;
   const supabase = await createClient();
-  
+    
   // Get authenticated user
   const { data: authData, error: authError } = await supabase.auth.getUser();
   if (authError || !authData.user) {
@@ -36,7 +36,6 @@ export default async function OrgLayout({
   .eq("id", authData.user.id)
   .single();
 
-  console.log("Profile",profile)
 
   const { data: orgs, error } = await supabase
     .from("tenants")

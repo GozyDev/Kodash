@@ -11,7 +11,6 @@ import { Task } from "@/lib/superbase/type";
 import { useState } from "react";
 import { Calendar, DollarSign, FileText } from "lucide-react";
 import StripeOnboardingRequiredDialog from "./StripeOnboardingRequiredDialog";
-import onboardFreelancer from "@/action/strpe";
 
 interface WriteProposalDialogProps {
   open: boolean;
@@ -63,9 +62,17 @@ export default function WriteProposalDialog({
 
   const handleContinueToOnboarding = async () => {
     try {
-      await onboardFreelancer({
-        returnTo: `dashboard/issues/${task.id}`,
+      const res = await fetch("/api/stripe/onboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ returnTo: `dashboard/issues/${task.id}` }),
       });
+      const data = await res.json();
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        console.error("No onboarding URL returned", data);
+      }
     } catch (error) {
       console.error("Failed to redirect to onboarding:", error);
     }

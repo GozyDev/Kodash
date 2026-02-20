@@ -10,7 +10,7 @@ export default function StripeReturnListener() {
   const searchParams = useSearchParams();
   // Ref to prevent double-checking in strict mode
   const hasChecked = useRef(false);
-
+console.log("runing")
   useEffect(() => {
     const checkStripeStatus = async () => {
       // Only run check if we have NOT already checked in this mount (prevents React Strict Mode double-call)
@@ -19,8 +19,9 @@ export default function StripeReturnListener() {
 
       // Check for stripe_return parameter - only run status check if present
       const stripeReturn = searchParams?.get("stripe_return");
+      console.log(stripeReturn,"STRIPE RETURN")
 
-      if (!stripeReturn) {
+      if (!stripeReturn) { 
         return;
       }
 
