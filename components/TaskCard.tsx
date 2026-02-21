@@ -28,7 +28,7 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
     const normalized = displayStatusForTaskCard(status);
     switch (normalized) {
       case "proposed":
-        return "border-[#f97316]/10 bg-[#f97316]/2";
+        return "border-[#f97316]/5 bg-[#f97316]/1";
 
       case "on-going":
         return "border-[#2563eb]/10 bg-[#2563eb]/2";
