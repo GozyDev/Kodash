@@ -47,8 +47,6 @@ export async function POST(req: Request) {
         { error: "Can't find the request details for payment" },
         { status: 404 },
       );
-
-  
     }
     const origin = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
 
@@ -75,8 +73,8 @@ export async function POST(req: Request) {
         proposalId: proposalId,
       },
 
-      success_url: `${origin}/dashboard/issues/${issueId}?payment=success`,
-      cancel_url: `${origin}/${returnTo}`,
+      success_url: `${origin}/dashboard/payment/success/${returnTo}`,
+      cancel_url: `${origin}/payment/success/${returnTo}`,
     });
 
     console.log("The ID for our Escrow is:", session.payment_intent);
