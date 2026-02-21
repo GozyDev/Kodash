@@ -88,10 +88,10 @@ export async function POST(req: Request) {
       ) {
         status = "pending"; // They have work to do!
       }
-      // 4. PENDING (Processing): They submitted everything, but Stripe is still verifying.
-      else if (account.details_submitted && !account.charges_enabled) {
-        status = "pending"; // Stripe is "Thinking..."
-      }
+      // // 4. PENDING (Processing): They submitted everything, but Stripe is still verifying.
+      // else if (account.details_submitted && !account.charges_enabled) {
+      //   status = "pending"; // Stripe is "Thinking..."
+      // }
 
       // Update profile where stripe_connect_id matches
       const { data, error: updateError } = await supabase
