@@ -1,7 +1,13 @@
 import Link from "next/link";
-import { CheckCircle2 } from "lucide-react"; // npm install lucide-react
+import { CheckCircle2 } from "lucide-react";
 
-export default function SuccessPage() {
+interface SuccessPageProps { searchParams?: { return?: string } }
+
+export default function SuccessPage({ searchParams }: SuccessPageProps) {
+  // compute return path from query parameter, default /dashboard
+  let returnTo = searchParams?.return ? decodeURIComponent(searchParams.return) : "/dashboard";
+  if (!returnTo.startsWith("/")) returnTo = `/${returnTo}`;
+
   return (
     <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center p-6">
       <div className="max-w-md w-full bg-[#121214] border border-zinc-800 p-8 rounded-3xl text-center shadow-2xl relative overflow-hidden">
@@ -14,21 +20,18 @@ export default function SuccessPage() {
           </div>
         </div>
 
-        <h1 className="text-3xl font-bold mb-2">Payment Successful!</h1>
+        <h1 className="text-3xl font-bold mb-2">Payment Completed</h1>
         <p className="text-zinc-400 mb-8">
-          Thank you for your purchase. Your course has been added to your dashboard.
+          Your transaction went through successfully. You can return to your project or continue working in the app.
         </p>
 
         <div className="space-y-3">
           <Link 
-            href="/"
+            href={returnTo}
             className="block w-full bg-[#fafafa] text-black py-3 rounded-xl font-semibold hover:bg-emerald-400 transition-colors"
           >
-            Go to My Courses
+            Back to your app
           </Link>
-          <p className="text-xs text-zinc-500">
-            A receipt has been sent to your email.
-          </p>
         </div>
       </div>
     </div>

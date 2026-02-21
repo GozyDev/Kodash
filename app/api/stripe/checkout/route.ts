@@ -7,7 +7,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
-    const { issueId, proposalId, returnTo } = await req.json();
+    const { issueId, proposalId, returnTo: rawReturnTo } = await req.json();
+    // normalize return path: ensure leading slash and default to dashboard later
+    const returnTo = rawReturnTo && rawReturnTo.startsWith("/") ? rawReturnTo : `/${rawReturnTo || "dashboard"}`;
 
     // 1. Fetch the Proposal
     const { data: proposal, error: propError } = await supabase
@@ -73,12 +75,10 @@ export async function POST(req: Request) {
         proposalId: proposalId,
       },
 
-      success_url: `${origin}/dashboard/payment/success/${returnTo}`,
-      cancel_url: `${origin}/payment/success/${returnTo}`,
+      // encode the return path so query string is valid
+      success_url: `${origin}/dashboard/payment/success?return=${encodeURIComponent(returnTo)}`,
+      cancel_url: `${origin}/dashboard/payment/cancel?return=${encodeURIComponent(returnTo)}`,
     });
-
-    console.log("The ID for our Escrow is:", session.payment_intent);
-    console.log("The ID for our Escrow is:", session);
 
     return NextResponse.json({ url: session.url });
   } catch (err: any) {
