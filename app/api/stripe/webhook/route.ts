@@ -51,15 +51,24 @@ export async function POST(req: Request) {
       stripe_payment_id: session.payment_intent, // THE pi_xxx ID
     });
 
-    if (txError) console.error("DB Error saving transaction:", txError);
+    if (txError) {
+      console.error("DB Error saving transaction:", txError);
+    } else {
+      // 6. UPDATE RELATED TABLES AFTER PAYMENT
+      const { error: rpError } = await supabase
+        .from("request_proposal")
+        .update({ status: "accepted" })
+        .eq("id", proposalId);
+      if (rpError) console.error("Failed updating request_proposal status:", rpError);
 
-    // 6. UPDATE THE PROPOSAL STATUS
-    await supabase
-      .from("proposals")
-      .update({ status: "funded" })
-      .eq("id", proposalId);
+      const { error: taskError } = await supabase
+        .from("tasks")
+        .update({ status: "on-going" })
+        .eq("id", issueId);
+      if (taskError) console.error("Failed updating task status:", taskError);
 
-    console.log(`✅ Project ${proposalId} is now FUNDED!`);
+      console.log(`✅ Proposal ${proposalId} accepted and task ${issueId} marked on_going`);
+    }
   }
 
   // HANDLE account updates to keep onboarding status in sync

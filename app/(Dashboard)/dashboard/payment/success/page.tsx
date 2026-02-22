@@ -28,7 +28,7 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
         <div className="space-y-3">
           <Link 
             href={returnTo}
-            className="block w-full bg-[#fafafa] text-black py-3 rounded-xl font-semibold hover:bg-emerald-400 transition-colors"
+            className="block w-full bg-zinc-800 text-white py-3 rounded-xl font-semibold hover:bg-emerald-700 transition-colors"
           >
             Back to your app
           </Link>
