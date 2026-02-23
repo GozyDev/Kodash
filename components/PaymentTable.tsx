@@ -86,7 +86,7 @@ export async function PaymentTable({
     return (
       <div className="overflow-x-auto rounded-lg border border-cardCB bg-bgPrimary">
         <table className="w-full">
-          <thead className="border-b border-cardCB bg-bgPrimary/50">
+          <thead className="border-b border-cardCB bg-cardC/50">
             <tr>
               <th className="px-6 py-4 text-left text-sm font-semibold text-textNb">
                 Project Name
@@ -116,8 +116,12 @@ export async function PaymentTable({
                   {/* Project Name - Link to request */}
                   <td className="px-6 py-4">
                     <Link
-                      href={`/dashboard/organization/${orgId}/requests/${payment.issueId}`}
-                      className="text-sm text-blue-400 hover:text-blue-300 hover:underline transition-colors"
+                      href={
+                        userRole === "FREELANCER"
+                          ? `/dashboard/fr-org/${orgId}/request/${payment.issueId}`
+                          : `/dashboard/cl-org/${orgId}/request/${payment.issueId}`
+                      }
+                      className="text-sm text-textNc hover:text-blue-300 hover:underline transition-colors"
                     >
                       {taskTitle}
                     </Link>
