@@ -16,7 +16,7 @@ export function StatCard({ title, amount, description, icon, variant }: StatCard
           {icon}
         </div>
         <span className={cn(
-          "text-[13px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full tracking-widest",
+          "text-[13px] uppercase font-bold  px-2 py-0.5 rounded-full tracking-widest",
           variant === "success" ? "bg-emerald-500/10 text-emerald-500" : "bg-amber-500/10 text-amber-500"
         )}>
           {variant === "success" ? "Vault" : "Processing"}
@@ -25,6 +25,7 @@ export function StatCard({ title, amount, description, icon, variant }: StatCard
       <div>
         <p className="text text-textNd font-medium">{title}</p>
         <h2 className="text-4xl font-bold text-textNc mt-1">{amount}</h2>
+
         <p className="text-xs text-textNe mt-2 flex items-center gap-1">
           {description}
         </p>
