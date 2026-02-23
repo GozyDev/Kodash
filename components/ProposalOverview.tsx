@@ -236,6 +236,7 @@ export default function ProposalOverview({
                 body: JSON.stringify({
                   issueId,
                   proposalId: selectedProposalId,
+                  orgId,
                   returnTo: pathName,
                 }),
               });

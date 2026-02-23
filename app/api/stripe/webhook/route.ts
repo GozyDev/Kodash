@@ -35,10 +35,11 @@ export async function POST(req: Request) {
     interface MyMetadata {
       proposalId: string;
       issueId: string;
+      orgId: string;
     }
 
     // Cast it while destructuring
-    const { proposalId, issueId } = session.metadata as unknown as MyMetadata;
+    const { proposalId, issueId, orgId } = session.metadata as unknown as MyMetadata;
 
     // 5. SAVE TO DATABASE (The Escrow Record)
     const { error: txError } = await supabase.from("payments").insert({
@@ -49,6 +50,7 @@ export async function POST(req: Request) {
       issueId: issueId,
       proposal_id: proposalId,
       stripe_payment_id: session.payment_intent, // THE pi_xxx ID
+      orgId: orgId,
     });
 
     if (txError) {

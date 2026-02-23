@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
-    const { issueId, proposalId, returnTo: rawReturnTo } = await req.json();
+    const { issueId, proposalId, orgId, returnTo: rawReturnTo } = await req.json();
     // normalize return path: ensure leading slash and default to dashboard later
     const returnTo = rawReturnTo && rawReturnTo.startsWith("/") ? rawReturnTo : `/${rawReturnTo || "dashboard"}`;
 
@@ -73,6 +73,7 @@ export async function POST(req: Request) {
       metadata: {
         issueId: issueId,
         proposalId: proposalId,
+        orgId: orgId,
       },
 
       // encode the return path so query string is valid
