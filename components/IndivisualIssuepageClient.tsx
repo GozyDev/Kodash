@@ -10,6 +10,8 @@ import { Loader2, Paperclip } from "lucide-react";
 import { Task } from "@/lib/superbase/type";
 import { presentToPast } from "@/lib/status";
 import ProposalOverview from "./ProposalOverview";
+import { DeliveriesSection } from "./DeliveriesSection";
+import { fetchDeliveries, releaseFunds, type Delivery } from "@/action/deliveries";
 import { createBrowserClient } from "@supabase/ssr";
 import Image from "next/image";
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -89,6 +91,9 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
   const [attachmentsLoading, setAttachmentsLoading] = useState(true);
   const [stripeOnboardingStatus, setStripeOnboardingStatus] = useState<string | null>(null);
   const [stripeCheckLoaded, setStripeCheckLoaded] = useState(false);
+  const [deliveries, setDeliveries] = useState<Delivery[]>([]);
+  const [deliveriesLoading, setDeliveriesLoading] = useState(true);
+  const [releasingFunds, setReleasingFunds] = useState(false);
 
   // keep single-source state: `issue` drives all displayed values
 
@@ -220,6 +225,26 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
 
     fetchProposal();
   }, [issueId, tasks, handleOptimisticStatus]);
+
+  // Fetch deliveries for this issue
+  useEffect(() => {
+    if (!issueId) return;
+
+    const loadDeliveries = async () => {
+      try {
+        setDeliveriesLoading(true);
+        const data = await fetchDeliveries(issueId);
+        setDeliveries(data);
+      } catch (err) {
+        console.error("Failed to fetch deliveries:", err);
+        setDeliveries([]);
+      } finally {
+        setDeliveriesLoading(false);
+      }
+    };
+
+    loadDeliveries();
+  }, [issueId]);
 
   useEffect(() => {
     const refreshedIssue = tasks.find((t) => t.id === issueId);
@@ -590,6 +615,28 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
             <div className="rounded-xl border border-cardCB bg-cardC p-6">
               <p className="text-sm text-textNc">No proposal found.</p>
             </div>
+          )}
+
+          {/* Deliverables */}
+          {!deliveriesLoading && deliveries.length > 0 && (
+            <DeliveriesSection
+              deliveries={deliveries}
+              userRole={userRole}
+              onReleaseFunds={async () => {
+                try {
+                  setReleasingFunds(true);
+                  await releaseFunds(issueId, orgId);
+                  // Optionally refresh deliveries
+                  const updatedDeliveries = await fetchDeliveries(issueId);
+                  setDeliveries(updatedDeliveries);
+                } catch (err) {
+                  console.error("Failed to release funds:", err);
+                } finally {
+                  setReleasingFunds(false);
+                }
+              }}
+              loading={releasingFunds}
+            />
           )}
         </div>
 
