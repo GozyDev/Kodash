@@ -21,10 +21,10 @@ interface Attachment {
   file: File;
   preview: string;
   status?: "idle" | "uploading" | "failed" | "uploaded";
-  progress?: number;
   file_id?: string;
   file_url?: string;
   file_name?: string;
+  file_size?: number;
   abort?: () => void;
 }
 
@@ -100,16 +100,14 @@ const DeliveryDetailsDialog = ({
 
     setAttachments((prev) =>
       prev.map((a) =>
-        a.id === id ? { ...a, status: "uploading", progress: 0 } : a,
+        a.id === id ? { ...a, status: "uploading" } : a,
       ),
     );
 
     const { promise, abort } = uploadFile(
       file,
-      (p) => {
-        setAttachments((prev) =>
-          prev.map((a) => (a.id === id ? { ...a, progress: p } : a)),
-        );
+      () => {
+        // No progress tracking - just spinner
       },
       id,
     );
@@ -127,10 +125,10 @@ const DeliveryDetailsDialog = ({
             ? {
                 ...a,
                 status: "uploaded",
-                progress: 100,
                 file_id: res.file_id,
                 file_url: res.file_url,
                 file_name: res.file_name,
+                file_size: file.size,
                 abort: undefined,
               }
             : a,
@@ -206,7 +204,7 @@ const DeliveryDetailsDialog = ({
       {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
         url: linkInput,
-        label: linkLabel || linkInput,
+        label: linkLabel,
       },
     ]);
 
@@ -256,8 +254,8 @@ const DeliveryDetailsDialog = ({
       setLinks([]);
       onOpenChange(false);
     } catch (error) {
-      console.error("Failed to submit delivery details:", error);
-      alert("Failed to submit delivery details. Please try again.");
+      console.log("Failed to submit delivery details:", error);
+      alert("Failed to submit delivery details. Please try again 9889.");
     } finally {
       setSubmitting(false);
     }
@@ -267,19 +265,15 @@ const DeliveryDetailsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !isDisabled && onOpenChange(v)}>
-      <DialogContent className="sm:max-w-[600px] bg-cardC text-textNa border-none border border-cardCB max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] bg-cardC text-textNa border-none border border-cardCB max-h-[90vh] overflow-y-auto overflow-x-hidden px-3 md:px-6">
         <DialogHeader>
           <DialogTitle>Deliver {taskTitle}</DialogTitle>
-          <DialogDescription>
-            Provide delivery details including your message, attachments, and
-            relevant links.
-          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-6 mt-6">
           {/* Message textarea */}
           <div>
-            <label className="text-sm font-medium text-textNa mb-2 block">
+            <label className="text-sm font-medium text-textNb mb-2 block">
               Delivery Message
             </label>
             <Textarea
@@ -287,7 +281,7 @@ const DeliveryDetailsDialog = ({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               disabled={isDisabled}
-              className="min-h-[120px] bg-cardICB/30 border-cardCB text-textNa placeholder:text-textNc"
+              className="min-h-[120px] border-0 border-b-1 border-b-cardCB text-textNc placeholder:text-textNd text-sm tracking-widest rounded-none"
             />
           </div>
 
@@ -333,14 +327,7 @@ const DeliveryDetailsDialog = ({
                       <p className="text-xs font-medium truncate text-textNa">
                         {att.file_name || att.file.name}
                       </p>
-                      {att.status === "uploading" && (
-                        <div className="w-full bg-cardCB/30 rounded h-1 mt-1">
-                          <div
-                            className="bg-[#7c3aed] h-1 rounded transition-all"
-                            style={{ width: `${att.progress || 0}%` }}
-                          />
-                        </div>
-                      )}
+
                       {att.status === "failed" && (
                         <p className="text-xs text-red-500 mt-1">
                           Upload failed

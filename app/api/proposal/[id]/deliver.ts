@@ -8,7 +8,7 @@ export async function POST(
 ) {
   try {
     const supabase = await createClient();
-    const { id: taskId } = await params;
+    const { id: requestId } = await params;
 
     // Auth check
     const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -38,10 +38,11 @@ export async function POST(
     const { data: taskData, error: taskError } = await supabase
       .from("tasks")
       .select("tenant_id, title, project_id")
-      .eq("id", taskId)
+      .eq("id", requestId )
       .single();
 
     if (taskError || !taskData) {
+      console.log(taskError)
       return NextResponse.json(
         { error: "Task not found" },
         { status: 404 }
@@ -61,7 +62,7 @@ export async function POST(
     const { error: updateTaskError } = await supabase
       .from("tasks")
       .update({ status: "delivered", updated_at: new Date().toISOString() })
-      .eq("id", taskId);
+      .eq("id", requestId );
 
     if (updateTaskError) {
       console.error("Failed to update task status:", updateTaskError);
@@ -71,30 +72,24 @@ export async function POST(
       );
     }
 
-    // Store delivery details in a delivery record
-    // Note: This assumes a 'deliveries' table exists with columns:
-    // id, task_id, freelancer_id, message, attachments (JSON), links (JSON), created_at
+ 
     const { error: deliveryError } = await supabase
       .from("deliveries")
       .insert({
-        task_id: taskId,
+        issueId: requestId ,
         freelancer_id: authData.user.id,
         message: message || null,
         attachments: attachments,
         links: links,
-        created_at: new Date().toISOString(),
       });
 
     if (deliveryError) {
       console.error("Failed to create delivery record:", deliveryError);
-      // Don't fail the request - task status was already updated
-      // The delivery details can be inferred from task status change
     }
 
-    // Also create attachment records in request_attachments table for visibility
     if (attachments.length > 0) {
       const attachmentRecords = attachments.map((att) => ({
-        request_id: taskId,
+        request_id: requestId ,
         file_id: att.file_id,
         file_url: att.file_url,
         file_name: att.file_name,
@@ -117,7 +112,7 @@ export async function POST(
       {
         success: true,
         message: "Delivery submitted successfully",
-        taskId: taskId,
+        taskId:requestId ,
         status: "delivered",
       },
       { status: 200 }

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Task } from "@/lib/superbase/type";
 import { useTaskStore } from "@/app/store/useTask";
+import { submitDelivery } from "@/action/delivery";
 
 import { presentToPast, displayStatusForStatusCard } from "@/lib/status";
 import ConfirmStatusChangeDialog from "@/components/ConfirmStatusChangeDialog";
@@ -303,26 +304,17 @@ const StatusCard = ({
       file_id?: string;
       file_url?: string;
       file_name?: string;
+      file_size?: number;
     }>;
     links: Array<{ url: string; label: string }>;
   }) => {
     setIsSubmitting(true);
     try {
-      const res = await fetch(`/api/proposal/${task.id}/deliver`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          taskId: task.id,
-          message: data.message,
-          attachments: data.attachments,
-          links: data.links,
-        }),
+      await submitDelivery(task.id, {
+        message: data.message,
+        attachments: data.attachments,
+        links: data.links,
       });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to submit delivery");
-      }
 
       // Update local state to reflect delivered status
       handleOptimisticStatus(task.id, "delivered");
