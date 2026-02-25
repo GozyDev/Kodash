@@ -33,9 +33,9 @@ export function DeliveryLinks({ links }: DeliveryLinksProps) {
             <ExternalLink size={14} className="text-textNc group-hover:text-blue-400 transition-colors" />
             <div className="flex-1 min-w-0">
               <p className="text-sm text-textNc group-hover:text-blue-400 truncate transition-colors">
-                {link.label || link.url}
+                {link.label}
               </p>
-              {link.label && (
+              {link.url && (
                 <p className="text-xs text-textNd truncate">
                   {link.url}
                 </p>

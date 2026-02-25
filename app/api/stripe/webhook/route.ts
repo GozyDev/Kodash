@@ -124,5 +124,107 @@ export async function POST(req: Request) {
     }
   }
 
+  // HANDLE transfer.created - when payment is released to freelancer
+  if (event.type === "transfer.created") {
+    try {
+      const transfer = event.data.object as any;
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      );
+
+      // Extract metadata from transfer
+      interface TransferMetadata {
+        issueId: string;
+        proposalId: string;
+        deliveryId: string;
+        orgId: string;
+        freelancerId: string;
+        grossAmount?: string;
+        stripeFee?: string;
+        platformFee?: string;
+        netAmount?: string;
+        freelancerAmount?: string;
+      }
+
+      const metadata = transfer.metadata as unknown as TransferMetadata;
+
+      if (!metadata.issueId || !metadata.deliveryId || !metadata.orgId) {
+        console.error("Transfer missing required metadata:", transfer.id);
+        return new NextResponse("Missing metadata", { status: 400 });
+      }
+
+      // 1. Update deliverable status to "approved" (if not already)
+      const { error: updateDeliverableError } = await supabase
+        .from("deliverables")
+        .update({ status: "approved", updated_at: new Date().toISOString() })
+        .eq("id", metadata.deliveryId);
+
+      if (updateDeliverableError) {
+        console.error("Failed to update deliverable:", updateDeliverableError);
+      }
+
+      // 2. Update task status to "completed"
+      const { error: updateTaskError } = await supabase
+        .from("tasks")
+        .update({ status: "completed", updated_at: new Date().toISOString() })
+        .eq("id", metadata.issueId);
+
+      if (updateTaskError) {
+        console.error("Failed to update task:", updateTaskError);
+      }
+
+      // 3. Insert new payment record for payout with fee breakdown
+      const payoutAmount = metadata.freelancerAmount 
+        ? parseInt(metadata.freelancerAmount) 
+        : transfer.amount;
+
+      const payoutRecord: any = {
+        amount: payoutAmount,
+        currency: transfer.currency,
+        status: "released",
+        type: "payout",
+        issueId: metadata.issueId,
+        proposal_id: metadata.proposalId,
+        stripe_payment_id: transfer.id,
+        orgId: metadata.orgId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      // Add fee breakdown if available
+      if (metadata.stripeFee) {
+        payoutRecord.stripe_fee = parseInt(metadata.stripeFee);
+      }
+      if (metadata.platformFee) {
+        payoutRecord.platform_fee = parseInt(metadata.platformFee);
+      }
+      if (metadata.grossAmount) {
+        payoutRecord.gross_amount = parseInt(metadata.grossAmount);
+      }
+      if (metadata.netAmount) {
+        payoutRecord.net_amount = parseInt(metadata.netAmount);
+      }
+
+      const { error: insertPaymentError } = await supabase
+        .from("payments")
+        .insert(payoutRecord);
+
+      if (insertPaymentError) {
+        console.error("Failed to insert payout record:", insertPaymentError);
+      } else {
+        console.log(`✅ Transfer ${transfer.id} completed - payout record created for issue ${metadata.issueId}`);
+        console.log("Payout breakdown:", {
+          freelancerAmount: payoutAmount / 100,
+          stripeFee: (metadata.stripeFee ? parseInt(metadata.stripeFee) / 100 : 0),
+          platformFee: (metadata.platformFee ? parseInt(metadata.platformFee) / 100 : 0),
+          grossAmount: (metadata.grossAmount ? parseInt(metadata.grossAmount) / 100 : 0),
+        });
+      }
+    } catch (err) {
+      console.error("Error handling transfer.created webhook", err);
+    }
+  }
+
   return new NextResponse("Received", { status: 200 });
 }

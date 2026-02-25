@@ -5,13 +5,17 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'hicryffbmdqypzeuempp.supabase.co',
-        port: '',
-        pathname: '/storage/v1/object/public/**',
+        protocol: "https",
+        hostname: "hicryffbmdqypzeuempp.supabase.co",
+        port: "",
+        pathname: "/storage/v1/object/public/**",
       },
     ],
   },
+
+  serverActions: {
+    bodySizeLimit: '50mb',
+  }
 };
 
 export default nextConfig;

@@ -1,6 +1,13 @@
 "use client";
 
-import { Download } from "lucide-react";
+import Image from "next/image";
+import { Paperclip } from "lucide-react";
+
+function isImageFile(fileName: string): boolean {
+  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp"];
+  const extension = fileName.toLowerCase().substring(fileName.lastIndexOf(".")) || "";
+  return imageExtensions.includes(extension);
+}
 
 interface Attachment {
   file_id: string;
@@ -47,7 +54,18 @@ export function DeliveryAttachments({ attachments }: DeliveryAttachmentsProps) {
             rel="noopener noreferrer"
             className="flex items-center gap-2 p-2 rounded hover:bg-bgPrimary/50 transition-colors group"
           >
-            <Download size={14} className="text-textNc group-hover:text-blue-400 transition-colors" />
+            {isImageFile(attachment.file_name) ? (
+              <div className="relative w-10 h-10 flex-shrink-0 rounded overflow-hidden">
+                <Image
+                  src={attachment.file_url}
+                  alt={attachment.file_name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            ) : (
+              <Paperclip className="w-4 h-4 text-textNc flex-shrink-0" />
+            )}
             <div className="flex-1 min-w-0">
               <p className="text-sm text-textNc group-hover:text-blue-400 truncate transition-colors">
                 {attachment.file_name}

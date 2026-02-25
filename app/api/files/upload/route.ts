@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       console.log("Upload error, attempting fallback", uploadError.message);
       try {
         const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(filename);
-        return NextResponse.json({ file_id: filename, file_url: publicUrlData.publicUrl });
+        return NextResponse.json({ file_id: filename, file_url: publicUrlData.publicUrl, file_name: file.name });
       } catch {
         return NextResponse.json({ error: uploadError.message }, { status: 500 });
       }

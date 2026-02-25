@@ -11,7 +11,7 @@ import { Task } from "@/lib/superbase/type";
 import { presentToPast } from "@/lib/status";
 import ProposalOverview from "./ProposalOverview";
 import { DeliveriesSection } from "./DeliveriesSection";
-import { fetchDeliveries, releaseFunds, type Delivery } from "@/action/deliveries";
+import { fetchDeliveries, releaseFunds, approveDelivery, requestDeliveryRevision, type Delivery } from "@/action/deliveries";
 import { createBrowserClient } from "@supabase/ssr";
 import Image from "next/image";
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -622,17 +622,23 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
             <DeliveriesSection
               deliveries={deliveries}
               userRole={userRole}
-              onReleaseFunds={async () => {
+              taskId={issueId}
+              onApprove={async (deliveryId, taskId) => {
                 try {
-                  setReleasingFunds(true);
-                  await releaseFunds(issueId, orgId);
-                  // Optionally refresh deliveries
+                  await approveDelivery(deliveryId, taskId, orgId);
                   const updatedDeliveries = await fetchDeliveries(issueId);
                   setDeliveries(updatedDeliveries);
                 } catch (err) {
-                  console.error("Failed to release funds:", err);
-                } finally {
-                  setReleasingFunds(false);
+                  console.error("Failed to approve delivery:", err);
+                }
+              }}
+              onRequestRevision={async (deliveryId, reason) => {
+                try {
+                  await requestDeliveryRevision(deliveryId, issueId, reason);
+                  const updatedDeliveries = await fetchDeliveries(issueId);
+                  setDeliveries(updatedDeliveries);
+                } catch (err) {
+                  console.error("Failed to request revision:", err);
                 }
               }}
               loading={releasingFunds}

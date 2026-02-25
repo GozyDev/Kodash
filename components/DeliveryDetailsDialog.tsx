@@ -16,6 +16,20 @@ import { uploadFile } from "@/lib/upload";
 import { X, Paperclip, Link2, Loader2 } from "lucide-react";
 import Image from "next/image";
 
+function isImageFile(fileName: string): boolean {
+  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp"];
+  const extension = fileName.toLowerCase().substring(fileName.lastIndexOf("."));
+  return imageExtensions.includes(extension);
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+}
+
 interface Attachment {
   id: string;
   file: File;
@@ -60,6 +74,7 @@ const DeliveryDetailsDialog = ({
   const [linkLabel, setLinkLabel] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const addFiles = (files: FileList | null) => {
     if (!files) return;
@@ -195,7 +210,7 @@ const DeliveryDetailsDialog = ({
     try {
       new URL(linkInput);
     } catch {
-      alert("Please enter a valid URL");
+      setError("Please enter a valid URL");
       return;
     }
 
@@ -217,8 +232,9 @@ const DeliveryDetailsDialog = ({
   };
 
   const handleSubmit = async () => {
+    setError(null);
     if (!message.trim() && attachments.length === 0 && links.length === 0) {
-      alert("Please provide at least a message, attachment, or link");
+      setError("Please provide at least a message, attachment, or link");
       return;
     }
 
@@ -229,14 +245,12 @@ const DeliveryDetailsDialog = ({
     );
 
     if (uploadingAttachments.length > 0) {
-      alert("Please wait for all attachments to finish uploading");
+      setError("Please wait for all attachments to finish uploading");
       return;
     }
 
     if (failedAttachments.length > 0) {
-      alert(
-        "Some attachments failed to upload. Please remove them and try again.",
-      );
+      setError("Some attachments failed to upload. Please remove them and try again.");
       return;
     }
 
@@ -252,10 +266,11 @@ const DeliveryDetailsDialog = ({
       setMessage("");
       setAttachments([]);
       setLinks([]);
+      setError(null);
       onOpenChange(false);
     } catch (error) {
       console.log("Failed to submit delivery details:", error);
-      alert("Failed to submit delivery details. Please try again 9889.");
+      setError("Failed to submit delivery details. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -271,6 +286,13 @@ const DeliveryDetailsDialog = ({
         </DialogHeader>
 
         <div className="space-y-6 mt-6">
+          {/* Error message */}
+          {error && (
+            <div className="p-3 rounded bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Message textarea */}
           <div>
             <label className="text-sm font-medium text-textNb mb-2 block">
@@ -313,21 +335,25 @@ const DeliveryDetailsDialog = ({
                     key={att.id}
                     className="flex items-center gap-2 p-2 bg-cardICB/20 rounded border border-cardCB"
                   >
-                    {att.preview && (
-                      <div className="relative w-10 h-10 flex-shrink-0">
+                    {att.preview && isImageFile(att.file.name) ? (
+                      <div className="relative w-10 h-10 flex-shrink-0 rounded overflow-hidden">
                         <Image
                           src={att.preview}
                           alt={att.file.name}
                           fill
-                          className="object-cover rounded"
+                          className="object-cover"
                         />
                       </div>
+                    ) : (
+                      <Paperclip className="w-4 h-4 text-textNc flex-shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium truncate text-textNa">
                         {att.file_name || att.file.name}
                       </p>
-
+                      <p className="text-xs text-textNd mt-0.5">
+                        {formatFileSize(att.file_size || att.file.size)}
+                      </p>
                       {att.status === "failed" && (
                         <p className="text-xs text-red-500 mt-1">
                           Upload failed
@@ -396,7 +422,7 @@ const DeliveryDetailsDialog = ({
                         <p className="text-xs font-medium text-textNa">
                           {link.label}
                         </p>
-                        <p className="text-xs text-textNc truncate">
+                        <p className="text-xs text-textNc">
                           {link.url}
                         </p>
                       </div>
