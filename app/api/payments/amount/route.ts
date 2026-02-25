@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       currency: "USD",
     });
   } catch (error) {
-    console.error("Error fetching payment amount:", error);
+    console.log("Error fetching payment amount:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

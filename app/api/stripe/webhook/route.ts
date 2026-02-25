@@ -39,7 +39,8 @@ export async function POST(req: Request) {
     }
 
     // Cast it while destructuring
-    const { proposalId, issueId, orgId } = session.metadata as unknown as MyMetadata;
+    const { proposalId, issueId, orgId } =
+      session.metadata as unknown as MyMetadata;
 
     // 5. SAVE TO DATABASE (The Escrow Record)
     const { error: txError } = await supabase.from("payments").insert({
@@ -61,7 +62,8 @@ export async function POST(req: Request) {
         .from("request_proposal")
         .update({ status: "accepted" })
         .eq("id", proposalId);
-      if (rpError) console.error("Failed updating request_proposal status:", rpError);
+      if (rpError)
+        console.error("Failed updating request_proposal status:", rpError);
 
       const { error: taskError } = await supabase
         .from("tasks")
@@ -69,7 +71,9 @@ export async function POST(req: Request) {
         .eq("id", issueId);
       if (taskError) console.error("Failed updating task status:", taskError);
 
-      console.log(`✅ Proposal ${proposalId} accepted and task ${issueId} marked on_going`);
+      console.log(
+        `✅ Proposal ${proposalId} accepted and task ${issueId} marked on_going`,
+      );
     }
   }
 
@@ -110,7 +114,7 @@ export async function POST(req: Request) {
         .update({ stripe_onboarding_status: status })
         .eq("stripe_connect_id", account.id)
         .select("email");
-      console.log("data",data);
+      console.log("data", data);
       if (updateError) {
         console.error(
           "Failed to update profile onboarding status:",
@@ -150,18 +154,18 @@ export async function POST(req: Request) {
       const metadata = transfer.metadata as unknown as TransferMetadata;
 
       if (!metadata.issueId || !metadata.deliveryId || !metadata.orgId) {
-        console.error("Transfer missing required metadata:", transfer.id);
+        console.log("Transfer missing required metadata:", transfer.id);
         return new NextResponse("Missing metadata", { status: 400 });
       }
 
       // 1. Update deliverable status to "approved" (if not already)
       const { error: updateDeliverableError } = await supabase
         .from("deliverables")
-        .update({ status: "approved", updated_at: new Date().toISOString() })
+        .update({ status: "approved"})
         .eq("id", metadata.deliveryId);
 
       if (updateDeliverableError) {
-        console.error("Failed to update deliverable:", updateDeliverableError);
+        console.log("Failed to update deliverable:", updateDeliverableError);
       }
 
       // 2. Update task status to "completed"
@@ -171,12 +175,12 @@ export async function POST(req: Request) {
         .eq("id", metadata.issueId);
 
       if (updateTaskError) {
-        console.error("Failed to update task:", updateTaskError);
+        console.log("Failed to update task:", updateTaskError);
       }
 
       // 3. Insert new payment record for payout with fee breakdown
-      const payoutAmount = metadata.freelancerAmount 
-        ? parseInt(metadata.freelancerAmount) 
+      const payoutAmount = metadata.freelancerAmount
+        ? parseInt(metadata.freelancerAmount)
         : transfer.amount;
 
       const payoutRecord: any = {
@@ -188,8 +192,6 @@ export async function POST(req: Request) {
         proposal_id: metadata.proposalId,
         stripe_payment_id: transfer.id,
         orgId: metadata.orgId,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
       };
 
       // Add fee breakdown if available
@@ -211,18 +213,41 @@ export async function POST(req: Request) {
         .insert(payoutRecord);
 
       if (insertPaymentError) {
-        console.error("Failed to insert payout record:", insertPaymentError);
+        console.log("Failed to insert payout record:", insertPaymentError);
       } else {
-        console.log(`✅ Transfer ${transfer.id} completed - payout record created for issue ${metadata.issueId}`);
+        console.log(
+          `✅ Transfer ${transfer.id} completed - payout record created for issue ${metadata.issueId}`,
+        );
         console.log("Payout breakdown:", {
           freelancerAmount: payoutAmount / 100,
-          stripeFee: (metadata.stripeFee ? parseInt(metadata.stripeFee) / 100 : 0),
-          platformFee: (metadata.platformFee ? parseInt(metadata.platformFee) / 100 : 0),
-          grossAmount: (metadata.grossAmount ? parseInt(metadata.grossAmount) / 100 : 0),
+          stripeFee: metadata.stripeFee
+            ? parseInt(metadata.stripeFee) / 100
+            : 0,
+          platformFee: metadata.platformFee
+            ? parseInt(metadata.platformFee) / 100
+            : 0,
+          grossAmount: metadata.grossAmount
+            ? parseInt(metadata.grossAmount) / 100
+            : 0,
         });
+
+        const { error: feeError } = await supabase
+          .from("payment_fees") // New table to track fees
+          .insert({
+            issueId: metadata.issueId,
+            proposalId: metadata.proposalId,
+            stripe_fee: metadata.stripeFee,
+            platform_fee: metadata.platformFee,
+            stripe_payment_id: transfer.id,
+          });
+
+          if(feeError){
+        console.log(feeError);
+
+          }
       }
     } catch (err) {
-      console.error("Error handling transfer.created webhook", err);
+      console.log("Error handling transfer.created webhook", err);
     }
   }
 
