@@ -121,7 +121,7 @@ export async function PaymentTable({
                           ? `/dashboard/fr-org/${orgId}/request/${payment.issueId}`
                           : `/dashboard/cl-org/${orgId}/request/${payment.issueId}`
                       }
-                      className=" text-[10px] md:text-sm tracking-wider text-textNc hover:text-green-300 hover:underline transition-colors"
+                      className=" text-[10px] md:text-sm tracking-wider text-textNc hover:text-green-300 hover:underline transition-colors no-wrap truncate border"
                     >
                       {taskTitle}
                     </Link>
