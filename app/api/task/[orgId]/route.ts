@@ -86,7 +86,7 @@ export async function POST(
     : [];
 
   const body = await req.json();
-  const { title, description, priority, due_date } = body;
+  const { title, description, priority, due_date, links } = body;
 
   if (!title || !title.toString().trim()) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -107,6 +107,7 @@ export async function POST(
         tenant_id: orgId,
         created_by: authData.user.id,
         visible_user_ids: viewUsers, // simplified spread
+        links: links ?? [],
       },
     ])
     .select()

@@ -6,15 +6,20 @@ export type Task = {
   description: string | null;
   priority: "high" | "medium" | "low" | "ugency" | "no priority";
   status:
-    | "propose" | "proposed"
+    | "propose"
+    | "proposed"
     | "on-going"
-    | "deliver" | "delivered"
+    | "deliver"
+    | "delivered"
     | "draft"
-    | "complete" | "completed"
-    | "cancel" | "canceled" ; 
+    | "complete"
+    | "completed"
+    | "cancel"
+    | "canceled";
   due_date: string | null;
   created_at: string;
   updated_at: string;
+  links?: { url: string; label: string }[] | null;
 };
 export type Comment = {
   id: string;

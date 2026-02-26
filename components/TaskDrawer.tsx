@@ -79,6 +79,15 @@ export default function TaskDrawer({
   };
   const [attachments, setAttachments] = useState<Attachment[]>([]);
 
+  type LinkItem = {
+    id: string;
+    url: string;
+    label: string;
+  };
+  const [links, setLinks] = useState<LinkItem[]>([]);
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkLabel, setLinkLabel] = useState("");
+
   const addFiles = (files: FileList | null) => {
     if (!files) return;
     // prevent duplicate selections by name+size
@@ -179,6 +188,34 @@ export default function TaskDrawer({
     e.preventDefault();
   };
 
+  const handleAddLink = () => {
+    if (!linkUrl.trim()) return;
+
+    try {
+      // Basic URL validation
+      // eslint-disable-next-line no-new
+      new URL(linkUrl);
+    } catch {
+      return;
+    }
+
+    setLinks((prev) => [
+      ...prev,
+      {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+        url: linkUrl,
+        label: linkLabel,
+      },
+    ]);
+
+    setLinkUrl("");
+    setLinkLabel("");
+  };
+
+  const handleRemoveLink = (id: string) => {
+    setLinks((prev) => prev.filter((link) => link.id !== id));
+  };
+
   const deleteFileOnServer = async (file_id?: string) => {
     if (!file_id) return;
     try {
@@ -265,6 +302,9 @@ export default function TaskDrawer({
     }
   
     setAttachments([]);
+    setLinks([]);
+    setLinkUrl("");
+    setLinkLabel("");
     onClose();
   }, [attachments, onClose, setAttachments]); 
   // ^ These are the dependencies that trigger a function refresh
@@ -608,6 +648,8 @@ export default function TaskDrawer({
                                   <Image
                                     src={att.preview}
                                     alt={file.name}
+                                    width={50}
+                                    height={50}
                                     className="w-full h-full object-contain"
                                   />
                                 </div>
@@ -699,6 +741,65 @@ export default function TaskDrawer({
                       })}
                     </div>
                   )}
+                </div>
+
+                {/* Links */}
+                <div className="mb-6">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={linkUrl}
+                        onChange={(e) => setLinkUrl(e.target.value)}
+                        placeholder="https://example.com"
+                        className="bg-cardICB/30 border-cardCB text-textNa placeholder:text-textNd"
+                      />
+                      <Input
+                        value={linkLabel}
+                        onChange={(e) => setLinkLabel(e.target.value)}
+                        placeholder="Link label (optional)"
+                        className="bg-cardICB/30 border-cardCB text-textNa placeholder:text-textNd"
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleAddLink}
+                        disabled={!linkUrl.trim()}
+                        className="h-9 px-3 text-xs butt"
+                      >
+                        Add
+                      </Button>
+                    </div>
+
+                    {links.length > 0 && (
+                      <div className="space-y-1 mt-2">
+                        {links.map((link) => (
+                          <div
+                            key={link.id}
+                            className="flex items-center justify-between p-2 bg-cardICB/20 rounded border border-cardCB"
+                          >
+                            <div className="flex-1 min-w-0 mr-2">
+                              <p className="text-xs font-medium text-textNa truncate">
+                                {link.label || link.url}
+                              </p>
+                              {link.label && (
+                                <p className="text-[11px] text-textNd truncate">
+                                  {link.url}
+                                </p>
+                              )}
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              type="button"
+                              onClick={() => handleRemoveLink(link.id)}
+                              className="h-7 w-7 p-0"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="mb-4">
@@ -869,6 +970,7 @@ export default function TaskDrawer({
                           await handleCreateTask({
                             ...formData,
                             attachments: uploadedAttachments,
+                            links: links.map(({ url, label }) => ({ url, label })),
                           });
                           setIsSaving(false);
 

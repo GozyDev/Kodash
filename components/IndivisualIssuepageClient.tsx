@@ -16,6 +16,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import Image from "next/image";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import WriteProposalDialog from "./WriteProposalDialog";
+import { DeliveryLinks } from "./DeliveryLinks";
 
 // Small helper component for description viewing/editing
 function DescriptionViewer({
@@ -413,6 +414,62 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
             });
           },
         )
+
+        // ---- DELIVERABLE INSERT ----
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "deliverables",
+            filter: `issueId=eq.${issueId}`,
+          },
+          (payload) => {
+            const newDelivery = payload.new as Delivery;
+
+            setDeliveries((prev) => {
+              const exists = prev.some((d) => d.id === newDelivery.id);
+              if (exists) {
+                return prev.map((d) => (d.id === newDelivery.id ? newDelivery : d));
+              }
+              return [newDelivery, ...prev];
+            });
+          },
+        )
+
+        // ---- DELIVERABLE UPDATE ----
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "deliverables",
+            filter: `issueId=eq.${issueId}`,
+          },
+          (payload) => {
+            const updatedDelivery = payload.new as Delivery;
+
+            setDeliveries((prev) =>
+              prev.map((d) => (d.id === updatedDelivery.id ? updatedDelivery : d)),
+            );
+          },
+        )
+
+        // ---- DELIVERABLE DELETE ----
+        .on(
+          "postgres_changes",
+          {
+            event: "DELETE",
+            schema: "public",
+            table: "deliverables",
+            filter: `issueId=eq.${issueId}`,
+          },
+          (payload) => {
+            const removed = payload.old as Delivery;
+
+            setDeliveries((prev) => prev.filter((d) => d.id !== removed.id));
+          },
+        )
         .subscribe((status) => console.log("Realtime status:", status));
     };
 
@@ -589,6 +646,12 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
                     );
                   })}
                 </ul>
+              )}
+
+              {issue?.links && issue.links.length > 0 && (
+                <div className="mt-4">
+                  <DeliveryLinks links={issue.links} />
+                </div>
               )}
             </div>
 

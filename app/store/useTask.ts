@@ -13,6 +13,7 @@ interface CreateTaskInput {
     file_size?: number | null;
     file_name?: string | null;
   }>;
+  links?: { url: string; label: string }[];
 }
 
 interface TaskStore {
@@ -56,7 +57,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
     const data = await res.json();
     if (!res.ok) {
-      console.error("Error creating task:", data.error);
+      console.log("Error creating task:", data.error);
       return;
     }
 
