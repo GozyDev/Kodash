@@ -8,7 +8,7 @@ interface StatusBadgeProps {
 
 const statusConfig: Record<PaymentStatus, { label: string; bgColor: string; textColor: string }> = {
   held: {
-    label: "In Escrow",
+    label: "In-Escrow",
     bgColor: "bg-amber-500/20",
     textColor: "text-amber-300",
   },
@@ -28,10 +28,10 @@ export function StatusBadge({ status }: StatusBadgeProps) {
   const config = statusConfig[status];
 
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${config.bgColor} ${config.textColor}`}
+    <div
+      className={` w-max rounded-full px-2 py-1 text-[10px] md:text-sm tracking-wider font-medium ${config.bgColor} ${config.textColor}`}
     >
       {config.label}
-    </span>
+    </div>
   );
 }

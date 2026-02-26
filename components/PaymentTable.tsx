@@ -88,16 +88,16 @@ export async function PaymentTable({
         <table className="w-full">
           <thead className="border-b border-cardCB bg-cardC/50">
             <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-textNb">
+              <th className="px-6 py-4 text-left text-[10px] md:text-sm tracking-wider font-semibold text-textNb">
                 Project Name
               </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-textNb">
+              <th className="px-6 py-4 text-left text-[10px] md:text-sm tracking-wider font-semibold text-textNb">
                 Amount
               </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-textNb">
+              <th className="px-6 py-4 text-left text-[10px] md:text-sm tracking-wider font-semibold text-textNb">
                 Status
               </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-textNb">
+              <th className="px-6 py-4 text-left text-[10px] md:text-sm tracking-wider font-semibold text-textNb">
                 Date
               </th>
             </tr>
@@ -121,7 +121,7 @@ export async function PaymentTable({
                           ? `/dashboard/fr-org/${orgId}/request/${payment.issueId}`
                           : `/dashboard/cl-org/${orgId}/request/${payment.issueId}`
                       }
-                      className="text-sm text-textNc hover:text-blue-300 hover:underline transition-colors"
+                      className=" text-[10px] md:text-sm tracking-wider text-textNc hover:text-green-300 hover:underline transition-colors"
                     >
                       {taskTitle}
                     </Link>
@@ -129,17 +129,17 @@ export async function PaymentTable({
 
                   {/* Amount */}
                   <td className="px-6 py-4">
-                    <span className="text-sm font-medium text-textNb">{amount}</span>
+                    <span className=" text-[10px] md:text-sm tracking-wider font-medium text-textNb">{amount}</span>
                   </td>
 
                   {/* Status Badge */}
                   <td className="px-6 py-4">
-                    <StatusBadge status={payment.status} />
+                    <StatusBadge status={payment.status}  />
                   </td>
 
                   {/* Date */}
                   <td className="px-6 py-4">
-                    <span className="text-sm text-textNc">{date}</span>
+                    <span className=" text-[10px] md:text-sm tracking-wider text-textNc">{date}</span>
                   </td>
                 </tr>
               );
