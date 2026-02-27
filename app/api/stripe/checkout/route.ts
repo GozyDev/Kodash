@@ -50,7 +50,8 @@ export async function POST(req: Request) {
         { status: 404 },
       );
     }
-    const origin = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+    const origin = process.env.NEXT_PUBLIC_URL! || "http://localhost:3000";
+
 
     // 3. Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
@@ -82,7 +83,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (err:unknown) {
+  } catch (err: unknown) {
     if (err instanceof Error) {
       console.error("Checkout Error:", err.message);
       return NextResponse.json({ error: err.message }, { status: 500 });
@@ -90,6 +91,6 @@ export async function POST(req: Request) {
       console.error("Checkout Error:", err);
       return NextResponse.json({ error: "Unknown error" }, { status: 500 });
     }
-    
+
   }
 }
