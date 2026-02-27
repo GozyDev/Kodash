@@ -116,7 +116,7 @@ export function DeliveryActionButtons({
     if (status === "pending" || status === "in_review") {
       return (
         <>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-col md:flex-row">
             <Button
               onClick={handleApproveClick}
               disabled={approving || loadingAmount}
