@@ -7,6 +7,8 @@ import { createClient } from "@/lib/superbase/superbase-server";
 import OrgLayoutClient from "@/components/OrgLayoutClient";
 import { getUserRole } from "@/lib/utils/role";
 
+export const revalidate = 0;
+
 export default async function OrgLayout({
   children,
   params,
@@ -30,6 +32,12 @@ export default async function OrgLayout({
     redirect("/dashboard/organizations");
   }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("stripe_onboarding_status,email")
+    .eq("id", authData.user.id)
+    .single();
+
   const { data: orgs, error } = await supabase
     .from("tenants")
     .select("id, name, plan");
@@ -39,13 +47,17 @@ export default async function OrgLayout({
   }
 
   if (!orgs) {
-    return
+    return;
   }
 
   return (
     <SidebarProvider>
       <OrgHeader orgs={orgs} orgId={orgId} />
-      <OrgLayoutClient orgId={orgId} role="client">
+      <OrgLayoutClient
+        orgId={orgId}
+        role="client"
+        stripeStatus={profile?.stripe_onboarding_status || "not_started"}
+      >
         {children}
       </OrgLayoutClient>
     </SidebarProvider>
