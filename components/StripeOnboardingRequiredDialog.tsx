@@ -62,7 +62,7 @@ export default function StripeOnboardingRequiredDialog({
         </DialogHeader>
 
         <div className="bg-cardICB/30 rounded-lg p-4 border border-cardCB space-y-2">
-          <p className="text-sm font-medium text-textNa">What you'll do:</p>
+          <p className="text-sm font-medium text-textNa">What you&apos;ll do:</p>
           <ul className="text-sm text-textNc space-y-1 ml-4">
             <li>✓ Verify your business information</li>
             <li>✓ Add your bank account details</li>

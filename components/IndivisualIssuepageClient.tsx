@@ -11,7 +11,7 @@ import { Task } from "@/lib/superbase/type";
 import { presentToPast } from "@/lib/status";
 import ProposalOverview from "./ProposalOverview";
 import { DeliveriesSection } from "./DeliveriesSection";
-import { fetchDeliveries, releaseFunds, approveDelivery, requestDeliveryRevision, type Delivery } from "@/action/deliveries";
+import { fetchDeliveries, approveDelivery, requestDeliveryRevision, type Delivery } from "@/action/deliveries";
 import { createBrowserClient } from "@supabase/ssr";
 import Image from "next/image";
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -94,7 +94,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
   const [stripeCheckLoaded, setStripeCheckLoaded] = useState(false);
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [deliveriesLoading, setDeliveriesLoading] = useState(true);
-  const [releasingFunds, setReleasingFunds] = useState(false);
+  const [releasingFunds] = useState(false);
 
   // keep single-source state: `issue` drives all displayed values
 

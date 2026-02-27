@@ -82,8 +82,14 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (err: any) {
-    console.error("Checkout Error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err:unknown) {
+    if (err instanceof Error) {
+      console.error("Checkout Error:", err.message);
+      return NextResponse.json({ error: err.message }, { status: 500 });
+    } else {
+      console.error("Checkout Error:", err);
+      return NextResponse.json({ error: "Unknown error" }, { status: 500 });
+    }
+    
   }
 }

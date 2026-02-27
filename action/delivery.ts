@@ -64,7 +64,12 @@ export async function submitDelivery(taskId: string, data: DeliveryData) {
 
     // Filter attachments to only include required fields
     const filteredAttachments = attachments.map((att) => {
-      const filtered: any = {
+      const filtered: {
+        file_id?: string;
+        file_url?: string;
+        file_name?: string;
+        file_size?: number;
+      } = {
         file_id: att.file_id,
         file_url: att.file_url,
         file_name: att.file_name,
@@ -127,8 +132,11 @@ export async function submitDelivery(taskId: string, data: DeliveryData) {
       taskId: taskId,
       status: "delivered",
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Delivery submission error:", err);
-    throw err;
+    if (err instanceof Error) {
+      throw err;
+    }
+    throw new Error("Delivery submission failed with an unknown error");
   }
 }

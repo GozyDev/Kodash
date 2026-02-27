@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -71,9 +71,11 @@ export function DeliveryActionButtons({
     try {
       await onApprove(deliveryId, taskId);
       setApproveDialogOpen(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Approval error:", err);
-      setApprovalError(err.message || "Failed to approve delivery");
+      const message =
+        err instanceof Error ? err.message : "Failed to approve delivery";
+      setApprovalError(message);
     } finally {
       setApproving(false);
     }

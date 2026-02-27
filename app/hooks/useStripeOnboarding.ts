@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
 
 export type StripeOnboardingStatus = "not_started" | "pending" | "completed" | "failed";
 
@@ -15,7 +14,6 @@ interface UseStripeOnboardingReturn {
 }
 
 export function useStripeOnboarding(): UseStripeOnboardingReturn {
-  const router = useRouter();
   const [status, setStatus] = useState<StripeOnboardingStatus | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

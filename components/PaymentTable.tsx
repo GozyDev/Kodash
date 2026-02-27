@@ -1,15 +1,7 @@
 import { createClient } from "@/lib/superbase/superbase-server";
 import Link from "next/link";
 import { StatusBadge } from "@/components/StatusBadge";
-
-interface PaymentRow {
-  id: string;
-  amount: number;
-  status: "held" | "releasing" | "released";
-  created_at: string;
-  issueId: string;
-  taskTitle: string;
-}
+import type { PaymentStatus } from "@/components/StatusBadge";
 
 interface PaymentTableProps {
   orgId: string;
@@ -57,9 +49,22 @@ export async function PaymentTable({
     }
 
     // Filter payments by orgId since we couldn't do it in the query
-    const filteredPayments = payments?.filter((payment: any) => {
-      return payment.tasks && payment.tasks.tenant_id === orgId;
-    }) || [];
+    interface PaymentRow {
+      id: string;
+      amount: number;
+      status: PaymentStatus;
+      created_at: string;
+      issueId: string;
+      tasks: {
+        title?: string | null;
+        tenant_id?: string | null;
+      } | null;
+    }
+
+    const filteredPayments =
+      (payments as PaymentRow[] | null)?.filter((payment) => {
+        return payment.tasks && payment.tasks.tenant_id === orgId;
+      }) || [];
 
     // Check if this is a filtered view (status filter applied)
     const isFiltered = searchParams.status && searchParams.status !== "all";
@@ -103,7 +108,7 @@ export async function PaymentTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-cardCB">
-            {filteredPayments.map((payment: any) => {
+            {filteredPayments.map((payment) => {
               const taskTitle = payment.tasks?.title || "Unknown Project";
               const amount = formatCurrency(payment.amount);
               const date = formatDate(payment.created_at);
@@ -121,9 +126,9 @@ export async function PaymentTable({
                           ? `/dashboard/fr-org/${orgId}/request/${payment.issueId}`
                           : `/dashboard/cl-org/${orgId}/request/${payment.issueId}`
                       }
-                      className=" text-[10px] md:text-sm tracking-wider text-textNc hover:text-green-300 hover:underline transition-colors no-wrap truncate border"
+                      className=""
                     >
-                      {taskTitle}
+                      <p className=" text-[10px] md:text-sm tracking-wider text-textNc hover:text-green-300 transition-colors  w-[100px] md:w-full truncate">{taskTitle}</p>
                     </Link>
                   </td>
 
@@ -134,7 +139,7 @@ export async function PaymentTable({
 
                   {/* Status Badge */}
                   <td className="px-6 py-4">
-                    <StatusBadge status={payment.status}  />
+                    <StatusBadge status={payment.status} />
                   </td>
 
                   {/* Date */}

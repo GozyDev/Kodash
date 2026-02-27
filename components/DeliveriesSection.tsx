@@ -23,7 +23,7 @@ export function DeliveriesSection({
   onApprove,
   onRequestRevision,
   onResubmit,
-  loading = false,
+
 }: DeliveriesSectionProps) {
   // Mark deliveries as in_review when CLIENT views them
   useEffect(() => {

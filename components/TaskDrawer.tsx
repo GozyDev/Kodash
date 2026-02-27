@@ -193,7 +193,6 @@ export default function TaskDrawer({
 
     try {
       // Basic URL validation
-      // eslint-disable-next-line no-new
       new URL(linkUrl);
     } catch {
       return;

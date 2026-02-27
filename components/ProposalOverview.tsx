@@ -271,8 +271,10 @@ export default function ProposalOverview({
               setProcessing(false);
               setConfirmDialogOpen(false);
             }
-          } catch (err: any) {
-            setErrorMsg(err.message || "Something went wrong");
+          } catch (err: unknown) {
+            const message =
+              err instanceof Error ? err.message : "Something went wrong";
+            setErrorMsg(message);
             setProcessing(false);
           }
         }}

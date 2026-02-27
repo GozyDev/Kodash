@@ -1,6 +1,6 @@
 "use client";
 
-type PaymentStatus = "held" | "releasing" | "released";
+export type PaymentStatus = "held" | "releasing" | "released";
 
 interface StatusBadgeProps {
   status: PaymentStatus;

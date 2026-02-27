@@ -16,7 +16,7 @@ interface PaymentFiltersProps {
   orgId: string;
 }
 
-export function PaymentFilters({ orgId }: PaymentFiltersProps) {
+export function PaymentFilters({}: PaymentFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [statusOpen, setStatusOpen] = useState(false);

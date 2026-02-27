@@ -2,6 +2,7 @@ import { stripe } from "@/lib/stripe";
 import { createClient } from "@supabase/supabase-js";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import type Stripe from "stripe";
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -15,9 +16,14 @@ export async function POST(req: Request) {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!,
     );
-  } catch (err: any) {
-    console.error(` Webhook signature verification failed.`, err.message);
-    return new NextResponse("Webhook Error", { status: 400 });
+  } catch (err:unknown) {
+    if (err instanceof Error) {
+      console.error(` Webhook signature verification failed.`, err.message);
+      return NextResponse.json({ error: err.message }, { status: 400 });
+    } else {
+      console.error(` Webhook signature verification failed.`, err);
+      return NextResponse.json({ error: "Unknown error" }, { status: 400 });
+    }
   }
 
   //HANDLE THE SUCCESS EVENT
@@ -80,7 +86,7 @@ export async function POST(req: Request) {
   // HANDLE account updates to keep onboarding status in sync
   if (event.type === "account.updated") {
     try {
-      const account = event.data.object as any;
+      const account = event.data.object as Stripe.Account;
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!, // NOT the anon key
@@ -109,12 +115,12 @@ export async function POST(req: Request) {
       // }
 
       // Update profile where stripe_connect_id matches
-      const { data, error: updateError } = await supabase
+      const {  error: updateError } = await supabase
         .from("profiles")
         .update({ stripe_onboarding_status: status })
         .eq("stripe_connect_id", account.id)
         .select("email");
-      console.log("data", data);
+    
       if (updateError) {
         console.error(
           "Failed to update profile onboarding status:",
@@ -123,15 +129,21 @@ export async function POST(req: Request) {
       } else {
         console.log(`Updated onboarding status for ${account.id} -> ${status}`);
       }
-    } catch (err) {
-      console.error("Error handling account.updated webhook", err);
+    } catch (err:unknown) {
+      if (err instanceof Error) {
+        console.error("Error handling account.updated webhook", err.message);
+        return NextResponse.json({ error: err.message }, { status: 500 });
+      } else {
+        console.error("Error handling account.updated webhook", err);
+        return NextResponse.json({ error: "Unknown error" }, { status: 500 });
+      }
     }
   }
 
   // HANDLE transfer.created - when payment is released to freelancer
   if (event.type === "transfer.created") {
     try {
-      const transfer = event.data.object as any;
+      const transfer = event.data.object as Stripe.Transfer;
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -183,7 +195,22 @@ export async function POST(req: Request) {
         ? parseInt(metadata.freelancerAmount)
         : transfer.amount;
 
-      const payoutRecord: any = {
+      interface PayoutRecord {
+        amount: number;
+        currency: string;
+        status: "released";
+        type: "payout";
+        issueId: string;
+        proposal_id: string;
+        stripe_payment_id: string;
+        orgId: string;
+        stripe_fee?: number;
+        platform_fee?: number;
+        gross_amount?: number;
+        net_amount?: number;
+      }
+
+      const payoutRecord: PayoutRecord = {
         amount: payoutAmount,
         currency: transfer.currency,
         status: "released",

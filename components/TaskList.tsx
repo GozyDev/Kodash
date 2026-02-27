@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import TaskCard from "./TaskCard";
 import { useMemo, useState, useCallback } from "react";
 import { ChevronDown, ChevronRight, ListFilter } from "lucide-react";
+import Image from "next/image";
 
 interface TaskListProps {
   tasks: Task[];
@@ -80,9 +81,11 @@ export default function TaskList({
   if (totalTasksCount === 0) {
     return (
       <div className="flex gap-3 justify-center items-center flex-col h-[60vh] border-2 border-dashed border-cardCB rounded-lg m-4">
-        <img
+        <Image
           src="/linear.png"
           alt="no tasks"
+          width={100}
+          height={100}
           className="w-[100px] grayscale-80"
         />
         <div className="text-textNb capitalize text-center">

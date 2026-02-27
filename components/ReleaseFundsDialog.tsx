@@ -42,9 +42,11 @@ export function ReleaseFundsDialog({
     try {
       await onConfirm();
       onOpenChange(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Release funds error:", err);
-      setInternalError(err.message || "An error occurred");
+      const message =
+        err instanceof Error ? err.message : "An error occurred";
+      setInternalError(message);
     } finally {
       setIsSubmitting(false);
     }

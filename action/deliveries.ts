@@ -98,9 +98,12 @@ export async function releaseFunds(taskId: string, orgId: string) {
       success: true,
       message: "Funds release initiated successfully",
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Release funds error:", err);
-    throw err;
+    if (err instanceof Error) {
+      throw err;
+    }
+    throw new Error("Release funds failed with an unknown error");
   }
 }
 
@@ -164,9 +167,12 @@ export async function markDeliveryAsInReview(deliveryId: string) {
       success: true,
       message: "Delivery marked as in review",
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Mark delivery as in review error:", err);
-    throw err;
+    if (err instanceof Error) {
+      throw err;
+    }
+    throw new Error("Mark delivery as in review failed with an unknown error");
   }
 }
 
@@ -308,9 +314,12 @@ export async function approveDelivery(
           freelancerAmount: freelancerAmount.toString(),
         },
       });
-    } catch (stripeError: any) {
+    } catch (stripeError: unknown) {
       console.error("Stripe transfer error:", stripeError);
-      throw new Error(`Stripe transfer failed: ${stripeError.message}`);
+      if (stripeError instanceof Error) {
+        throw new Error(`Stripe transfer failed: ${stripeError.message}`);
+      }
+      throw new Error("Stripe transfer failed due to an unknown error");
     }
 
     // Update delivery status to "approved"
@@ -329,9 +338,12 @@ export async function approveDelivery(
       message: "Delivery approved and payment released",
       transferId: transfer.id,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Approve delivery error:", err);
-    throw err;
+    if (err instanceof Error) {
+      throw err;
+    }
+    throw new Error("Approve delivery failed with an unknown error");
   }
 }
 
@@ -384,8 +396,11 @@ export async function requestDeliveryRevision(
       success: true,
       message: "Revision requested",
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Request revision error:", err);
-    throw err;
+    if (err instanceof Error) {
+      throw err;
+    }
+    throw new Error("Request revision failed with an unknown error");
   }
 }
