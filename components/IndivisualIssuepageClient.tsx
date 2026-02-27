@@ -403,12 +403,12 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
               task: tasks.map((t) =>
                 t.id === issueId
                   ? {
-                      ...t,
-                      status:
-                        updatedProposal.status === "accepted"
-                          ? "on-going"
-                          : t.status,
-                    }
+                    ...t,
+                    status:
+                      updatedProposal.status === "accepted"
+                        ? "on-going"
+                        : t.status,
+                  }
                   : t,
               ),
             });
@@ -586,9 +586,8 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span>Loading attachments...</span>
                 </div>
-              ) : attachments.length === 0 ? (
-                <div className="text-sm text-textNc">No attachments.</div>
-              ) : (
+              ) : !attachmentsLoading && attachments && attachments.length > 0 && (
+
                 <ul className="space-y-2 text-sm">
                   {attachments.map((a, idx) => {
                     const isImage =
@@ -668,17 +667,14 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
           </section>
 
           {/* Proposal */}
-          {proposal ? (
+          {proposal && (
             <ProposalOverview
               proposal={proposal}
               orgId={orgId}
               issueId={issueId}
             />
-          ) : (
-            <div className="rounded-xl border border-cardCB bg-cardC p-6">
-              <p className="text-sm text-textNc">No proposal found.</p>
-            </div>
-          )}
+          )
+          }
 
           {/* Deliverables */}
           {!deliveriesLoading && deliveries.length > 0 && (
