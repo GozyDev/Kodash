@@ -29,7 +29,7 @@ export function StatusBadge({ status }: StatusBadgeProps) {
 
   return (
     <div
-      className={` w-max rounded-full px-2 py-1 text-[10px] md:text-sm tracking-wider font-medium ${config.bgColor} ${config.textColor}`}
+      className={` w-max rounded-full px-4 py-1 text-[10px] md:text-[13px] tracking-wider ${config.bgColor} ${config.textColor}`}
     >
       {config.label}
     </div>

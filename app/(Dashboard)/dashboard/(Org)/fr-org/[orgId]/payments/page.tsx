@@ -26,7 +26,7 @@ export default async function PaymentsPage({
   }
 
   return (
-    <main className="py-6 px-3 md:px-6">
+    <main className="py-6 px-3 md:px-6 ">
       <h1 className="text-2xl font-bold mb-6 text-textNb">Payments</h1>
 
       {/* Composable Stats Section */}

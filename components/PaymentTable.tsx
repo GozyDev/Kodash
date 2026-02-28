@@ -28,7 +28,7 @@ export async function PaymentTable({
         created_at,
         issueId,
         tasks!issueId(title, tenant_id)
-      `
+      `,
       )
       .order("created_at", { ascending: searchParams.sortBy === "oldest" });
 
@@ -89,20 +89,20 @@ export async function PaymentTable({
     }
 
     return (
-      <div className="overflow-x-auto rounded-lg border border-cardCB bg-bgPrimary">
-        <table className="w-full">
+      <section className="overflow-x-auto p-3 ">
+        <table className="min-w-[700px] w-full">
           <thead className="border-b border-cardCB bg-cardC/50">
             <tr>
-              <th className="px-6 py-4 text-left text-[10px] md:text-sm tracking-wider font-semibold text-textNb">
+              <th className="px-6 py-4 text-left text-sm tracking-wider font-semibold text-textNb">
                 Project Name
               </th>
-              <th className="px-6 py-4 text-left text-[10px] md:text-sm tracking-wider font-semibold text-textNb">
+              <th className="px-6 py-4 text-left text-sm tracking-wider font-semibold text-textNb">
                 Amount
               </th>
-              <th className="px-6 py-4 text-left text-[10px] md:text-sm tracking-wider font-semibold text-textNb">
+              <th className="px-6 py-4 text-left text-sm tracking-wider font-semibold text-textNb">
                 Status
               </th>
-              <th className="px-6 py-4 text-left text-[10px] md:text-sm tracking-wider font-semibold text-textNb">
+              <th className="px-6 py-4 text-left text-sm tracking-wider font-semibold text-textNb">
                 Date
               </th>
             </tr>
@@ -112,7 +112,6 @@ export async function PaymentTable({
               const taskTitle = payment.tasks?.title || "Unknown Project";
               const amount = formatCurrency(payment.amount);
               const date = formatDate(payment.created_at);
-
               return (
                 <tr
                   key={payment.id}
@@ -128,30 +127,33 @@ export async function PaymentTable({
                       }
                       className=""
                     >
-                      <p className=" text-[10px] md:text-sm tracking-wider text-textNc hover:text-green-300 transition-colors  w-[100px] md:w-full truncate">{taskTitle}</p>
+                      <p className="text-sm tracking-wider text-textNc hover:text-green-300 transition-colors   truncate">
+                        {taskTitle}
+                      </p>
                     </Link>
                   </td>
-
                   {/* Amount */}
                   <td className="px-6 py-4">
-                    <span className=" text-[10px] md:text-sm tracking-wider font-medium text-textNb">{amount}</span>
+                    <span className="text-sm tracking-wider font-medium text-textNb">
+                      {amount}
+                    </span>
                   </td>
-
                   {/* Status Badge */}
                   <td className="px-6 py-4">
                     <StatusBadge status={payment.status} />
                   </td>
-
                   {/* Date */}
                   <td className="px-6 py-4">
-                    <span className=" text-[10px] md:text-sm tracking-wider text-textNc">{date}</span>
+                    <span className="text-sm tracking-wider text-textNc whitespace-nowrap">
+                      {date}
+                    </span>
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
-      </div>
+      </section>
     );
   } catch (error) {
     console.error("PaymentTable error:", error);
@@ -164,7 +166,9 @@ export async function PaymentTable({
 }
 
 // Role-based empty state messages
-function getRoleBasedEmptyMessage(userRole: "CLIENT" | "FREELANCER" | null): string {
+function getRoleBasedEmptyMessage(
+  userRole: "CLIENT" | "FREELANCER" | null,
+): string {
   if (userRole === "CLIENT") {
     return "No payments found. Start accepting proposals to see transactions here.";
   } else if (userRole === "FREELANCER") {
@@ -174,7 +178,10 @@ function getRoleBasedEmptyMessage(userRole: "CLIENT" | "FREELANCER" | null): str
 }
 
 // Status-specific filter empty messages
-function getFilteredEmptyMessage(status: string | undefined, statusLabel: string): string {
+function getFilteredEmptyMessage(
+  status: string | undefined,
+  statusLabel: string,
+): string {
   if (!status || status === "all") return "No payments found.";
 
   const messages: Record<string, string> = {
@@ -183,7 +190,9 @@ function getFilteredEmptyMessage(status: string | undefined, statusLabel: string
     released: `No payments have been released yet.`,
   };
 
-  return messages[status] || `No payments in ${statusLabel.toLowerCase()} status.`;
+  return (
+    messages[status] || `No payments in ${statusLabel.toLowerCase()} status.`
+  );
 }
 
 // Get readable status label

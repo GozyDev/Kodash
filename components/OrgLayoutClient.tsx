@@ -5,7 +5,6 @@ import { useOrgIdStore } from "@/app/store/useOrgId";
 import { OrgSidebar } from "@/components/OrgSidebar";
 import StripeReturnListener from "./StripeReturnListener";
 
-
 export default function OrgLayoutClient({
   orgId,
   role,
@@ -15,26 +14,23 @@ export default function OrgLayoutClient({
   orgId: string;
   role: "client" | "freelancer";
   children: ReactNode;
-  stripeStatus:string
+  stripeStatus: string;
 }) {
-  const { setOrgId } = useOrgIdStore()
+  const { setOrgId } = useOrgIdStore();
 
   useEffect(() => {
     setOrgId(orgId);
-  }, [orgId,setOrgId],);
-  
+  }, [orgId, setOrgId]);
 
   return (
     <>
       <div className="text-textNa flex w-full">
         <aside>
-          <StripeReturnListener/>
+          <StripeReturnListener />
           <OrgSidebar orgId={orgId} role={role} stripeStatus={stripeStatus} />
         </aside>
-        <main className="flex-1 pt-[68px] ">
-          <div className="flex w-full">
-            <div className="flex-1">{children}</div>
-          </div>
+        <main className=" w-full pt-[68px] flex">
+          <div className=" flex-1 min-w-0">{children}</div>
         </main>
       </div>
     </>

@@ -1,0 +1,1 @@
+{"id":"log_1772208413690_payment_table_overflow","timestamp":1772208413690,"location":"components/PaymentTableOverflowProbe.tsx:15","message":"PaymentTable container vs document width","data":{"containerClientWidth":1311,"containerScrollWidth":1311,"bodyClientWidth":1521,"bodyScrollWidth":1521},"runId":"pre-fix","hypothesisId":"H1"}
