@@ -50,7 +50,8 @@ export async function POST(req: Request) {
         { status: 404 },
       );
     }
-    const origin = process.env.NEXT_PUBLIC_URL! || "http://localhost:3000";
+    const origin = req.headers.get("origin")!;
+    console.log("Origin",origin)
 
 
     // 3. Create Stripe Checkout Session
