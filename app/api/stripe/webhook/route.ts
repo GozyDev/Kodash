@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!,
     );
-  } catch (err:unknown) {
+  } catch (err: unknown) {
     if (err instanceof Error) {
       console.error(` Webhook signature verification failed.`, err.message);
       return NextResponse.json({ error: err.message }, { status: 400 });
@@ -115,12 +115,12 @@ export async function POST(req: Request) {
       // }
 
       // Update profile where stripe_connect_id matches
-      const {  error: updateError } = await supabase
+      const { error: updateError } = await supabase
         .from("profiles")
         .update({ stripe_onboarding_status: status })
         .eq("stripe_connect_id", account.id)
         .select("email");
-    
+
       if (updateError) {
         console.error(
           "Failed to update profile onboarding status:",
@@ -129,7 +129,7 @@ export async function POST(req: Request) {
       } else {
         console.log(`Updated onboarding status for ${account.id} -> ${status}`);
       }
-    } catch (err:unknown) {
+    } catch (err: unknown) {
       if (err instanceof Error) {
         console.error("Error handling account.updated webhook", err.message);
         return NextResponse.json({ error: err.message }, { status: 500 });
@@ -165,15 +165,34 @@ export async function POST(req: Request) {
 
       const metadata = transfer.metadata as unknown as TransferMetadata;
 
-      if (!metadata.issueId || !metadata.deliveryId || !metadata.orgId) {
-        console.log("Transfer missing required metadata:", transfer.id);
-        return new NextResponse("Missing metadata", { status: 400 });
+      const {
+        grossAmount,
+        stripeFee,
+        netAmount,
+        freelancerAmount,
+        issueId,
+        proposalId,
+        orgId,
+        platformFee,
+      } = metadata;
+
+      if (
+        grossAmount == null ||
+        stripeFee == null ||
+        platformFee == null ||
+        freelancerAmount == null ||
+        netAmount === null ||
+        issueId === null ||
+        proposalId === null ||
+        orgId === null
+      ) {
+        throw new Error("metadata missing");
       }
 
       // 1. Update deliverable status to "approved" (if not already)
       const { error: updateDeliverableError } = await supabase
         .from("deliverables")
-        .update({ status: "approved"})
+        .update({ status: "approved" })
         .eq("id", metadata.deliveryId);
 
       if (updateDeliverableError) {
@@ -204,10 +223,11 @@ export async function POST(req: Request) {
         proposal_id: string;
         stripe_payment_id: string;
         orgId: string;
-        stripe_fee?: number;
-        platform_fee?: number;
-        gross_amount?: number;
-        net_amount?: number;
+        stripe_fee?: string;
+        platform_fee?: string;
+        gross_amount?: string;
+        net_amount?: string;
+        freelancer_pending_amount: string;
       }
 
       const payoutRecord: PayoutRecord = {
@@ -215,25 +235,16 @@ export async function POST(req: Request) {
         currency: transfer.currency,
         status: "released",
         type: "payout",
-        issueId: metadata.issueId,
-        proposal_id: metadata.proposalId,
+        issueId: issueId,
+        proposal_id: proposalId,
         stripe_payment_id: transfer.id,
-        orgId: metadata.orgId,
+        orgId: orgId,
+        gross_amount: grossAmount,
+        stripe_fee: stripeFee,
+        platform_fee: platformFee,
+        net_amount: netAmount,
+        freelancer_pending_amount: freelancerAmount,
       };
-
-      // Add fee breakdown if available
-      if (metadata.stripeFee) {
-        payoutRecord.stripe_fee = parseInt(metadata.stripeFee);
-      }
-      if (metadata.platformFee) {
-        payoutRecord.platform_fee = parseInt(metadata.platformFee);
-      }
-      if (metadata.grossAmount) {
-        payoutRecord.gross_amount = parseInt(metadata.grossAmount);
-      }
-      if (metadata.netAmount) {
-        payoutRecord.net_amount = parseInt(metadata.netAmount);
-      }
 
       const { error: insertPaymentError } = await supabase
         .from("payments")
@@ -245,38 +256,77 @@ export async function POST(req: Request) {
         console.log(
           `✅ Transfer ${transfer.id} completed - payout record created for issue ${metadata.issueId}`,
         );
-        console.log("Payout breakdown:", {
-          freelancerAmount: payoutAmount / 100,
-          stripeFee: metadata.stripeFee
-            ? parseInt(metadata.stripeFee) / 100
-            : 0,
-          platformFee: metadata.platformFee
-            ? parseInt(metadata.platformFee) / 100
-            : 0,
-          grossAmount: metadata.grossAmount
-            ? parseInt(metadata.grossAmount) / 100
-            : 0,
-        });
-
-        const { error: feeError } = await supabase
-          .from("payment_fees") // New table to track fees
-          .insert({
-            issueId: metadata.issueId,
-            proposalId: metadata.proposalId,
-            stripe_fee: metadata.stripeFee,
-            platform_fee: metadata.platformFee,
-            stripe_payment_id: transfer.id,
-          });
-
-          if(feeError){
-        console.log(feeError);
-
-          }
       }
     } catch (err) {
       console.log("Error handling transfer.created webhook", err);
     }
   }
 
+  // HANDLE charge.succeeded
+  if (event.type === "charge.succeeded") {
+    const charge = event.data.object as Stripe.Charge;
+
+    await handleChargeAccounting(charge.id);
+  }
+
+  if (event.type === "charge.updated") {
+    const charge = event.data.object as Stripe.Charge;
+    if (charge.balance_transaction) {
+      await handleChargeAccounting(charge.id);
+    } else {
+      console.log("Pending");
+    }
+  }
+
   return new NextResponse("Received", { status: 200 });
+}
+
+async function handleChargeAccounting(chargeId: string) {
+  const charge = await stripe.charges.retrieve(chargeId);
+
+  if (!charge.balance_transaction) {
+    return false; // not ready
+  }
+
+  const balanceTx = await stripe.balanceTransactions.retrieve(
+    charge.balance_transaction as string,
+  );
+
+  const grossAmount = balanceTx.amount;
+  const stripeFee = balanceTx.fee;
+  const netAmount = balanceTx.net;
+
+  const PLATFORM_PERCENT = 0.04;
+  const platformFee = Math.round(grossAmount * PLATFORM_PERCENT);
+  const freelancerPending = grossAmount - stripeFee - platformFee;
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  );
+
+  // 🔒 Idempotency guard
+  const { data: existing } = await supabase
+    .from("payments")
+    .select("stripe_fee")
+    .eq("stripe_payment_id", charge.payment_intent)
+    .single();
+
+  if (existing?.stripe_fee) {
+    return true; // already processed
+  }
+
+  await supabase
+    .from("payments")
+    .update({
+      gross_amount: grossAmount,
+      stripe_fee: stripeFee,
+      net_amount: netAmount,
+      platform_fee: platformFee,
+      freelancer_pending_amount: freelancerPending,
+    })
+    .eq("stripe_payment_id", charge.payment_intent)
+    .eq("type", "funding");
+
+  return true;
 }

@@ -22,7 +22,7 @@ export interface Delivery {
   }>;
   created_at: string;
 }
- 
+
 export async function fetchDeliveries(taskId: string): Promise<Delivery[]> {
   try {
     const supabase = await createClient();
@@ -156,7 +156,7 @@ export async function markDeliveryAsInReview(deliveryId: string) {
     // Update delivery status to "in_review"
     const { error: updateError } = await supabase
       .from("deliverables")
-      .update({ status: "in_review"})
+      .update({ status: "in_review" })
       .eq("id", deliveryId);
 
     if (updateError) {
@@ -179,7 +179,7 @@ export async function markDeliveryAsInReview(deliveryId: string) {
 export async function approveDelivery(
   deliveryId: string,
   taskId: string,
-  orgId?: string
+  orgId?: string,
 ) {
   try {
     const supabase = await createClient();
@@ -224,7 +224,20 @@ export async function approveDelivery(
     // Query payments table for the original funding record
     const { data: paymentData, error: paymentError } = await supabase
       .from("payments")
-      .select("id, amount, proposal_id, currency, stripe_payment_id")
+      .select(
+        `
+  id,
+  amount,
+  proposal_id,
+  currency,
+  stripe_payment_id,
+  gross_amount,
+  stripe_fee,
+  platform_fee,
+  freelancer_pending_amount,
+  net_amount
+`,
+      )
       .eq("issueId", taskId)
       .eq("type", "funding")
       .eq("status", "held")
@@ -234,31 +247,27 @@ export async function approveDelivery(
       throw new Error("Payment record not found or not in held status");
     }
 
-    const { amount, proposal_id, currency, stripe_payment_id } = paymentData;
+    const {
+      proposal_id,
+      currency,
+      gross_amount,
+      stripe_fee,
+      platform_fee,
+      freelancer_pending_amount,
+      net_amount,
+    } = paymentData;
 
-    // Fetch Stripe payment intent to get actual fees charged
-    let paymentIntent;
-    try {
-      paymentIntent = await stripe.paymentIntents.retrieve(stripe_payment_id);
-    } catch (err) {
-      console.error("Failed to retrieve payment intent:", err);
-      throw new Error("Failed to retrieve payment details from Stripe");
+    if (
+      gross_amount == null ||
+      stripe_fee == null ||
+      platform_fee == null ||
+      freelancer_pending_amount == null ||
+      net_amount === null
+    ) {
+      throw new Error("Funding record missing fee breakdown");
     }
 
-    // Calculate net amount and fees
-    const stripeFeeCharged = amount - (paymentIntent.amount_received || amount);
-    const netAmount = paymentIntent.amount_received || amount;
-    const platformFee = Math.round(netAmount * 0.04); // 4% platform fee
-    const freelancerAmount = netAmount - platformFee;
-
-    console.log("Payment breakdown:", {
-      originalAmount: amount / 100,
-      stripeFee: stripeFeeCharged / 100,
-      netAmount: netAmount / 100,
-      platformFee: platformFee / 100,
-      freelancerAmount: freelancerAmount / 100,
-    });
-
+    const freelancerAmount = freelancer_pending_amount;
     // Query request_proposal to get freelancer_id
     const { data: proposalData, error: proposalError } = await supabase
       .from("request_proposal")
@@ -294,11 +303,26 @@ export async function approveDelivery(
       throw new Error("Freelancer's Stripe onboarding is not completed");
     }
 
+    const paymentIntent = await stripe.paymentIntents.retrieve(
+      paymentData.stripe_payment_id,
+    );
+
+    if (paymentIntent.status !== "succeeded") {
+      throw new Error("Payment not completed.");
+    }
+
+    const chargeId = paymentIntent.latest_charge as string;
+    const charge = await stripe.charges.retrieve(chargeId);
+
+    if (charge.disputed) {
+      throw new Error("Payment is under dispute. Cannot release funds.");
+    }
+
     // Create Stripe transfer with freelancer's net amount (after fees)
     let transfer;
     try {
       transfer = await stripe.transfers.create({
-        amount: freelancerAmount, // Transfer only what freelancer earns
+        amount: freelancerAmount,
         currency: currency || "usd",
         destination: stripe_connect_id,
         metadata: {
@@ -307,11 +331,11 @@ export async function approveDelivery(
           deliveryId: deliveryId,
           orgId: finalOrgId,
           freelancerId: freelancer_id,
-          grossAmount: amount.toString(), // Original amount in cents
-          stripeFee: stripeFeeCharged.toString(),
-          platformFee: platformFee.toString(),
-          netAmount: netAmount.toString(),
-          freelancerAmount: freelancerAmount.toString(),
+          grossAmount: gross_amount,
+          stripeFee: stripe_fee,
+          platformFee: platform_fee,
+          netAmount: net_amount,
+          freelancerAmount: freelancerAmount,
         },
       });
     } catch (stripeError: unknown) {
@@ -350,7 +374,7 @@ export async function approveDelivery(
 export async function requestDeliveryRevision(
   deliveryId: string,
   taskId: string,
-  reason: string
+  reason: string,
 ) {
   try {
     const supabase = await createClient();
