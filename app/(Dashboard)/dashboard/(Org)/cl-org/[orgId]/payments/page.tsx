@@ -5,6 +5,14 @@ import { PaymentFilters } from "@/components/PaymentFilters";
 import { createClient } from "@/lib/superbase/superbase-server";
 import { getUserRole } from "@/lib/utils/role";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Transations",
+  description:
+    "Kodash is a contract first platform for client and freelancer to make agreement upfront before work actually  start",
+};
+
 export default async function PaymentsPage({
   params,
   searchParams,
@@ -14,11 +22,11 @@ export default async function PaymentsPage({
 }) {
   const { orgId } = await params;
   const filters = await searchParams;
-  
+
   // Get current user
   const supabase = await createClient();
   const { data: authData } = await supabase.auth.getUser();
-  
+
   // Get user role
   let userRole: "CLIENT" | "FREELANCER" | null = null;
   if (authData.user) {
@@ -30,14 +38,20 @@ export default async function PaymentsPage({
       <h1 className="text-2xl font-bold mb-6 text-textNb">Payments</h1>
 
       {/* Composable Stats Section */}
-      <Suspense fallback={<div className="h-24 animate-pulse rounded-2xl bg-bgPrimary border border-cardCB" />}>
+      <Suspense
+        fallback={
+          <div className="h-24 animate-pulse rounded-2xl bg-bgPrimary border border-cardCB" />
+        }
+      >
         <PaymentStats orgId={orgId} />
       </Suspense>
 
       {/* Your Transaction Table will go here next */}
       <div>
-        <h2 className="text-lg font-semibold mb-4 text-textNb">Transaction History</h2>
-        
+        <h2 className="text-lg font-semibold mb-4 text-textNb">
+          Transaction History
+        </h2>
+
         {/* Filters */}
         <PaymentFilters orgId={orgId} />
 
@@ -53,7 +67,11 @@ export default async function PaymentsPage({
             </div>
           }
         >
-          <PaymentTable orgId={orgId} searchParams={filters} userRole={userRole} />
+          <PaymentTable
+            orgId={orgId}
+            searchParams={filters}
+            userRole={userRole}
+          />
         </Suspense>
       </div>
     </main>

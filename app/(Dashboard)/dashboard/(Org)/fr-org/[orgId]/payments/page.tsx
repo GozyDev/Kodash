@@ -4,6 +4,13 @@ import { PaymentTable } from "@/components/PaymentTable";
 import { PaymentFilters } from "@/components/PaymentFilters";
 import { createClient } from "@/lib/superbase/superbase-server";
 import { getUserRole } from "@/lib/utils/role";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Transations",
+  description:
+    "Kodash is a contract first platform for client and freelancer to make agreement upfront before work actually  start",
+};
 
 export default async function PaymentsPage({
   params,
