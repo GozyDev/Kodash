@@ -182,6 +182,21 @@ export default function TeamClient({ orgId }: { orgId: string }) {
     return email.includes(query) || name.includes(query);
   });
 
+  // Logic to check if roles are already filled
+  const hasClient = memberships.some((m) => m.role === "CLIENT");
+  const hasFreelancer = memberships.some((m) => m.role === "FREELANCER");
+  const isWorkspaceFull = hasClient && hasFreelancer;
+
+  console.log(hasFreelancer, "Has freelancer");
+  console.log(hasClient, "Has Client");
+
+  // Determine which role should be the default for the invite
+  // If no Client exists, default to Client. If Client exists but no Freelancer, default to Freelancer.
+  useEffect(() => {
+    if (hasClient && !hasFreelancer) setRole("Freelancer");
+    if (!hasClient && hasFreelancer) setRole("Client");
+  }, [hasClient, hasFreelancer]);
+
   const getInitials = (profile: Profile | null) => {
     if (!profile) return "?";
     if (profile.full_name) {
@@ -221,6 +236,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
 
           <Button
             className="inline-flex items-center md:gap-2 text-white px-4 py-2 butt rounded"
+            disabled={isWorkspaceFull}
             onClick={() => setInviteOpen(true)}
           >
             <UserPlus className="w-5 h-5" strokeWidth={2.5} />
@@ -353,23 +369,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                   <label className="text-sm mb-2 block text-textNd">
                     Member role
                   </label>
-                  <Select
-                    defaultValue={role}
-                    onValueChange={(v: "Client" | "Freelancer") => setRole(v)}
-                  >
-                    <SelectTrigger
-                      className="w-full border-cardICB bg-cardICB/10"
-                      aria-label="Member role selector"
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="border-cardICB bg-cardC text-white">
-                      <SelectItem value="Client" className="">
-                        Client
-                      </SelectItem>
-                      <SelectItem value="Freelancer">Freelancer</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <p className="border border-cardCB bg-cardICB/10 p-2 rounded text-sm">{role}</p>
                 </div>
 
                 <div>
@@ -436,9 +436,7 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                         return;
                       }
 
-                       toast.success(
-                    `Invite sent successfully to ${email}`,
-                  );
+                      toast.success(`Invite sent successfully to ${email}`);
 
                       setInviteOpen(false);
                       setEmail("");

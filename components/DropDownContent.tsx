@@ -100,7 +100,7 @@ const DropDownContent = ({ orgs }: { orgs: Org[] }) => {
         <div className="max-h-48 overflow-auto">
           {filtered.length === 0 && (
             <div className="px-3 py-2 text-xs text-textNd">
-              No organizations
+              No Workspace
             </div>
           )}
 
@@ -128,7 +128,7 @@ const DropDownContent = ({ orgs }: { orgs: Org[] }) => {
               onClick={() => goToAll()}
               className="w-full text-left px-3 py-2 hover:bg-cardCB text-[13px]"
             >
-              All Organizations
+              All Workspace
             </button>
           </DropdownMenuItem>
 
@@ -140,7 +140,7 @@ const DropDownContent = ({ orgs }: { orgs: Org[] }) => {
               onClick={() => router.push("/dashboard/new")}
               className="w-full text-left px-3 py-2 hover:bg-cardCB text-[13px] flex items-center gap-2"
             >
-              <Plus className="w-4 h-4" /> New organization
+              <Plus className="w-4 h-4" /> New Workspace
             </button>
           </DropdownMenuItem>
         </div>
