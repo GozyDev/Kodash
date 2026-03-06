@@ -53,7 +53,7 @@ export default function UserMenuClient({ user }: { user: User }) {
                     className="cursor-pointer bg-red-500/50 hover:bg-red-500"
                     onClick={async () => {
                         await fetch("/api/logout", { method: "POST" });
-                        window.location.href = "/login";
+                        window.location.href = "/dashboard/auth/sign_in";
                     }}
                 >
                     <LogOut className="mr-2 h-4 w-4" />
