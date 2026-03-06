@@ -6,7 +6,7 @@ import { Resend } from "resend";
 // POST /api/workspaces/:id/invite
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const svc = await createClient();
 
@@ -33,11 +33,11 @@ export async function POST(
     if (!role) {
       return NextResponse.json({ error: "Role is required" }, { status: 400 });
     }
-    console.log(email)
+    console.log(email);
 
     const param = await params;
 
-    const workspaceId = param.id
+    const workspaceId = param.id;
     const token = randomUUID();
 
     // expire in 24 hours
@@ -69,13 +69,13 @@ export async function POST(
       console.error("NEXT_PUBLIC_APP_URL is not set");
       return NextResponse.json(
         { error: "Server misconfiguration" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     const inviteUrl = `${appUrl.replace(
       /\/$/,
-      ""
+      "",
     )}/invite?token=${encodeURIComponent(token)}`;
 
     // Send email via Resend
@@ -84,65 +84,75 @@ export async function POST(
       console.error("RESEND_API_KEY is not set");
       return NextResponse.json(
         { error: "Server misconfiguration" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     const resend = new Resend(resendKey);
-    // const fromAddress = process.env.RESEND_FROM_EMAIL || "no-reply@kodash.com";
+    const fromAddress =
+      process.env.RESEND_FROM_EMAIL || "no-reply@kodash.online";
 
     const subject = "You've been invited to a workspace on Kodash";
     const html = `
-      <div style="font-family:system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial; color:#0f172a;">
-        <h2 style="margin:0 0 8px 0">You've been invited to a workspace on Kodash</h2>
-        <p style="margin:0 0 16px 0">You were invited to join a workspace. Click the button below to accept the invite. This link expires in 24 hours.</p>
-        <p style="margin:0 0 24px 0"><a href="${inviteUrl}" style="display:inline-block;padding:10px 16px;background:#2563eb;color:#fff;border-radius:6px;text-decoration:none">Accept invitation</a></p>
-        <p style="margin:0;color:#64748b;font-size:13px">If the button doesn't work, paste this URL into your browser:</p>
-        <p style="word-break:break-all;font-size:13px;color:#0f172a">${inviteUrl}</p>
+      <div style="background-color: #020617; padding: 50px 20px; font-family: 'Inter', system-ui, -apple-system, sans-serif; color: #f8fafc;">
+        <div style="max-width: 500px; margin: 0 auto; background-color: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 40px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
+          
+          <div style="margin-bottom: 32px;">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.05em; color: #ffffff;">KODASH</h1>
+          </div>
+
+          <h2 style="margin: 0 0 16px 0; font-size: 20px; font-weight: 600; color: #ffffff;">You've been invited!</h2>
+          <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #94a3b8;">
+            You were invited to join a workspace on <strong>Kodash</strong>. Collaborate on requests, manage members, and track payments in one place.
+          </p>
+
+          <div style="margin-bottom: 32px;">
+            <a href="${inviteUrl}" style="display: inline-block; padding: 12px 24px; background-color: #22c55e; color: #ffffff; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; text-align: center;">
+              Accept Invitation
+            </a>
+          </div>
+
+          <div style="border-top: 1px solid #1e293b; margin-bottom: 24px;"></div>
+
+          <p style="margin: 0 0 8px 0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Expiry</p>
+          <p style="margin: 0 0 20px 0; color: #94a3b8; font-size: 13px;">This invitation link will expire in 24 hours.</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 24px;">
+          <p style="color: #475569; font-size: 12px;">&copy; ${new Date().getFullYear()} Kodash. All rights reserved.</p>
+        </div>
       </div>
     `;
 
     try {
       const { data, error } = await resend.emails.send({
-        from: "onboarding@resend.dev",
+        from: fromAddress,
         to: email,
         subject,
         html,
       });
 
-      console.log("Resend response:", { data, error } ,"yh");
+      console.log("Resend response:", { data, error, fromAddress }, "yh");
 
       if (error) {
         throw error;
       }
-    } catch (sendErr:unknown) {
-      if(sendErr instanceof Error){
+    } catch (sendErr: unknown) {
+      if (sendErr instanceof Error) {
         console.error("Resend send error:", sendErr);
-        return NextResponse.json(
-          { error:sendErr.message },
-          { status: 500 }
-        );
-      }else{
-        return NextResponse.json(
-          String(sendErr),
-          { status: 500 }
-        );
+        return NextResponse.json({ error: sendErr.message }, { status: 500 });
+      } else {
+        return NextResponse.json(String(sendErr), { status: 500 });
       }
-     
     }
 
     return NextResponse.json({ invite: insertData }, { status: 201 });
-  } catch (err:unknown) {
-    if(err instanceof Error){
+  } catch (err: unknown) {
+    if (err instanceof Error) {
       console.error("Resend send error:", err);
-      return NextResponse.json(
-        { error:err.message },
-        { status: 500 }
-      );
-    }else{
-      return NextResponse.json(
-        String(err),
-        { status: 500 }
-      );
+      return NextResponse.json({ error: err.message }, { status: 500 });
+    } else {
+      return NextResponse.json(String(err), { status: 500 });
     }
-}}
+  }
+}
