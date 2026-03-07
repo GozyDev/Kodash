@@ -41,6 +41,7 @@ export async function updateSession(request: NextRequest) {
 
   const PUBLIC_PATHS = [
     "/comfirm_email",
+    "/",
     "/dashboard/auth/sign_in",
     "/dashboard/auth/sign_up",
     "/dashboard/auth/callback", // explicit callback
