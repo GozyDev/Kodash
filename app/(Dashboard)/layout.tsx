@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     siteName: "Koadash",
     images: [
       {
-        url: "/openGraph.png", // the image shown in link previews
+        url: "/contract.png", // the image shown in link previews
         width: 1200,
         height: 630,
         alt: "Koadash Platform Logo",

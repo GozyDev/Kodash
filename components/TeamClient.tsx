@@ -4,13 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { UserPlus, Search, LogOut, X } from "lucide-react";
 import Image from "next/image";
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -369,7 +363,9 @@ export default function TeamClient({ orgId }: { orgId: string }) {
                   <label className="text-sm mb-2 block text-textNd">
                     Member role
                   </label>
-                  <p className="border border-cardCB bg-cardICB/10 p-2 rounded text-sm">{role}</p>
+                  <p className="border border-cardCB bg-cardICB/10 p-2 rounded text-sm">
+                    {role}
+                  </p>
                 </div>
 
                 <div>
