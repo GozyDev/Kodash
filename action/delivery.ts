@@ -27,9 +27,7 @@ export async function submitDelivery(taskId: string, data: DeliveryData) {
     const { message, attachments, links } = data;
 
     if (!message && attachments.length === 0 && links.length === 0) {
-      throw new Error(
-        "Please provide at least a message, attachment, or link"
-      );
+      throw new Error("Please provide at least a message, attachment, or link");
     }
 
     // Get task to verify permissions and get tenant_id
@@ -39,7 +37,7 @@ export async function submitDelivery(taskId: string, data: DeliveryData) {
       .eq("id", taskId)
       .single();
 
-      console.log("Request",taskId)
+    console.log("Request", taskId);
     if (taskError || !taskData) {
       console.log(taskError);
       throw new Error("Task not found");
@@ -97,13 +95,26 @@ export async function submitDelivery(taskId: string, data: DeliveryData) {
         links: filteredLinks,
       });
 
-      console.log(attachments)
-
     if (deliveryError) {
       console.error("Failed to create delivery record:", deliveryError);
-      // Don't fail - task status already updated
     }
 
+    const { error: paymentUpdateError } = await supabase
+      .from("payments")
+      .update({
+        delivered_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("issueId", taskId)
+      .eq("status", "held"); // Only update the money currently in escrow
+
+    if (paymentUpdateError) {
+      console.error(
+        "Warning: Payment delivery timestamp failed to update:",
+        paymentUpdateError,
+      );
+    }
+    // --- NEW LOGIC ENDS HERE ---
     // // Create attachment records if any
     // if (attachments.length > 0) {
     //   const attachmentRecords = attachments.map((att) => ({
