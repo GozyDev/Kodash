@@ -17,6 +17,8 @@ import Image from "next/image";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import WriteProposalDialog from "./WriteProposalDialog";
 import { DeliveryLinks } from "./DeliveryLinks";
+import { getPayoutTiming } from "@/action/get-payout-timing";
+import PayoutCountdown from "./PayoutCountdown";
 
 // Small helper component for description viewing/editing
 function DescriptionViewer({
@@ -80,7 +82,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
   const [issue, setIssue] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
   const [proposal, setProposal] = useState<Proposal[] | null>(null);
-  console.log(proposal);
+   const [payoutDeadline, setPayoutDeadline] = useState<string | null>(null);
   const [attachments, setAttachments] = useState<
     {
       file_url: string;
@@ -497,6 +499,14 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
     return !hasActiveOrPending;
   }, [userRole, proposal, stripeOnboardingStatus]);
 
+   useEffect(() => {
+      if (userRole === "client" && issue?.status === "delivered") {
+        getPayoutTiming(issue.id).then((data) => {
+          if (data) setPayoutDeadline(data.autoPayoutAt);
+        });
+      }
+    }, [issue?.id, issue?.status, userRole])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[90vh]">
@@ -755,6 +765,8 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
               Write Proposal
             </button>
           )}
+
+          {payoutDeadline && <PayoutCountdown deadline={payoutDeadline} className="flex-col gap-1 " />}
         </aside>
       </div>
     </div>

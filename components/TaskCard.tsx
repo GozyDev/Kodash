@@ -7,10 +7,13 @@ import { Calendar } from "lucide-react";
 import PriorityCard from "./piortyCard";
 import StatusCard from "./StatusCard";
 import { displayStatusForTaskCard } from "@/lib/status";
+import { getPayoutTiming } from "@/action/get-payout-timing";
+import PayoutCountdown from "./PayoutCountdown";
 
 import { useOrgIdStore } from "@/app/store/useOrgId";
 
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface TaskCardProps {
   task: Task;
@@ -18,11 +21,18 @@ interface TaskCardProps {
 }
 
 export default function TaskCard({ task, userRole }: TaskCardProps) {
-  const router = useRouter();
+  const [payoutDeadline, setPayoutDeadline] = useState<string | null>(null);
   
+  useEffect(() => {
+    if (userRole === "client" && task.status === "delivered") {
+      getPayoutTiming(task.id).then((data) => {
+        if (data) setPayoutDeadline(data.autoPayoutAt);
+      });
+    }
+  }, [task.id, task.status, userRole]);
+  const router = useRouter();
 
   const orgId = useOrgIdStore((state) => state.orgId);
-  
 
   const getStatusColor = (status: Task["status"]) => {
     const normalized = displayStatusForTaskCard(status);
@@ -101,13 +111,8 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
               {task.description}
             </p>
           )}
-          {task.due_date && (
-            <div className="flex items-center mt-2 text-sm text-textNd">
-              <Calendar className="w-4 h-4 mr-1" />
-              {new Date(task.due_date).toLocaleDateString()}
-            </div>
-          )}
-          {/* Only show "Write Proposal" for freelancers on draft requests */}
+          {payoutDeadline && <PayoutCountdown deadline={payoutDeadline} className=" items-center gap-5" />}
+          
         </div>
       </div>
     </motion.div>
