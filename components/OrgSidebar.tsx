@@ -88,7 +88,14 @@ export function OrgSidebar({
       collapsible="icon"
     >
       <SidebarHeader className="text-textNa flex flex-row py-3 md:hidden items-center">
-        <Image src="/Logo.png" alt="KodashLogo" width={45} height={45}></Image>
+        <Link href="/">
+          <Image
+            src="/Logo.png"
+            alt="KodashLogo"
+            width={45}
+            height={45}
+          ></Image>
+        </Link>
         <p className=" uppercase">kodash</p>
       </SidebarHeader>
       <div className="border-b border-b-cardCB md:hidden"></div>

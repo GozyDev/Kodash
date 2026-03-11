@@ -3,6 +3,7 @@ import Image from "next/image";
 import DropDownContent from "./DropDownContent";
 import User from "./User";
 import { SidebarTrigger } from "./ui/sidebar";
+import Link from "next/link";
 
 type Org = { id: string; name: string; plan?: string };
 
@@ -17,13 +18,15 @@ export default function OrgHeader({
     <header className="fixed top-0 left-0 w-full flex justify-between items-center  text-neutral-100 px-2 py-3 border-b border-cardCB/80 bg-bgPrimary/90 backdrop-blur-2xl">
       <div className="flex items-center gap-1">
         <div className="">
-          <Image
-            src="/Logo.png"
-            alt="Supabase Logo"
-            width={35}
-            height={35}
-            className="text-white"
-          />
+          <Link href="/">
+            <Image
+              src="/Logo.png"
+              alt="Supabase Logo"
+              width={35}
+              height={35}
+              className="text-white"
+            />
+          </Link>
         </div>
 
         <div className="flex items-center gap-1">
