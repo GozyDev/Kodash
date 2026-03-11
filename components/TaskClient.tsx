@@ -13,6 +13,7 @@ import { RealtimeChannel } from "@supabase/supabase-js";
 import Image from "next/image";
 
 import { createBrowserClient } from "@supabase/ssr";
+import { FilePenLine } from "lucide-react";
 
 export default function TaskClient({
   orgId,
@@ -248,10 +249,10 @@ export default function TaskClient({
 
         {userRole === "client" && (
           <button
-            className="butt  px-4 rounded"
+            className="butt  px-4 py-1.5 rounded"
             onClick={() => setIsDrawerOpen(true)}
           >
-            +
+           <FilePenLine size={15}/>
           </button>
         )}
       </div>
