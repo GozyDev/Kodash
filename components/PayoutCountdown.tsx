@@ -7,9 +7,11 @@ import { useState, useEffect } from "react";
 export default function PayoutCountdown({
   deadline,
   className,
+  outer
 }: {
   deadline: string;
   className: string;
+  outer: string;
 }) {
   const [timeLeft, setTimeLeft] = useState("");
   const [isExpired, setIsExpired] = useState(false);
@@ -48,7 +50,7 @@ export default function PayoutCountdown({
 
   return (
     <div
-      className={`mt-5   flex flex-col gap-2 bg-cardC/0  text-sm border-t border-t-cardCB pt-3 ${
+      className={`mt-5 ${outer}  flex flex-col gap-2 bg-cardC/0  text-sm  ${
         isExpired ? "border-red-200" : ""
       }`}
     >
