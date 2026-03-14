@@ -31,7 +31,8 @@ export default function TaskList({
       "on-going": [],
       deliver: [],
       complete: [],
-      cancel: [],
+      disputed: [],
+      "on-revision":[]
     };
 
     for (const t of tasks) {
@@ -60,6 +61,11 @@ export default function TaskList({
         key: "deliver" as Task["status"],
         label: "Delivered",
         items: byStatus["deliver"],
+      },
+      {
+        key: "on-revision" as Task["status"],
+        label: "Onrevision",
+        items: byStatus["on-revision"],
       },
       {
         key: "complete" as Task["status"],

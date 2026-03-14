@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,8 +13,6 @@ import { submitDelivery } from "@/action/delivery";
 import { presentToPast, displayStatusForStatusCard } from "@/lib/status";
 import ConfirmStatusChangeDialog from "@/components/ConfirmStatusChangeDialog";
 import DeliveryDetailsDialog from "@/components/DeliveryDetailsDialog";
-
-
 
 // const statusData: StatusData[] = [
 //   {
@@ -214,7 +212,25 @@ const getStatusImage = (status: Task["status"]) => {
         </svg>
       );
 
-    case "cancel":
+    case "on-revision":
+      return (
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#F59E0B"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="M16 8v4h-4"></path>
+          <path d="M8 16v-4h4"></path>
+        </svg>
+      );
+
+    case "disputed":
       return (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -266,9 +282,8 @@ const StatusCard = ({
   userRole: string;
 }) => {
   const handleOptimisticStatus = useTaskStore(
-    (state) => state.handleOptimisticStatus
+    (state) => state.handleOptimisticStatus,
   );
-  
 
   // Only allow opening the popout when the present-tense status is "on-going"
   const present = displayStatusForStatusCard(status);

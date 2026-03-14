@@ -22,7 +22,7 @@ interface TaskCardProps {
 
 export default function TaskCard({ task, userRole }: TaskCardProps) {
   const [payoutDeadline, setPayoutDeadline] = useState<string | null>(null);
-  
+
   useEffect(() => {
     if (userRole === "client" && task.status === "delivered") {
       getPayoutTiming(task.id).then((data) => {
@@ -45,6 +45,9 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
 
       case "delivered":
         return "border-[#7c3aed]/10 bg-[#7c3aed]/2";
+
+      case "on-revision":
+        return "border-[#F59E0B]/10 bg-[#F59E0B]/2";
 
       case "completed":
         return "border-[#22c55e]/10 bg-[#22c55e]/2";
@@ -111,8 +114,13 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
               {task.description}
             </p>
           )}
-          {payoutDeadline && <PayoutCountdown deadline={payoutDeadline} className=" items-center gap-5" />}
-          
+          {payoutDeadline && (
+            <PayoutCountdown
+              deadline={payoutDeadline}
+              outer="border-t border-t-cardCB pt-3"
+              className=" items-center gap-5"
+            />
+          )}
         </div>
       </div>
     </motion.div>

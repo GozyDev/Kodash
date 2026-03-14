@@ -15,7 +15,9 @@ export type Task = {
     | "complete"
     | "completed"
     | "cancel"
-    | "canceled";
+    | "canceled"
+    | "on-revision"
+    | "disputed";
   due_date: string | null;
   created_at: string;
   updated_at: string;
@@ -49,7 +51,7 @@ export type Workspace = {
   id: string;
   name: string;
   plan?: string;
-  role:"FREELANCER"|"CLIENT"
+  role: "FREELANCER" | "CLIENT";
   created_at?: string;
   created_by?: string | null;
 };
@@ -58,8 +60,8 @@ export interface RequestProposal {
   id: string; // Typically a UUID
   price: number;
   currency?: string;
-  due_date: string ; // ISO date string
-  dod: string ;      // "Definition of Done" or similar text/json
+  due_date: string; // ISO date string
+  dod: string; // "Definition of Done" or similar text/json
   status: "draft" | "pending" | "accepted" | "rejected"; // Replace with your actual status union
 }
 
