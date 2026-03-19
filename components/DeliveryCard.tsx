@@ -41,7 +41,6 @@ export function DeliveryCard({
         </p>
         <DeliveryStatusBadge status={delivery.status} />
       </div>
-
       {/* Message */}
       {delivery.message && (
         <div>
@@ -50,17 +49,21 @@ export function DeliveryCard({
           </p>
         </div>
       )}
-
       {/* Attachments */}
       {delivery.attachments && delivery.attachments.length > 0 && (
         <DeliveryAttachments attachments={delivery.attachments} />
       )}
-
       {/* Links */}
       {delivery.links && delivery.links.length > 0 && (
         <DeliveryLinks links={delivery.links} />
       )}
 
+      {delivery.revision_reason && (
+        <div className="py-2">
+          <h2 className=" uppercase text-sm tracking-tight text-textNc">Revision Reason</h2>
+          <p className="">{delivery.revision_reason}</p>
+        </div>
+      )}
       {/* Action Buttons */}
       {(onApprove || onRequestRevision || onResubmit) && (
         <div className="pt-4 border-t border-cardCB">
