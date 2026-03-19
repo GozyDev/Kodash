@@ -9,7 +9,8 @@ export interface Delivery {
   issueId: string;
   freelancer_id: string;
   message: string | null;
-  status: "pending" | "in_review" | "approved" | "rejected";
+  revision_reason:string
+  status: "pending" | "in_review" | "approved" | "rejected" | "revision";
   attachments: Array<{
     file_id: string;
     file_url: string;
@@ -406,14 +407,15 @@ export async function requestDeliveryRevision(
     const { error: updateError } = await supabase
       .from("deliverables")
       .update({
-        status: "rejected",
+        status: "revision",
         revision_reason: reason,
         updated_at: new Date().toISOString(),
       })
       .eq("id", deliveryId);
 
     if (updateError) {
-      throw new Error("Failed to request revision");
+      console.log(updateError);
+      throw new Error("Failed to request revision", updateError);
     }
 
     return {
