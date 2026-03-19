@@ -141,126 +141,120 @@ export async function POST(req: Request) {
   }
 
   // HANDLE transfer.created - when payment is released to freelancer
-  if (event.type === "transfer.created") {
-    try {
-      const transfer = event.data.object as Stripe.Transfer;
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      );
-
-      // Extract metadata from transfer
-      interface TransferMetadata {
-        issueId: string;
-        proposalId: string;
-        deliveryId: string;
-        orgId: string;
-        freelancerId: string;
-        grossAmount?: string;
-        stripeFee?: string;
-        platformFee?: string;
-        netAmount?: string;
-        freelancerAmount?: string;
-      }
-
-      const metadata = transfer.metadata as unknown as TransferMetadata;
-
-      const {
-        grossAmount,
-        stripeFee,
-        netAmount,
-        freelancerAmount,
-        issueId,
-        proposalId,
-        orgId,
-        platformFee,
-      } = metadata;
-
-      if (
-        grossAmount == null ||
-        stripeFee == null ||
-        platformFee == null ||
-        freelancerAmount == null ||
-        netAmount === null ||
-        issueId === null ||
-        proposalId === null ||
-        orgId === null
-      ) {
-        throw new Error("metadata missing");
-      }
-
-      // 1. Update deliverable status to "approved" (if not already)
-      const { error: updateDeliverableError } = await supabase
-        .from("deliverables")
-        .update({ status: "approved" })
-        .eq("id", metadata.deliveryId);
-
-      if (updateDeliverableError) {
-        console.log("Failed to update deliverable:", updateDeliverableError);
-      }
-
-      // 2. Update task status to "completed"
-      const { error: updateTaskError } = await supabase
-        .from("tasks")
-        .update({ status: "completed", updated_at: new Date().toISOString() })
-        .eq("id", metadata.issueId);
-
-      if (updateTaskError) {
-        console.log("Failed to update task:", updateTaskError);
-      }
-
-      // 3. Insert new payment record for payout with fee breakdown
-      const payoutAmount = metadata.freelancerAmount
-        ? parseInt(metadata.freelancerAmount)
-        : transfer.amount;
-
-      interface PayoutRecord {
-        amount: number;
-        currency: string;
-        status: "released";
-        type: "payout";
-        issueId: string;
-        proposal_id: string;
-        stripe_payment_id: string;
-        orgId: string;
-        stripe_fee?: string;
-        platform_fee?: string;
-        gross_amount?: string;
-        net_amount?: string;
-        freelancer_pending_amount: string;
-      }
-
-      const payoutRecord: PayoutRecord = {
-        amount: payoutAmount,
-        currency: transfer.currency,
-        status: "released",
-        type: "payout",
-        issueId: issueId,
-        proposal_id: proposalId,
-        stripe_payment_id: transfer.id,
-        orgId: orgId,
-        gross_amount: grossAmount,
-        stripe_fee: stripeFee,
-        platform_fee: platformFee,
-        net_amount: netAmount,
-        freelancer_pending_amount: freelancerAmount,
-      };
-
-      const { error: insertPaymentError } = await supabase
-        .from("payments")
-        .insert(payoutRecord);
-
-      if (insertPaymentError) {
-        console.log("Failed to insert payout record:", insertPaymentError);
-      } else {
-        console.log(
-          `✅ Transfer ${transfer.id} completed - payout record created for issue ${metadata.issueId}`,
+    if (event.type === "transfer.created") {
+      console.log("EVENT TYPE:", event.type);
+      console.log("TRANSFER:", event.data.object);
+      console.log("METADATA:", event.data.object.metadata);
+      try {
+        const transfer = event.data.object as Stripe.Transfer;
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!,
         );
+
+        // Extract metadata from transfer
+        interface TransferMetadata {
+          issueId: string;
+          proposalId: string;
+          deliveryId: string;
+          orgId: string;
+          freelancerId: string;
+          grossAmount?: string;
+          stripeFee?: string;
+          platformFee?: string;
+          netAmount?: string;
+          freelancerAmount?: string;
+        }
+
+        const metadata = transfer.metadata as unknown as TransferMetadata;
+
+        const {
+          grossAmount,
+          stripeFee,
+          netAmount,
+          freelancerAmount,
+          issueId,
+          proposalId,
+          orgId,
+          platformFee,
+        } = metadata;
+
+        if (
+          !grossAmount ||
+          !stripeFee ||
+          !platformFee ||
+          !freelancerAmount ||
+          !netAmount ||
+          !issueId ||
+          !proposalId ||
+          !orgId
+        ) {
+          console.log("TRANSFER METADATA:", transfer.metadata);
+          throw new Error("metadata missing");
+        }
+
+        // 2. Update task status to "completed"
+        const { error: updateTaskError } = await supabase
+          .from("tasks")
+          .update({ status: "completed", updated_at: new Date().toISOString() })
+          .eq("id", issueId);
+
+        if (updateTaskError) {
+          console.log("Failed to update task:", updateTaskError);
+        }
+
+        // 3. Insert new payment record for payout with fee breakdown
+        const payoutAmount = metadata.freelancerAmount
+          ? parseInt(freelancerAmount)
+          : transfer.amount;
+
+        interface PayoutRecord {
+          amount: number;
+          currency: string;
+          status: "released";
+          type: "payout";
+          issueId: string;
+          proposal_id: string;
+          stripe_payment_id: string;
+          orgId: string;
+          stripe_fee?: string;
+          platform_fee?: string;
+          gross_amount?: string;
+          net_amount?: string;
+          freelancer_pending_amount: string;
+        }
+
+        const payoutRecord: PayoutRecord = {
+          amount: payoutAmount,
+          currency: transfer.currency,
+          status: "released",
+          type: "payout",
+          issueId: issueId,
+          proposal_id: proposalId,
+          stripe_payment_id: transfer.id,
+          orgId: orgId,
+          gross_amount: grossAmount,
+          stripe_fee: stripeFee,
+          platform_fee: platformFee,
+          net_amount: netAmount,
+          freelancer_pending_amount: freelancerAmount,
+        };
+
+        const { error: insertPaymentError } = await supabase
+          .from("payments")
+          .insert(payoutRecord);
+
+        if (insertPaymentError) {
+          console.log("Failed to insert payout record:", insertPaymentError);
+        } else {
+          console.log(
+            `✅ Transfer ${transfer.id} completed - payout record created for issue ${metadata.issueId}`,
+          );
+        }
+      } catch (err) {
+        console.log("Error handling transfer.created webhook", err);
       }
-    } catch (err) {
-      console.log("Error handling transfer.created webhook", err);
     }
-  }
 
   // HANDLE charge.succeeded
   if (event.type === "charge.succeeded") {
