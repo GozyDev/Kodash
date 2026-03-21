@@ -418,6 +418,13 @@ export async function requestDeliveryRevision(
       throw new Error("Failed to request revision", updateError);
     }
 
+      const { data: paymentData, error: paymentError } = await supabase
+      .from("payments")
+      .update({delivered_at:null})
+      .eq("issueId", taskId)
+      .eq("type", "funding")
+      .eq("status", "held")
+      .single();
     return {
       success: true,
       message: "Revision requested",
