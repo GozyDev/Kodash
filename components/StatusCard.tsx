@@ -287,7 +287,7 @@ const StatusCard = ({
 
   // Only allow opening the popout when the present-tense status is "on-going"
   const present = displayStatusForStatusCard(status);
-  const enabled = present === "on-going" && userRole === "freelancer";
+  const enabled = present === "on-going" || present === "on-revision" && userRole === "freelancer";
   const [open, setOpen] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [deliveryDialogOpen, setDeliveryDialogOpen] = useState(false);
@@ -399,7 +399,7 @@ const StatusCard = ({
               Deliver
             </DropdownMenuItem>
 
-            <DropdownMenuItem
+            {/* <DropdownMenuItem
               className={`text-[12px] tracking-widest text-textNc flex items-center gap-2 ${
                 enabled ? "" : "opacity-50 cursor-not-allowed"
               }`}
@@ -429,7 +429,7 @@ const StatusCard = ({
                 </svg>
               </span>
               Cancel
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
           </>
         </DropdownMenuContent>
       </DropdownMenu>
