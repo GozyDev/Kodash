@@ -76,7 +76,9 @@ const ConfirmRevisionDialog = ({
           <p className="text-sm text-textNb">{content.note}</p>
         </div>
 
-        {error ? <p className="text-sm text-red-500">{error}</p> : null}
+        {error ? (
+          <p className="text-sm text-red-500">{error}</p>
+        ) : null}
 
         <DialogFooter className="gap-2 sm:gap-0">
           <Button
