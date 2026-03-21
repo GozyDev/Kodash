@@ -9,8 +9,8 @@ export interface Delivery {
   issueId: string;
   freelancer_id: string;
   message: string | null;
-  revision_reason:string
-  status: "pending" | "in_review" | "approved" | "rejected" | "revision";
+  revision_reason: string;
+  status: "pending" | "in_review" | "approved" | "disputed" | "revision" | "accepted_revision";
   attachments: Array<{
     file_id: string;
     file_url: string;
@@ -421,6 +421,82 @@ export async function requestDeliveryRevision(
     return {
       success: true,
       message: "Revision requested",
+    };
+  } catch (err: unknown) {
+    console.error("Request revision error:", err);
+    if (err instanceof Error) {
+      throw err;
+    }
+    throw new Error("Request revision failed with an unknown error");
+  }
+}
+
+export async function RequestRevisionAction(
+  deliveryId: string,
+  taskId: string,
+  action: "accept" | "reject",
+) {
+  try {
+    const supabase = await createClient();
+
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError || !authData.user) {
+      throw new Error("Unauthorized");
+    }
+
+    const { data: taskData, error: taskError } = await supabase
+      .from("tasks")
+      .select("tenant_id")
+      .eq("id", taskId)
+      .single();
+
+    if (taskError || !taskData) {
+      throw new Error("Task not found");
+    }
+
+    const userRole = await getUserRole(authData.user.id, taskData.tenant_id);
+
+    if (userRole !== "FREELANCER") {
+      throw new Error("This operation belongs to the freelancer");
+    }
+
+    const nextStatus = action === "reject" ? "disputed" : "accepted-revision";
+    console.log("Status", nextStatus);
+
+    const { error: updateError } = await supabase
+      .from("deliverables")
+      .update({
+        status: nextStatus,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", deliveryId);
+
+    if (updateError) {
+      console.log(updateError);
+      throw new Error("Failed to update delivery status");
+    }
+
+    if (action === "reject") {
+      const { error: taskUpdateError } = await supabase
+        .from("tasks")
+        .update({
+          status: "disputed",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", taskId);
+
+      if (taskUpdateError) {
+        console.log(taskUpdateError);
+        throw new Error("Failed to update task status");
+      }
+    }
+
+    return {
+      success: true,
+      message:
+        action === "reject"
+          ? "Revision rejected and delivery disputed"
+          : "Revision accepted and delivery moved forward",
     };
   } catch (err: unknown) {
     console.error("Request revision error:", err);
