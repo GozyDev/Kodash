@@ -11,14 +11,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  CheckCircle2,
-  MessageSquare,
-  Check,
-  X,
-} from "lucide-react";
+import { CheckCircle2, MessageSquare, Check, X } from "lucide-react";
 import { ReleaseFundsDialog } from "./ReleaseFundsDialog";
 import ConfirmRevisionDialog from "./ConfirmRevisionDialog";
+import {RequestRevisionAction} from "@/action/deliveries";
 
 interface DeliveryActionButtonsProps {
   deliveryId: string;
@@ -37,12 +33,14 @@ export function DeliveryActionButtons({
   userRole,
   onApprove,
   onRequestRevision,
-  onResubmit,
 }: DeliveryActionButtonsProps) {
   const [revisionDialogOpen, setRevisionDialogOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
-  const [revisionActionDialogOpen, setRevisionActionDialogOpen] = useState(false);
-  const [revisionAction, setRevisionAction] = useState<"reject" | "accept" | null>(null);
+  const [revisionActionDialogOpen, setRevisionActionDialogOpen] =
+    useState(false);
+  const [revisionAction, setRevisionAction] = useState<
+    "reject" | "accept" | null
+  >(null);
 
   const [revisionReason, setRevisionReason] = useState("");
   const [approving, setApproving] = useState(false);
@@ -50,6 +48,7 @@ export function DeliveryActionButtons({
   const [paymentAmount, setPaymentAmount] = useState<number | null>(null);
   const [approvalError, setApprovalError] = useState<string | null>(null);
   const [loadingAmount, setLoadingAmount] = useState(false);
+  const [loadingRevision, setLoadingRevision] = useState(false);
 
   const isClient = userRole?.toUpperCase() === "CLIENT";
   const isFreelancer = userRole?.toUpperCase() === "FREELANCER";
@@ -112,6 +111,20 @@ export function DeliveryActionButtons({
     }
   };
 
+  const handleRequestRevisionAction = async () => {
+    if (!revisionAction || !RequestRevisionAction) return;
+
+    setLoadingRevision(true);
+    try {
+      await RequestRevisionAction(deliveryId, taskId, revisionAction);
+      setRevisionActionDialogOpen(false);
+    } catch (error) {
+      console.error("Revision action failed:", error);
+    } finally {
+      setLoadingRevision(false);
+    }
+  };
+
   if (isFreelancer) {
     if (status === "revision") {
       return (
@@ -144,7 +157,8 @@ export function DeliveryActionButtons({
             open={revisionActionDialogOpen}
             onOpenChange={setRevisionActionDialogOpen}
             action={revisionAction ?? "reject"}
-            onConfirm={onResubmit}
+            onConfirm={handleRequestRevisionAction}
+            loading={loadingRevision}
           />
         </>
       );
