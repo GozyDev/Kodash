@@ -460,7 +460,7 @@ export async function RequestRevisionAction(
       throw new Error("This operation belongs to the freelancer");
     }
 
-    const nextStatus = action === "reject" ? "disputed" : "accepted-revision";
+    const nextStatus = action === "reject" ? "disputed" : "accepted_revision";
     console.log("Status", nextStatus);
 
     const { error: updateError } = await supabase
