@@ -450,6 +450,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
           },
           (payload) => {
             const updatedDelivery = payload.new as Delivery;
+            
 
             setDeliveries((prev) =>
               prev.map((d) => (d.id === updatedDelivery.id ? updatedDelivery : d)),
@@ -715,7 +716,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
           )}
         </div>
 
-        <aside className="space-y-4  h-max p-4  lg:p-0 sticky top-[68px] right-[10px] flex lg:flex-col items-center  border-b border-b-cardCB md:border-none gap-3 bg-bgPrimary/90 backdrop-blur-2xl flex-wrap">
+        <aside className="space-y-4  h-max p-4  lg:p-0 sticky top-[61px] right-[10px] flex lg:flex-col items-center  border-b border-b-cardCB md:border-none gap-3 bg-bgPrimary/90 backdrop-blur-2xl flex-wrap">
           <section className="rounded border border-cardCB bg-cardC p-2 w-max md:w-full m-0">
             <div className="flex items-center justify-between">
               <p className=" capitalize ">{issue.status}</p>
@@ -766,7 +767,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
             </button>
           )}
 
-          {payoutDeadline && <PayoutCountdown deadline={payoutDeadline} className="flex-col gap-1 " />}
+          {payoutDeadline && <PayoutCountdown deadline={payoutDeadline} outer="te" className="flex-row gap-3 md:gap-1 md:flex-col " />  }
         </aside>
       </div>
     </div>
