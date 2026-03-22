@@ -3,7 +3,6 @@
 
 import { Task } from "@/lib/superbase/type";
 import { motion } from "framer-motion";
-import { Calendar } from "lucide-react";
 import PriorityCard from "./piortyCard";
 import StatusCard from "./StatusCard";
 import { displayStatusForTaskCard } from "@/lib/status";
