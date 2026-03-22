@@ -1,6 +1,6 @@
 "use client";
 
-export type PaymentStatus = "held" | "releasing" | "released";
+export type PaymentStatus = "held" | "releasing" | "released" |"disputed";
 
 interface StatusBadgeProps {
   status: PaymentStatus;
@@ -21,6 +21,12 @@ const statusConfig: Record<PaymentStatus, { label: string; bgColor: string; text
     label: "Released",
     bgColor: "bg-green-500/20",
     textColor: "text-green-300",
+  },
+
+   disputed: {
+    label: "Disputed",
+    bgColor: "bg-red-500/20",
+    textColor: "text-red-300",
   },
 };
 
