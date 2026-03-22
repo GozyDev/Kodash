@@ -52,7 +52,7 @@ export default function TaskCard({ task, userRole }: TaskCardProps) {
       case "completed":
         return "border-[#22c55e]/10 bg-[#22c55e]/2";
 
-      case "canceled":
+      case "disputed":
         return "border-[#ef4444]/10 bg-[#ef4444]/2";
 
       default:
