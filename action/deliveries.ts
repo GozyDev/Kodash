@@ -10,7 +10,13 @@ export interface Delivery {
   freelancer_id: string;
   message: string | null;
   revision_reason: string;
-  status: "pending" | "in_review" | "approved" | "disputed" | "revision" | "accepted_revision";
+  status:
+    | "pending"
+    | "in_review"
+    | "approved"
+    | "disputed"
+    | "revision"
+    | "accepted_revision";
   attachments: Array<{
     file_id: string;
     file_url: string;
@@ -418,13 +424,17 @@ export async function requestDeliveryRevision(
       throw new Error("Failed to request revision", updateError);
     }
 
-      const { data: paymentData, error: paymentError } = await supabase
+    const { error: paymentError } = await supabase
       .from("payments")
-      .update({delivered_at:null})
+      .update({ delivered_at: null })
       .eq("issueId", taskId)
       .eq("type", "funding")
       .eq("status", "held")
       .single();
+
+    if (paymentError) {
+      throw new Error("Failed to update payment record", paymentError);
+    }
     return {
       success: true,
       message: "Revision requested",
@@ -447,30 +457,72 @@ export async function RequestRevisionAction(
     const supabase = await createClient();
 
     const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
-      throw new Error("Unauthorized");
-    }
+    if (authError || !authData.user) throw new Error("Unauthorized");
 
+    // 1. Verify Task & Get Tenant
     const { data: taskData, error: taskError } = await supabase
       .from("tasks")
       .select("tenant_id")
       .eq("id", taskId)
       .single();
 
-    if (taskError || !taskData) {
-      throw new Error("Task not found");
-    }
+    if (taskError || !taskData) throw new Error("Task not found");
 
+    // 2. Permission Check (Freelancer Only)
     const userRole = await getUserRole(authData.user.id, taskData.tenant_id);
+    if (userRole !== "FREELANCER")
+      throw new Error("Unauthorized: Freelancer only");
 
-    if (userRole !== "FREELANCER") {
-      throw new Error("This operation belongs to the freelancer");
+    // 3. Logic for REJECTION (Creating the Dispute Ledger)
+    if (action === "reject") {
+      const Disputed = new Date().toISOString();
+      // A. Fetch the original 'held' funding record to get the financial breakdown
+      const { data: originalPayment, error: fetchError } = await supabase
+        .from("payments")
+        .select("*")
+        .eq("issueId", taskId)
+        .eq("type", "funding")
+        .eq("status", "held")
+        .single();
+
+      if (fetchError || !originalPayment) {
+        throw new Error(
+          "Could not find the original funding record to dispute",
+        );
+      }
+
+      // B. Insert the NEW record (The Dispute Ledger Entry)
+      // We destructure 'id' and 'created_at' so Supabase generates new ones
+      const { id, created_at, updated_at, ...paymentDetails } = originalPayment;
+
+      const { error: insertError } = await supabase.from("payments").insert({
+        ...paymentDetails,
+        type: "dispute", // Mark this as a dispute record
+        status: "disputed", // This record status is disputed
+        created_at: new Date().toISOString(),
+        disputed_at: Disputed,
+      });
+
+      if (insertError) throw new Error("Failed to create dispute record");
+
+      // C. Update the original payment status so it's ignored by the Auto-Payout Cron
+      await supabase
+        .from("payments")
+        .update({ disputed_at: Disputed })
+        .eq("id", originalPayment.id)
+        .eq("type", "funding")
+        .eq("status", "held");
+
+      // D. Update Task Status
+      await supabase
+        .from("tasks")
+        .update({ status: "disputed", updated_at: new Date().toISOString() })
+        .eq("id", taskId);
     }
 
+    // 4. Update the Deliverable Status
     const nextStatus = action === "reject" ? "disputed" : "accepted_revision";
-    console.log("Status", nextStatus);
-
-    const { error: updateError } = await supabase
+    const { error: updateDelError } = await supabase
       .from("deliverables")
       .update({
         status: nextStatus,
@@ -478,38 +530,14 @@ export async function RequestRevisionAction(
       })
       .eq("id", deliveryId);
 
-    if (updateError) {
-      console.log(updateError);
-      throw new Error("Failed to update delivery status");
-    }
-
-    if (action === "reject") {
-      const { error: taskUpdateError } = await supabase
-        .from("tasks")
-        .update({
-          status: "disputed",
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", taskId);
-
-      if (taskUpdateError) {
-        console.log(taskUpdateError);
-        throw new Error("Failed to update task status");
-      }
-    }
+    if (updateDelError) throw new Error("Failed to update delivery status");
 
     return {
       success: true,
-      message:
-        action === "reject"
-          ? "Revision rejected and delivery disputed"
-          : "Revision accepted and delivery moved forward",
+      message: action === "reject" ? "Dispute opened" : "Revision accepted",
     };
   } catch (err: unknown) {
     console.error("Request revision error:", err);
-    if (err instanceof Error) {
-      throw err;
-    }
-    throw new Error("Request revision failed with an unknown error");
+    throw err instanceof Error ? err : new Error("Operation failed");
   }
 }
