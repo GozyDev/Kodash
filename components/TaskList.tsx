@@ -32,7 +32,7 @@ export default function TaskList({
       deliver: [],
       complete: [],
       disputed: [],
-      "on-revision":[]
+      "on-revision": [],
     };
 
     for (const t of tasks) {
@@ -68,14 +68,14 @@ export default function TaskList({
         items: byStatus["on-revision"],
       },
       {
+        key: "disputed" as Task["status"],
+        label: "Disputed",
+        items: byStatus["disputed"],
+      },
+      {
         key: "complete" as Task["status"],
         label: "Completed",
         items: byStatus["complete"],
-      },
-      {
-        key: "cancel" as Task["status"],
-        label: "Cancelled",
-        items: byStatus["cancel"],
       },
     ];
   }, [tasks]);
