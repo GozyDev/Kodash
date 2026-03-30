@@ -6,21 +6,25 @@ interface StatCardProps {
   description: string;
   icon: React.ReactNode;
   variant: "success" | "warning";
+  showBadge?: boolean;
 }
 
-export function StatCard({ title, amount, description, icon, variant }: StatCardProps) {
+export function StatCard({ title, amount, description, icon, variant, showBadge = true }: StatCardProps) {
   return (
     <div className="bg-cardC/50 border border-cardCB rounded-2xl p-6 shadow-sm">
       <div className="flex justify-between items-start mb-4">
         <div className="p-2 rounded-lg bg-white/5 border border-white/10">
           {icon}
         </div>
-        <span className={cn(
-          "text-[13px] uppercase font-bold  px-2 py-0.5 rounded-full tracking-widest",
-          variant === "success" ? "bg-emerald-500/10 text-emerald-500" : "bg-amber-500/10 text-amber-500"
-        )}>
-          {variant === "success" ? "Vault" : "Processing"}
-        </span>
+        {showBadge && (variant === "warning" ? (
+          <span className="text-[13px] uppercase font-bold px-2 py-0.5 rounded-full tracking-widest bg-purple-500/10 text-purple-500">
+            Released
+          </span>
+        ) : (
+          <span className="text-[13px] uppercase font-bold px-2 py-0.5 rounded-full tracking-widest bg-emerald-500/10 text-emerald-500">
+            Vault
+          </span>
+        ))}
       </div>
       <div>
         <p className="text text-textNd font-medium">{title}</p>
