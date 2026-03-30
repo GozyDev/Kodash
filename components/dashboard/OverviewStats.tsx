@@ -86,7 +86,7 @@ export default async function OverviewStats({ orgId }: OverviewStatsProps) {
         amount={formatCurrency(payoutMadeCents)}
         description="Released payouts completed"
         icon={<Wallet className="text-purple-500" />}
-        variant="warning"
+        variant="released"
       />
     </div>
   );

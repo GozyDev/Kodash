@@ -67,7 +67,7 @@ export async function PaymentStats({ orgId }: { orgId: string }) {
                 amount={formatCurrency(releasingCents)}
                 description="Awaiting bank processing"
                 icon={<Clock className="text-amber-500" />}
-                variant="warning"
+                variant="pending"
             />
         </div>
     );
