@@ -17,7 +17,6 @@ export const presentToPast = (status: string) => {
     case "draft":
       return "draft";
     case "on-going":
-    case "ongoing":
       return "on-going";
     default:
       return status;
@@ -42,7 +41,6 @@ export const pastToPresent = (status: string) => {
     case "draft":
       return "draft";
     case "on-going":
-    case "ongoing":
       return "on-going";
     default:
       return status;

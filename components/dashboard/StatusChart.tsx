@@ -16,7 +16,7 @@ import { statusIconFromPresent } from "@/components/StatusCard";
 type StatusKey =
   | "draft"
   | "proposed"
-  | "ongoing"
+  | "on-going"
   | "delivered"
   | "on-revision"
   | "disputed"
@@ -36,7 +36,7 @@ type StatusChartProps = {
 const STATUS_COLORS: Record<StatusKey, string> = {
   draft: "#94a3b8",
   proposed: "#f97316",
-  ongoing: "#3b82f6",
+  "on-going": "#3b82f6",
   delivered: "#a855f7",
   "on-revision": "#f59e0b",
   disputed: "#ef4444",
@@ -46,7 +46,7 @@ const STATUS_COLORS: Record<StatusKey, string> = {
 const chartConfig = {
   draft: { label: "Draft", color: STATUS_COLORS.draft },
   proposed: { label: "Proposed", color: STATUS_COLORS.proposed },
-  ongoing: { label: "Ongoing", color: STATUS_COLORS.ongoing },
+  "on-going": { label: "On Going", color: STATUS_COLORS["on-going"] },
   delivered: { label: "Delivered", color: STATUS_COLORS.delivered },
   "on-revision": {
     label: "On Revision",

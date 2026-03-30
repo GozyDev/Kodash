@@ -86,7 +86,7 @@ const STATUS_OPTIONS: StatusOption[] = [
         <circle cx="12" cy="12" r="9" />
       </svg>
     ),
-    label: "Ongoing",
+    label: "On Going",
   },
   {
     value: "delivered",

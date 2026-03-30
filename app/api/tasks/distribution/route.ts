@@ -9,7 +9,7 @@ type StatusCount = {
 const ORDERED_STATUSES = [
   "draft",
   "proposed",
-  "ongoing",
+  "on-going",
   "delivered",
   "on-revision",
   "disputed",
