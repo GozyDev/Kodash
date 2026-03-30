@@ -89,7 +89,7 @@ function StatusChartTooltip({
 
   return (
     <div
-      className="flex items-center gap-2 rounded-lg border border-border/50 bg-background px-3 py-2 text-xs shadow-xl"
+      className="flex items-center gap-2 rounded-lg border border-cardCB bg-cardC px-3 py-2 text-xs shadow-xl"
       style={{ color }}
     >
       {icon ? <span className="inline-flex">{icon}</span> : null}
