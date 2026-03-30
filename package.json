@@ -29,6 +29,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-toastify": "^11.0.5",
+    "recharts": "^3.8.1",
     "resend": "^6.6.0",
     "stripe": "^20.3.0",
     "supabase": "^2.78.1",

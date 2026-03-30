@@ -135,9 +135,7 @@ import DeliveryDetailsDialog from "@/components/DeliveryDetailsDialog";
 //   },
 // ];
 
-const getStatusImage = (status: Task["status"]) => {
-  // ensure we compare using present-tense for selecting images
-  const present = displayStatusForStatusCard(status);
+export const statusIconFromPresent = (present: string) => {
   switch (present) {
     case "draft":
       return (
@@ -270,6 +268,12 @@ const getStatusImage = (status: Task["status"]) => {
     default:
       return null;
   }
+};
+
+const getStatusImage = (status: Task["status"]) => {
+  // ensure we compare using present-tense for selecting images
+  const present = displayStatusForStatusCard(status);
+  return statusIconFromPresent(present);
 };
 
 const StatusCard = ({
