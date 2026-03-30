@@ -1,11 +1,35 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Zap } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleStartWorkspace = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/user");
+      const data = await res.json();
+
+      if (data.user) {
+        // User is logged in, route to dashboard
+        router.push("/dashboard/organizations");
+      } else {
+        // User is not logged in, route to sign in
+        router.push("/dashboard/auth/sign_in");
+      }
+    } catch (error) {
+      // If there's an error, assume not logged in
+      router.push("/dashboard/auth/sign_in");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="">
       {/* Hero Section */}
@@ -53,8 +77,12 @@ export default function HomePage() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="flex flex-col-reverse sm:flex-row gap-4"
             >
-              <button className="w-full sm:w-auto px-8 py-4 butt font-bold rounded-xl transition-all flex items-center justify-center gap-2 group">
-                Start Your Workspace{" "}
+              <button 
+                onClick={handleStartWorkspace}
+                disabled={isLoading}
+                className="w-full sm:w-auto px-8 py-4 butt font-bold rounded-xl transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Loading..." : "Start Your Workspace"}{" "}
                 <ArrowRight
                   size={20}
                   className="group-hover:translate-x-1 transition-transform"
