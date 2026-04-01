@@ -41,7 +41,6 @@ export async function updateSession(request: NextRequest) {
 
   const PUBLIC_PATHS = [
     "/comfirm_email",
-    "/",
     "/dashboard/auth/sign_in",
     "/dashboard/auth/sign_up",
     "/dashboard/auth/callback", // explicit callback
@@ -51,15 +50,18 @@ export async function updateSession(request: NextRequest) {
     "/api/auth", // allow server-side auth API routes
     "/api/auth/", // wildcard
     "/api/auth/google",
-    "/api", // allow other public APIs if needed
+    "/static",
     "/_next", // next internals
     "/favicon.ico",
-    "/static",
     "/invite",
   ];
 
   function isPublic(pathname: string) {
-    return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p));
+    // Exact match for root path only
+    if (pathname === "/") return true;
+    
+    // For other paths, check startsWith to match prefixes
+    return PUBLIC_PATHS.some((p) => pathname.startsWith(p));
   }
 
   if (!user && !isPublic(request.nextUrl.pathname)) {
