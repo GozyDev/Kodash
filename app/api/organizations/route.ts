@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     const { data: tenantData, error: tenantError } = await svc
       .from("tenants")
       .insert({ name, created_by: user.id })
-      .select("id")
+      .select("id")                                 
       .single();
 
     if (tenantError || !tenantData) {
