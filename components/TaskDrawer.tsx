@@ -801,7 +801,7 @@ export default function TaskDrawer({
                   </div>
                 </div>
 
-                <div className="mb-4">
+                {/* <div className="mb-4">
                   <div className="bg-primaryHC/10 h-auto border border-cardCB focus:outline-none px-3 py-1 rounded-md relative">
                     <Input
                       value={aiInput}
@@ -916,7 +916,7 @@ export default function TaskDrawer({
                       )}
                     </div>
                   )}
-                </div>
+                </div> */}
                 {/* Status & Priority Row - Button style like Linear */}
                 <div className="flex items-center gap-2 flex-wrap border-t border-cardCB/80 pt-4 abosolute bottom-0 w-full">
                   {/* Status */}
