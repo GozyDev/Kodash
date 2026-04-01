@@ -50,7 +50,7 @@ export default async function InvitePage({ searchParams }: Props) {
           className="mb-5"
         />
         <h1 className="text-xl font-semibold">Invite expired or invalid</h1>
-        <p className="mt-2">This invite is either invalid or has expired.</p>
+        <p className="mt-2 text-center">This invite is either invalid or has expired.</p>
       </div>
     );
   }
@@ -72,7 +72,7 @@ export default async function InvitePage({ searchParams }: Props) {
         />
         <h1 className="text-xl font-semibold">You&apos;ve been invited</h1>
         <p className="mt-2">Email: {invite.email}</p>
-        <p className="mt-1 capitalize">Resigter to kodask to accept the invitation</p>
+        <p className="mt-1 capitalize text-center">Resigter to kodask to accept the invitation</p>
         <div className="mt-4 space-x-3">
           <a
             href={`/api/auth/google?redirectTo=${redirect}`}
@@ -99,8 +99,8 @@ export default async function InvitePage({ searchParams }: Props) {
         <h1 className="text-xl font-semibold">
           This invite is not for your email
         </h1>
-        <p className="mt-2">Signed in as: {user.email}</p>
-        <p className="mt-1">Invite for: {invite.email}</p>
+        <p className="mt-2 text-center">Signed in as: {user.email}</p>
+        <p className="mt-1 text-center">Invite for: {invite.email}</p>
       </div>
     );
   }
@@ -129,8 +129,8 @@ export default async function InvitePage({ searchParams }: Props) {
         className="mb-5"
       />
       <h1 className="text-xl font-semibold">Accept workspace invite</h1>
-      <p className="mt-2 text-textNb">You are signing in as {user.email}</p>
-      <p className="mt-1 text-textNb">
+      <p className="mt-2 text-textNb text-center">You are signing in as {user.email}</p>
+      <p className="mt-1 text-textNb text-center">
         to {worspaceName} workspace as a {invite.role}
       </p>
       <AcceptButton token={token} />
