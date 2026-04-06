@@ -16,6 +16,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import Image from "next/image";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import WriteProposalDialog from "./WriteProposalDialog";
+import StripeOnboardingRequiredDialog from "./StripeOnboardingRequiredDialog";
 import { DeliveryLinks } from "./DeliveryLinks";
 import { getPayoutTiming } from "@/action/get-payout-timing";
 import PayoutCountdown from "./PayoutCountdown";
@@ -97,6 +98,9 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [deliveriesLoading, setDeliveriesLoading] = useState(true);
   const [releasingFunds] = useState(false);
+  const [showStripeRequiredDialog, setShowStripeRequiredDialog] = useState(false);
+  const [stripeStatus, setStripeStatus] = useState<string | null>(null);
+  const [checkingStripe, setCheckingStripe] = useState(false);
 
   // keep single-source state: `issue` drives all displayed values
 
@@ -482,23 +486,64 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
       if (channel) supabase.removeChannel(channel);
     };
   }, [issueId]);
+
+  // Handler for Write Proposal button: Check Stripe status before opening dialog
+  const handleProposalButtonClick = async () => {
+    console.log("[Write Proposal] Button clicked, starting Stripe check...");
+    setCheckingStripe(true);
+    try {
+      console.log("[Write Proposal] Fetching /api/stripe/check_status...");
+      const res = await fetch("/api/stripe/check_status");
+      const data = await res.json();
+     
+      setStripeStatus(data.status || null);
+
+      // If Stripe is not completed, show the modal instead of opening proposal dialog
+      if (data.status !== "completed") {
+        
+        setShowStripeRequiredDialog(true);
+        return;
+      }
+
+     
+      
+      setOpenProposal(true);
+    } catch (error) {
+      console.error("[Write Proposal] Failed to check Stripe status:", error);
+      // On error, still try to open the proposal dialog (API may fail but user might still be valid)
+      setOpenProposal(true);
+    } finally {
+      setCheckingStripe(false);
+    }
+  };
+
+  const handleStripeRedirect = async () => {
+    
+    try {
+      console.log("[Stripe Modal] Calling /api/stripe/onboard...");
+      const res = await fetch("/api/stripe/onboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ returnTo: window.location.href }),
+      });
+      const data = await res.json();
+      console.log("[Stripe Modal] Onboard response:", data);
+      if (data.url) {
+        console.log("[Stripe Modal] Redirecting to:", data.url);
+        window.location.href = data.url;
+      } else {
+        console.error("[Stripe Modal] No URL in response:", data);
+      }
+    } catch (error) {
+      console.error("[Stripe Modal] Failed to redirect to Stripe onboarding:", error);
+    }
+  };
+
   const canWriteProposal = useMemo(() => {
-    if (userRole !== "freelancer") return false;
-
-    // If Stripe is not completed, cannot write proposal
-    if (stripeOnboardingStatus !== "completed") return false;
-
-    // If there are no proposals at all, they can write one
-    if (!proposal || proposal.length === 0) return true;
-
-    // Check if there are any proposals that are NOT canceled
-    // (i.e., if any are 'pending' or 'accepted', they cannot write a new one)
-    const hasActiveOrPending = proposal.some(
-      (p) => p.status === "pending" || p.status === "accepted",
-    );
-
-    return !hasActiveOrPending;
-  }, [userRole, proposal, stripeOnboardingStatus]);
+    // Only freelancers can write proposals
+    // Stripe validation will happen on button click, not here
+    return userRole === "freelancer";
+  }, [userRole]);
 
    useEffect(() => {
       if (userRole === "client" && issue?.status === "delivered") {
@@ -587,6 +632,14 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
               }}
             />
           </div>
+
+          {/* Stripe Onboarding Dialog - shown when user clicks Write Proposal but hasn't completed Stripe setup */}
+          <StripeOnboardingRequiredDialog
+            open={showStripeRequiredDialog}
+            onOpenChange={setShowStripeRequiredDialog}
+            onContinueToOnboarding={handleStripeRedirect}
+            status={stripeStatus || undefined}
+          />
 
           {/* <CommentSection issueId={issueId} /> */}
 
@@ -744,26 +797,13 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setOpenProposal(true);
+                handleProposalButtonClick();
               }}
+              disabled={checkingStripe}
               onMouseDown={(e) => e.stopPropagation()}
-              className="md:w-full px-2 py-2 butt"
+              className="md:w-full px-2 py-2 butt disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Write Proposal
-            </button>
-          )}
-
-          {userRole === "freelancer" && stripeCheckLoaded && stripeOnboardingStatus !== "completed" && !canWriteProposal && (
-            <button
-              disabled
-              title={
-                stripeOnboardingStatus === "pending"
-                  ? "Complete your Stripe setup to write proposals"
-                  : "Connect your bank account with Stripe to write proposals"
-              }
-              className="md:w-full px-2 py-2 butt opacity-50 cursor-not-allowed"
-            >
-              Write Proposal
+              {checkingStripe ? "Checking..." : "Write Proposal"}
             </button>
           )}
 

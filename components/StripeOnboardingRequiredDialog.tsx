@@ -81,7 +81,7 @@ export default function StripeOnboardingRequiredDialog({
           <Button
             onClick={handleContinue}
             disabled={isLoading}
-            className="flex-1 bg-[#7c3aed] hover:bg-[#7c3aede8] flex items-center justify-center gap-2"
+            className="flex-1 butt flex items-center justify-center gap-2"
           >
             {isLoading ? "Redirecting..." : "Continue to Stripe"}
             {!isLoading && <ArrowRight size={16} />}
