@@ -38,6 +38,7 @@ export function OrgSidebar({
   stripeStatus: string;
 }) {
   const pathname = usePathname();
+  console.log(pathname)
   const basePath =
     role === "freelancer"
       ? `/dashboard/fr-org/${orgId}`

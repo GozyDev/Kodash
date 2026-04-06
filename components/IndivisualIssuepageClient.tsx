@@ -20,6 +20,7 @@ import StripeOnboardingRequiredDialog from "./StripeOnboardingRequiredDialog";
 import { DeliveryLinks } from "./DeliveryLinks";
 import { getPayoutTiming } from "@/action/get-payout-timing";
 import PayoutCountdown from "./PayoutCountdown";
+import { usePathname } from "next/navigation";
 
 // Small helper component for description viewing/editing
 function DescriptionViewer({
@@ -101,6 +102,8 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
   const [showStripeRequiredDialog, setShowStripeRequiredDialog] = useState(false);
   const [stripeStatus, setStripeStatus] = useState<string | null>(null);
   const [checkingStripe, setCheckingStripe] = useState(false);
+
+  const pathname = usePathname()
 
   // keep single-source state: `issue` drives all displayed values
 
@@ -489,10 +492,10 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
 
   // Handler for Write Proposal button: Check Stripe status before opening dialog
   const handleProposalButtonClick = async () => {
-    console.log("[Write Proposal] Button clicked, starting Stripe check...");
+
     setCheckingStripe(true);
     try {
-      console.log("[Write Proposal] Fetching /api/stripe/check_status...");
+  
       const res = await fetch("/api/stripe/check_status");
       const data = await res.json();
      
@@ -524,7 +527,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
       const res = await fetch("/api/stripe/onboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ returnTo: window.location.href }),
+        body: JSON.stringify({ returnTo: pathname}),
       });
       const data = await res.json();
       console.log("[Stripe Modal] Onboard response:", data);

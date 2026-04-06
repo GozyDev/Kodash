@@ -6,6 +6,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { returnTo } = body as { returnTo?: string };
+   
 
     const supabase = await createClient();
     const {
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
     // Build return URL (ensure single slash)
     const prefix = returnTo && returnTo.startsWith("/") ? "" : "/";
     const returnUrl = `${origin}${prefix}${returnTo || ""}${(returnTo || "").includes("?") ? "&" : "?"}stripe_return=true`;
-    console.log(returnUrl)
+ 
 
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
