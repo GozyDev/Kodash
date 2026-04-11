@@ -546,7 +546,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
     // Only freelancers can write proposals
     // Stripe validation will happen on button click, not here
     return userRole === "freelancer" && issue?.status === "draft";
-  }, [userRole]);
+  }, [userRole, issue?.status]);
 
    useEffect(() => {
       if (userRole === "client" && issue?.status === "delivered") {
