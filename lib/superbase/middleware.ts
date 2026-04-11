@@ -54,6 +54,7 @@ export async function updateSession(request: NextRequest) {
     "/_next", // next internals
     "/favicon.ico",
     "/invite",
+    "/privacy",
   ];
 
   function isPublic(pathname: string) {
