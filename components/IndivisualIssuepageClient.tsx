@@ -545,7 +545,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
   const canWriteProposal = useMemo(() => {
     // Only freelancers can write proposals
     // Stripe validation will happen on button click, not here
-    return userRole === "freelancer";
+    return userRole === "freelancer" && issue?.status === "draft";
   }, [userRole]);
 
    useEffect(() => {
