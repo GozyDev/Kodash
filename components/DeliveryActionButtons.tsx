@@ -134,7 +134,7 @@ export function DeliveryActionButtons({
               Revision request has been made on the deliverables
             </p>
 
-            <div className="flex gap-2">
+            <div className="flex-col md:flex-row flex gap-2">
               <Button
                 onClick={() => openRevisionActionDialog("reject")}
                 className="flex items-center gap-2 bg-cardICB/50"
