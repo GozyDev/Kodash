@@ -188,6 +188,7 @@ function getFilteredEmptyMessage(
     held: `No payments in ${statusLabel.toLowerCase()} status.`,
     releasing: `No payments currently pending release.`,
     released: `No payments have been released yet.`,
+    disputed: `No disputed payments found.`,
   };
 
   return (
@@ -201,6 +202,7 @@ function getStatusLabel(status: string | undefined): string {
     held: "Held",
     releasing: "Releasing",
     released: "Released",
+    disputed: "Disputed",
   };
   return labels[status || "all"] || "Unknown";
 }

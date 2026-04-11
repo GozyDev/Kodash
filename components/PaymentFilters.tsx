@@ -47,6 +47,8 @@ export function PaymentFilters({}: PaymentFiltersProps) {
         return "Releasing";
       case "released":
         return "Released";
+        case "disputed":
+        return "Disputed";
       default:
         return "All Statuses";
     }
@@ -136,6 +138,22 @@ export function PaymentFilters({}: PaymentFiltersProps) {
             />
             <span className="inline-block w-2 h-2 rounded-full bg-green-400 mr-2"></span>
             Released
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={() => handleStatusChange("disputed")}
+            className={`cursor-pointer text-sm ${
+              currentStatus === "disputed"
+                ? "bg-red-500/20 text-red-300"
+                : "text-textNc hover:bg-cardCB/50"
+            }`}
+          >
+            <Check
+              size={16}
+              className={`mr-2 ${currentStatus === "disputed" ? "opacity-100" : "opacity-0"}`}
+            />
+            <span className="inline-block w-2 h-2 rounded-full bg-red-400 mr-2"></span>
+            Disputed
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
