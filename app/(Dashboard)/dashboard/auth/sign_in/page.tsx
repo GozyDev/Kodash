@@ -80,6 +80,15 @@ export default function LoginPage() {
             Forgot your password?
           </Link>
         </div>
+
+        <div className="mt-4 text-center">
+          <Link
+            href="/privacy"
+            className="text-sm text-textNc/70 hover:text-primaryC transition-colors"
+          >
+            Privacy Policy
+          </Link>
+        </div>
       </form>
     </div>
   );
