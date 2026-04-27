@@ -28,10 +28,10 @@ const About = () => {
                 {cards.map((card) => (
                     <article
                         key={card.id}
-                        className="rounded-xl border border-cardCB bg-cardC/50 p-6 shadow-sm relative"
+                        className="rounded-xl border border-cardCB bg-cardC/50 p-4 shadow-sm relative"
                     >
                         <p className="mb-3 text-sm font-semibold text-primaryC uppercase">{card.id}</p>
-                        <h3 className="mb-3 text-xl font-bold text-textNc">{card.headline}</h3>
+                        <h3 className="mb-3 text-xl font-medium text-textNc tracking-tighter">{card.headline}</h3>
                         <p className="text-sm leading-6 text-textNd">{card.description}</p>
                         <div className='w-20 h-20 rounded-full bg-primaryC/20    absolute bottom-5  right-10 blur-2xl'></div>
                     </article>
