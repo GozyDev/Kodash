@@ -18,20 +18,20 @@ const FreelancerNext = () => {
             title: 'Define the Work Clearly',
             description:
                 'Defining the work clearly helps both sides understand exactly what needs to be delivered. By submitting a “definition of done,” you set simple and clear expectations before any work starts. This reduces confusion and makes sure everyone is aligned on the final outcome. It also helps the project run more smoothly from beginning to end',
-            image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1200&q=80',
+            image: 'clearly.png',
         },
 
         {
             title: 'Work with Confidence',
             description:
                 'Working with confidence means you can begin a project knowing everything is properly secured from the start. Once the payment is held safely in escrow, you don’t have to worry about whether the funds are available. This creates trust between both parties and allows you to focus fully on delivering good work. It’s a simple way to make the process safer and more reliable for everyone involved.',
-            image: 'inviteMenber.png',
+            image: 'confidence.png',
         },
         {
             title: 'Deliver and Refine',
             description:
                 'Delivering your work is the final step where you share the completed project with the client. If the client requests changes, you can make revisions to ensure everything meets their expectations. This process helps improve the quality of the final result and keeps both sides satisfied. Once the client approves the work, the payment is released, completing the project smoothly.',
-            image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1200&q=80',
+            image: 'Delivery.png',
         },
     ]
     const steps = baseSteps.map((step, index) => ({
@@ -40,11 +40,11 @@ const FreelancerNext = () => {
     }))
 
     return (
-        <div className='space-y-6'>
+        <div className=''>
             {steps.map((step) => (
                 <article
                     key={step.title}
-                    className='grid items-center  md:grid-cols-2 '
+                    className='grid items-center  md:grid-cols-2  '
                 >
                     <div className={step.imagePosition === 'left' ? 'md:order-1' : 'md:order-2'}>
                         <img

@@ -36,8 +36,10 @@ const WhatNext = () => {
                     </button>
                 </div>
             </div>
-            {isClient && <ClientNext />}
-            {isFreelancer && <FreelancerNext />}
+            <div className='pt-5'>
+                {isClient && <ClientNext />}
+                {isFreelancer && <FreelancerNext />}
+            </div>
         </section>
     )
 }

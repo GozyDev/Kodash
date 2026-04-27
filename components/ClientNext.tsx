@@ -39,7 +39,7 @@ const ClientNext = () => {
     }))
 
     return (
-        <div className='space-y-6'>
+        <div className=''>
             {steps.map((step) => (
                 <article
                     key={step.title}
