@@ -23,7 +23,7 @@ const About = () => {
     ]
 
     return (
-        <section className="mx-auto max-w-[1400px] px-4 py-12">
+        <section className="mx-auto max-w-[1400px] px-4 py-12 pt-5">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {cards.map((card) => (
                     <article
