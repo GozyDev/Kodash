@@ -3,6 +3,7 @@
   import HomeNav from "@/components/HomeNav";
 import About from "@/components/About";
 import WhatNext from "@/components/WhatNext";
+import FAQ from "@/components/FAQ";
 
   export default function Home() {
     return (
@@ -12,6 +13,7 @@ import WhatNext from "@/components/WhatNext";
 
         <About />
         <WhatNext />
+        <FAQ />
         <footer className="border-t border-cardCB/50 bg-bgPrimary/80 text-textNc/80 py-6">
           <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 text-center sm:flex-row sm:items-center sm:justify-between">
             <Link

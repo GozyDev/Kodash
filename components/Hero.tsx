@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Zap } from "lucide-react";
+import { ArrowRight, Zap , ArrowDown, Mouse} from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -33,8 +33,8 @@ export default function HomePage() {
   return (
     <div className="">
       {/* Hero Section */}
-      <section className="relative pt-30 pb-20 md:pt-35 md:pb-32 px-6 overflow-hidden">
-        <Image
+      <section className=" pt-30 pb-20 md:pt-69 md:pb-32 px-6 overflow-hidden relative">
+        {/* <Image
           src="/grid.png"
           alt=""
           width={60}
@@ -42,22 +42,24 @@ export default function HomePage() {
           className="w-full absolute opacity-70"
         ></Image>
 
-        <div className="w-[400px] h-[400px] bg-primaryC/10 absolute right-[500px] rounded-full blur-2xl animate-pulse"></div>
-        <section className="flex flex-col md:flex-row gap-8">
-          <div className="md:w-1/2 w-full">
+        <div className="w-[400px] h-[400px] bg-primaryC/10 absolute right-[500px] rounded-full blur-2xl animate-pulse"></div> */}
+        <section className="flex flex-col justify-center items-center">
+          <div className=" w-full z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primaryC/10 border border-primaryC/20 text-primaryC text-xs font-bold tracking-widest uppercase mb-8"
+              className="mx-auto  w-max "
             >
-              <Zap size={14} /> Now in Private Beta
+              <span className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-primaryC/50  text-textNc text-xs font-bold tracking-widest uppercase ">
+                <Zap size={14} /> Now in Private Beta
+              </span>
             </motion.div>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-5xl md:text-[89px] font-black tracking-tight leading-[1.1] mb-8"
+              className="text-5xl md:text-[80px] font-black tracking-tight leading-[1.1] mb-3 text-center"
             >
               Secure Freelance Contracts with Kodash
             </motion.h1>
@@ -65,7 +67,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-lg md:text-xl text-textNd max-w-2xl mb-10 leading-relaxed"
+              className="text-lg md:text-xl text-textNc max-w-2xl mb-10 leading-relaxed text-center mx-auto"
             >
               Connect with clients, agree on terms, get paid securely through
               escrow, and resolve disputes easily. Kodash makes frelancing safe
@@ -75,9 +77,9 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex flex-col-reverse sm:flex-row gap-4"
+              className="flex flex-col-reverse sm:flex-row gap-4 justify-center"
             >
-              <button 
+              <button
                 onClick={handleStartWorkspace}
                 disabled={isLoading}
                 className="w-full sm:w-auto px-8 py-4 butt font-bold rounded-xl transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
@@ -93,11 +95,30 @@ export default function HomePage() {
               </button>
             </motion.div>
           </div>
+
           <img
             src="/contract.png"
             alt=""
-            className="md:w-1/2 w-full opacity-80 object-cover rounded"
+            className="md:w-1/2 w-full opacity-80 object-cover rounded hidden"
           />
+
+          <div className="absolute -z-0 left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-max">
+            <div className="w-full relative">
+              <video
+                src="/contract.mp4"
+                className=" object-cover -z-0"
+                autoPlay
+                muted
+                loop
+                playsInline
+              ></video>
+              <div className="bg-bgPrimary/85 w-full h-full absolute top-0 left-0"/>
+              <button className="bg-primaryC/50 backdrop-blur-sm w-16 h-16 absolute right-4.5 bottom-2 rounded-full flex items-center justify-center">
+                
+              <Mouse className=" animate-bounce text-sm" />
+              </button>
+            </div>
+          </div>
         </section>
       </section>
     </div>
