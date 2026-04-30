@@ -15,9 +15,7 @@ import {
   Maximize2,
   Minimize2,
 
-  Mic,
-  MoveUp,
-  Check,
+  
   Paperclip,
 } from "lucide-react";
 import { useTaskStore } from "@/app/store/useTask";
@@ -54,15 +52,7 @@ export default function TaskDrawer({
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [aiInput, setAiInput] = useState("");
-  const [aiParsedData, setAiParsedData] = useState<{
-    title?: string;
-    description?: string;
-    priority?: string;
-    status?: string;
-    due_date?: string;
-  } | null>(null);
-  const [isSending, setIsSending] = useState(false);
+  
 
   // Attachments state & refs
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -337,8 +327,7 @@ export default function TaskDrawer({
     // Reset expand state when modal opens/closes
     if (!isOpen) {
       setIsExpanded(false);
-      setAiInput("");
-      setAiParsedData(null);
+    
     }
   }, [task, isOpen,initialStatus]);
 
@@ -369,22 +358,22 @@ export default function TaskDrawer({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleAcceptAI = () => {
-    if (!aiParsedData) return;
+  // const handleAcceptAI = () => {
+  //   if (!aiParsedData) return;
 
-    // Merge AI-generated data into formData
-    setFormData((prev) => ({
-      ...prev,
-      title: aiParsedData.title || prev.title,
-      description: aiParsedData.description || prev.description,
-      priority: (aiParsedData.priority as Task["priority"]) || prev.priority,
-      status: (aiParsedData.status as Task["status"]) || prev.status,
-      due_date: aiParsedData.due_date || prev.due_date,
-    }));
+  //   // Merge AI-generated data into formData
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     title: aiParsedData.title || prev.title,
+  //     description: aiParsedData.description || prev.description,
+  //     priority: (aiParsedData.priority as Task["priority"]) || prev.priority,
+  //     status: (aiParsedData.status as Task["status"]) || prev.status,
+  //     due_date: aiParsedData.due_date || prev.due_date,
+  //   }));
 
-    // Clear the AI parsed data after accepting
-    setAiParsedData(null);
-  };
+  //   // Clear the AI parsed data after accepting
+  //   setAiParsedData(null);
+  // };
 
   const isAnyUploading = attachments.some((a) => a.status === "uploading");
   const uploadedAttachments = attachments
@@ -396,81 +385,81 @@ export default function TaskDrawer({
       file_name: a.file_name || a.file.name,
     }));
 
-  const handleSendAI = async () => {
-    if (!aiInput.trim() || isSending) return;
+  // const handleSendAI = async () => {
+  //   if (!aiInput.trim() || isSending) return;
 
-    setIsSending(true);
-    setAiParsedData(null);
+  //   setIsSending(true);
+  //   setAiParsedData(null);
 
-    try {
-      const response = await fetch("/api/openai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: aiInput }),
-      });
+  //   try {
+  //     const response = await fetch("/api/openai", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ message: aiInput }),
+  //     });
 
-      const data = await response.json();
+  //     const data = await response.json();
 
-      if (response.ok && data.data) {
-        try {
-          // Parse the JSON response
-          const parsed = JSON.parse(data.data);
+  //     if (response.ok && data.data) {
+  //       try {
+  //         // Parse the JSON response
+  //         const parsed = JSON.parse(data.data);
 
-          // Normalize the values to match formData format
-          let normalizedStatus = parsed.status?.toLowerCase().trim() || "to-do";
-          // Handle various status formats: "to-do", "todo", "in progress", "in-progress", "done"
-          if (
-            normalizedStatus.includes("todo") ||
-            normalizedStatus === "to-do"
-          ) {
-            normalizedStatus = "to-do";
-          } else if (
-            normalizedStatus.includes("progress") ||
-            normalizedStatus === "in-progress"
-          ) {
-            normalizedStatus = "in-progress";
-          } else if (normalizedStatus === "done") {
-            normalizedStatus = "done";
-          } else {
-            normalizedStatus = "to-do";
-          }
+  //         // Normalize the values to match formData format
+  //         let normalizedStatus = parsed.status?.toLowerCase().trim() || "to-do";
+  //         // Handle various status formats: "to-do", "todo", "in progress", "in-progress", "done"
+  //         if (
+  //           normalizedStatus.includes("todo") ||
+  //           normalizedStatus === "to-do"
+  //         ) {
+  //           normalizedStatus = "to-do";
+  //         } else if (
+  //           normalizedStatus.includes("progress") ||
+  //           normalizedStatus === "in-progress"
+  //         ) {
+  //           normalizedStatus = "in-progress";
+  //         } else if (normalizedStatus === "done") {
+  //           normalizedStatus = "done";
+  //         } else {
+  //           normalizedStatus = "to-do";
+  //         }
 
-          let normalizedPriority =
-            parsed.priority?.toLowerCase().trim() || "medium";
-          // Ensure priority is one of: high, medium, low
-          if (!["high", "medium", "low"].includes(normalizedPriority)) {
-            normalizedPriority = "medium";
-          }
+  //         let normalizedPriority =
+  //           parsed.priority?.toLowerCase().trim() || "medium";
+  //         // Ensure priority is one of: high, medium, low
+  //         if (!["high", "medium", "low"].includes(normalizedPriority)) {
+  //           normalizedPriority = "medium";
+  //         }
 
-          const normalizedData = {
-            title: parsed.title || "",
-            description: parsed.description || "",
-            priority: normalizedPriority,
-            status: normalizedStatus,
-            due_date: parsed.due_date || "",
-          };
+  //         const normalizedData = {
+  //           title: parsed.title || "",
+  //           description: parsed.description || "",
+  //           priority: normalizedPriority,
+  //           status: normalizedStatus,
+  //           due_date: parsed.due_date || "",
+  //         };
 
-          setAiParsedData(normalizedData);
-        } catch (parseError) {
-          console.error("Failed to parse AI response:", parseError);
-          setAiParsedData({ title: "Error: Failed to parse response" });
-        }
-      } else {
-        setAiParsedData({
-          title: `Error: ${data.error || "Failed to get response"}`,
-        });
-      }
-    } catch (error) {
-      setAiParsedData({
-        title: `Error: ${error instanceof Error ? error.message : "Failed to send request"
-          }`,
-      });
-    } finally {
-      setIsSending(false);
-    }
-  };
+  //         setAiParsedData(normalizedData);
+  //       } catch (parseError) {
+  //         console.error("Failed to parse AI response:", parseError);
+  //         setAiParsedData({ title: "Error: Failed to parse response" });
+  //       }
+  //     } else {
+  //       setAiParsedData({
+  //         title: `Error: ${data.error || "Failed to get response"}`,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     setAiParsedData({
+  //       title: `Error: ${error instanceof Error ? error.message : "Failed to send request"
+  //         }`,
+  //     });
+  //   } finally {
+  //     setIsSending(false);
+  //   }
+  // };
 
   const getStatusIcon = (status:string) => {
     switch (status) {

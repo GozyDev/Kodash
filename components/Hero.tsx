@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Zap , ArrowDown, Mouse} from "lucide-react";
-import Image from "next/image";
+import { ArrowRight, Zap ,Mouse} from "lucide-react";
+
 import { useRouter } from "next/navigation";
 
 export default function HomePage() {
