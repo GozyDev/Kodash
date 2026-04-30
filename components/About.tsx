@@ -40,7 +40,7 @@ const About = () => {
     }
 
     return (
-        <section className="mx-auto max-w-[1400px] px-4 py-12 pt-5">
+        <section className="mx-auto max-w-[1400px] px-4 py-12">
             <motion.div
                 className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
                 initial="hidden"

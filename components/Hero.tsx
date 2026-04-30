@@ -43,8 +43,8 @@ export default function HomePage() {
         ></Image>
 
         <div className="w-[400px] h-[400px] bg-primaryC/10 absolute right-[500px] rounded-full blur-2xl animate-pulse"></div> */}
-        <section className="flex flex-col justify-center items-center">
-          <div className=" w-full z-10">
+        
+          <div className=" z-10 relative ">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -96,11 +96,7 @@ export default function HomePage() {
             </motion.div>
           </div>
 
-          <img
-            src="/contract.png"
-            alt=""
-            className="md:w-1/2 w-full opacity-80 object-cover rounded hidden"
-          />
+       
 
           <div className="absolute -z-0 left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-max">
             <div className="w-full relative">
@@ -120,7 +116,7 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-      </section>
+    
     </div>
   );
 }
