@@ -1,6 +1,10 @@
+'use client'
+
 import React from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 
 const ClientNext = () => {
+    const shouldReduceMotion = useReducedMotion()
     const baseSteps = [
         {
             title: 'Start a Workspace',
@@ -35,29 +39,63 @@ const ClientNext = () => {
     ]
     const steps = baseSteps.map((step, index) => ({
         ...step,
-        imagePosition: index % 2 === 0 ? 'left' : 'right',
+        imagePosition: (index % 2 === 0 ? 'left' : 'right') as 'left' | 'right',
     }))
+
+    const getDirectionalAnimation = (direction: 'left' | 'right') => ({
+        hidden: {
+            opacity: 0,
+            x: shouldReduceMotion ? 0 : direction === 'left' ? -56 : 56,
+            y: shouldReduceMotion ? 0 : 18,
+        },
+        visible: {
+            opacity: 1,
+            x: 0,
+            y: 0,
+        },
+    })
 
     return (
         <div className=''>
             {steps.map((step) => (
                 <article
                     key={step.title}
-                    className='grid items-center  md:grid-cols-2 '
+                    className='grid items-center gap-6 md:grid-cols-2'
                 >
-                    <div className={step.imagePosition === 'left' ? 'md:order-1' : 'md:order-2'}>
+                    <motion.div
+                        className={step.imagePosition === 'left' ? 'md:order-1' : 'md:order-2'}
+                        variants={getDirectionalAnimation(step.imagePosition)}
+                        initial='hidden'
+                        whileInView='visible'
+                        viewport={{ once: true, amount: 0.3 }}
+                        transition={{
+                            duration: shouldReduceMotion ? 0 : 0.7,
+                            ease: [0.22, 1, 0.36, 1],
+                        }}
+                    >
                         <img
                             src={step.image}
                             alt={step.title}
                             className='h-auto w-[500px] rounded-lg object-cover mx-auto z-0'
                         />
-                    </div>
-                    <div className={step.imagePosition === 'left' ? 'md:order-2' : 'md:order-1'}>
+                    </motion.div>
+                    <motion.div
+                        className={step.imagePosition === 'left' ? 'md:order-2' : 'md:order-1'}
+                        variants={getDirectionalAnimation(step.imagePosition === 'left' ? 'right' : 'left')}
+                        initial='hidden'
+                        whileInView='visible'
+                        viewport={{ once: true, amount: 0.3 }}
+                        transition={{
+                            duration: shouldReduceMotion ? 0 : 0.75,
+                            delay: shouldReduceMotion ? 0 : 0.12,
+                            ease: [0.22, 1, 0.36, 1],
+                        }}
+                    >
                         <div className={` p-3  py-6 bg-cardC/40 backdrop-blur z- ${step.imagePosition === 'left' ? "md:ml-[-150px] border-r-2 border-r-primaryC  " : "md:mr-[-150px] border-l-2 border-l-primaryC"}`}>
                             <h3 className='mb-2 text-xl font-bold text-textNc tracking-tight uppercase'>{step.title}</h3>
                             <p className='text-sm leading-7 text-textNd'>{step.description}</p>
                         </div>
-                    </div>
+                    </motion.div>
                 </article>
             ))}
         </div>

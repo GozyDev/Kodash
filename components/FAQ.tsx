@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 
 const faqItems = [
     {
@@ -27,6 +28,7 @@ const faqItems = [
 
 const FAQ = () => {
     const [openIndex, setOpenIndex] = useState<number | null>(0)
+    const shouldReduceMotion = useReducedMotion()
 
     const handleToggle = (index: number) => {
         setOpenIndex((current) => (current === index ? null : index))
@@ -40,6 +42,8 @@ const FAQ = () => {
             <div className='mx-auto mt-10 flex w-full max-w-4xl flex-col gap-4 py-10'>
                 {faqItems.map((item, index) => {
                     const isOpen = openIndex === index
+                    const contentId = `faq-answer-${index}`
+                    const buttonId = `faq-button-${index}`
 
                     return (
                         <button
@@ -47,12 +51,42 @@ const FAQ = () => {
                             type='button'
                             onClick={() => handleToggle(index)}
                             className='w-full rounded-2xl border border-cardCB bg-cardC/60 px-6 py-5 text-left transition-colors hover:bg-cardC'
+                            aria-expanded={isOpen}
+                            aria-controls={contentId}
+                            id={buttonId}
                         >
                             <div className='flex items-center justify-between gap-4'>
                                 <h3 className='text-lg font-medium text-textNa'>{item.question}</h3>
-                                <span className='text-2xl leading-none text-textNc'>{isOpen ? '-' : '+'}</span>
+                                <motion.span
+                                    className='text-2xl leading-none text-textNc'
+                                    animate={shouldReduceMotion ? { opacity: 1 } : { rotate: isOpen ? 45 : 0 }}
+                                    transition={{
+                                        duration: shouldReduceMotion ? 0 : 0.3,
+                                        ease: [0.22, 1, 0.36, 1],
+                                    }}
+                                >
+                                    +
+                                </motion.span>
                             </div>
-                            {isOpen && <p className='mt-4 text-sm leading-6 text-textNb'>{item.answer}</p>}
+                            <AnimatePresence initial={false}>
+                                {isOpen && (
+                                    <motion.div
+                                        id={contentId}
+                                        role='region'
+                                        aria-labelledby={buttonId}
+                                        initial={shouldReduceMotion ? false : { height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={shouldReduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                                        transition={{
+                                            duration: shouldReduceMotion ? 0 : 0.35,
+                                            ease: [0.22, 1, 0.36, 1],
+                                        }}
+                                        className='overflow-hidden'
+                                    >
+                                        <p className='mt-4 text-sm leading-6 text-textNb'>{item.answer}</p>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </button>
                     )
                 })}
