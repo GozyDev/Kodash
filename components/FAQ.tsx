@@ -5,24 +5,50 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 
 const faqItems = [
     {
-        question: 'How does Scale Dash keep payments safe?',
+        question: 'What is Kodash and how is it different from platforms like Upwork?',
         answer:
-            'Funds are held securely and only released when both sides confirm milestones or delivery terms are met.',
+            'Kodash is a contract-first workspace platform designed for people who already know who they want to work with. Instead of browsing jobs or bidding for work, you simply create a workspace, invite the other party, agree on the scope, and get started. It’s built for direct collaboration, not job searching.',
     },
     {
-        question: 'Can I use Scale Dash for one-time and ongoing projects?',
+        question: 'Do I need to choose between being a client or a freelancer?',
         answer:
-            'Yes. You can run one-off jobs or split long projects into milestones so payments and progress stay clear.',
+            'No, you don’t. Your role is decided per workspace. This means you can be a client in one project and a freelancer in another, depending on what you’re working on.',
     },
     {
-        question: 'What happens if there is a disagreement on delivery?',
+        question: 'Can freelancers invite clients to Kodash?',
         answer:
-            'Scale Dash records agreements and milestone history so both parties can resolve disputes with shared context.',
+            'Yes. If you already have a client outside the platform, you can invite them into a workspace on Kodash to manage the project in a more structured and secure way.',
     },
     {
-        question: 'Do clients and freelancers both see progress updates?',
+        question: 'Is Kodash a job marketplace?',
         answer:
-            'Yes. Both sides can track status updates in one place, which helps reduce confusion and improve trust.',
+            'No. Kodash is not a job board. You won’t find job listings or bidding systems here. It’s designed for people who already have work agreements and want a better way to manage them.',
+    },
+
+    {
+        question: 'How does payment work?',
+        answer:
+            'Before any work begins, the client funds the project. The payment is securely held in escrow, ensuring that the freelancer knows the project is funded and the client only releases payment when satisfied.',
+    },
+    {
+        question: 'What is a “definition of done”?',
+        answer:
+            'It’s a clear outline created by the freelancer that explains exactly what will be delivered. The client reviews and approves it before work starts, so both sides are fully aligned.',
+    },
+    {
+        question: 'What happens after the work is delivered?',
+        answer:
+            'The client reviews the work and can either approve it and release payment or request revisions if changes are needed.',
+    },
+    {
+        question: 'What if there’s a disagreement?',
+        answer:
+            'If there’s an issue with delivery or revisions, either party can raise a dispute. This ensures that both sides have a fair way to resolve conflicts.',
+    },
+    {
+        question: 'Why should I use Kodash instead of handling projects privately?',
+        answer:
+            'Kodash brings structure, clarity, and security to your workflow. It helps you avoid misunderstandings, ensures payments are protected, and keeps everything organized in one place.',
     },
 ]
 
