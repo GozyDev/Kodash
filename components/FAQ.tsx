@@ -61,11 +61,11 @@ const FAQ = () => {
     }
 
     return (
-        <section className='mx-auto max-w-[1400px] px-4 py-20'>
+        <section className='mx-auto max-w-[1400px] px-4 py-10 md:py-20'>
             <div>
-                <h2 className='text-5xl semi-bold text-center tracking-tighter'>Frequently Asked Questions</h2>
+                <h2 className='text-3xl md:text-5xl semi-bold text-center tracking-tighter'>Frequently Asked Questions</h2>
             </div>
-            <div className='mx-auto mt-10 flex w-full max-w-4xl flex-col gap-4 py-10'>
+            <div className='mx-auto mt-10 flex w-full max-w-4xl flex-col gap-4 md:py-5'>
                 {faqItems.map((item, index) => {
                     const isOpen = openIndex === index
                     const contentId = `faq-answer-${index}`

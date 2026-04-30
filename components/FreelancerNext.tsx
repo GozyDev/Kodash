@@ -57,7 +57,7 @@ const FreelancerNext = () => {
     })
 
     return (
-        <div className=''>
+        <div className='overflow-hidden'>
             {steps.map((step) => (
                 <article
                     key={step.title}

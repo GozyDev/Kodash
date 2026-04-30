@@ -49,7 +49,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="mx-auto  w-max "
+              className="md:mx-auto  w-max mb-3 "
             >
               <span className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-primaryC/50  text-textNc text-xs font-bold tracking-widest uppercase ">
                 <Zap size={14} /> Now in Private Beta
@@ -59,7 +59,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-5xl md:text-[80px] font-black tracking-tight leading-[1.1] mb-3 text-center"
+              className="text-5xl md:text-[80px] font-black tracking-tight leading-[1.1] mb-3 md:text-center"
             >
               Secure Freelance Contracts with Kodash
             </motion.h1>
@@ -67,7 +67,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-lg md:text-xl text-textNc max-w-2xl mb-10 leading-relaxed text-center mx-auto"
+              className="text-lg md:text-xl text-textNc max-w-2xl mb-10 leading-relaxed md:text-center md:mx-auto"
             >
               Connect with clients, agree on terms, get paid securely through
               escrow, and resolve disputes easily. Kodash makes frelancing safe
@@ -109,7 +109,7 @@ export default function HomePage() {
                 playsInline
               ></video>
               <div className="bg-bgPrimary/85 w-full h-full absolute top-0 left-0"/>
-              <button className="bg-primaryC/50 backdrop-blur-sm w-16 h-16 absolute right-4.5 bottom-2 rounded-full flex items-center justify-center">
+              <button className="bg-primaryC/50 backdrop-blur-sm w-16 h-16 absolute right-4.5 bottom-2 rounded-full md:flex items-center justify-center hidden">
                 
               <Mouse className=" animate-bounce text-sm" />
               </button>

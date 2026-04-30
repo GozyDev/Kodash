@@ -12,11 +12,11 @@ const CallToAction = () => {
           <div className="relative z-10 mx-auto max-w-3xl">
             
 
-            <h2 className="mt-6 text-4xl font-semibold tracking-tighter text-white sm:text-5xl md:text-[58px] md:leading-[1.08]">
+            <h2 className="mt-6 text-2xl md:text-4xl font-semibold tracking-tighter text-white sm:text-5xl md:text-[58px] md:leading-[1.08]">
             Start with clarity. Finish with confidence.
             </h2>
 
-            <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/70 sm:text-base">
+            <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-white/70 sm:text-base">
             Create a workspace, align on the work, and get paid securely without the back and forth.
             </p>
 
