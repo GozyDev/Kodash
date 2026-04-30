@@ -18,9 +18,9 @@ const WhatNext = () => {
     }
 
     return (
-        <section className='mx-auto max-w-[1400px] px-4 py-20'>
-            <div><h2 className='text-5xl semi-bold text-center tracking-tighter'>What are the next steps?</h2></div>
-            <div className='flex justify-center gap-4  py-10'>
+        <section className='mx-auto max-w-[1400px] px-4 py-10 md:py-20'>
+            <div><h2 className=' text-3xl md:text-5xl semi-bold text-center tracking-tighter'>What are the next steps?</h2></div>
+            <div className='flex justify-center gap-4 py-5 md:py-10'>
                 <div className='flex bg-cardC/70 border border-cardCB rounded-full gap-4'>
                     <button
                         onClick={handleClientView}
