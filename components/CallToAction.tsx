@@ -1,6 +1,30 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const CallToAction = () => {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCreateWorkspace = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/user");
+      const data = await res.json();
+
+      if (data.user) {
+        router.push("/dashboard/organizations");
+      } else {
+        router.push("/dashboard/auth/sign_in");
+      }
+    } catch (error) {
+      router.push("/dashboard/auth/sign_in");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <section className="px-4 pb-16 sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-7xl">
@@ -22,9 +46,11 @@ const CallToAction = () => {
 
             <button
               type="button"
-              className="mt-8 inline-flex items-center justify-center rounded-lg  px-6 py-3 text-sm font-semibold text-white  transition-all duration-200 butt"
+              onClick={handleCreateWorkspace}
+              disabled={isLoading}
+              className="mt-8 inline-flex items-center justify-center rounded-lg  px-6 py-3 text-sm font-semibold text-white  transition-all duration-200 butt disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create Your Workspace
+              {isLoading ? "Loading..." : "Create Your Workspace"}
             </button>
           </div>
         </div>
