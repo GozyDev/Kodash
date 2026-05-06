@@ -218,9 +218,9 @@ export const statusIconFromPresent = (present: string) => {
           viewBox="0 0 24 24"
           fill="none"
           stroke="#F59E0B"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
           <circle cx="12" cy="12" r="9"></circle>
           <path d="M16 8v4h-4"></path>
