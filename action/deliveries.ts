@@ -532,6 +532,19 @@ export async function RequestRevisionAction(
 
     if (updateDelError) throw new Error("Failed to update delivery status");
 
+    const taskStatus = action === "reject" ? "disputed" : "on-revision";
+    const { error: updateTaskError } = await supabase
+      .from("tasks")
+      .update({
+        status: taskStatus,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", taskId);
+
+    if (updateTaskError) {
+      throw new Error("Failed to update tasks status");
+    }
+
     return {
       success: true,
       message: action === "reject" ? "Dispute opened" : "Revision accepted",
