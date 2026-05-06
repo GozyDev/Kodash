@@ -50,6 +50,7 @@ export async function updateSession(request: NextRequest) {
     "/api/auth", // allow server-side auth API routes
     "/api/auth/", // wildcard
     "/api/auth/google",
+    "/api/stripe/webhook",
     "/static",
     "/_next", // next internals
     "/favicon.ico",
