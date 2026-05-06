@@ -554,3 +554,89 @@ export async function RequestRevisionAction(
     throw err instanceof Error ? err : new Error("Operation failed");
   }
 }
+
+export async function raisePayoutDispute(taskId: string, deliveryId: string) {
+  try {
+    const supabase = await createClient();
+    const disputedAt = new Date().toISOString();
+
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError || !authData.user) {
+      throw new Error("Unauthorized");
+    }
+
+    const { data: taskData, error: taskError } = await supabase
+      .from("tasks")
+      .select("tenant_id")
+      .eq("id", taskId)
+      .single();
+
+    if (taskError || !taskData) {
+      throw new Error("Task not found");
+    }
+
+    const userRole = await getUserRole(authData.user.id, taskData.tenant_id);
+    if (userRole !== "CLIENT") {
+      throw new Error("Unauthorized: Client only");
+    }
+
+    const { data: originalPayment, error: paymentError } = await supabase
+      .from("payments")
+      .select("*")
+      .eq("issueId", taskId)
+      .eq("type", "funding")
+      .eq("status", "held")
+      .single();
+
+    if (paymentError || !originalPayment) {
+      throw new Error("Could not find a held payment to dispute");
+    }
+
+    const { id, created_at, updated_at, ...paymentDetails } = originalPayment;
+    const { error: disputeInsertError } = await supabase.from("payments").insert({
+      ...paymentDetails,
+      type: "dispute",
+      status: "disputed",
+      created_at: disputedAt,
+      disputed_at: disputedAt,
+    });
+
+    if (disputeInsertError) {
+      throw new Error("Failed to create dispute record");
+    }
+
+    const { error: originalPaymentUpdateError } = await supabase
+      .from("payments")
+      .update({ disputed_at: disputedAt })
+      .eq("id", originalPayment.id)
+      .eq("type", "funding")
+      .eq("status", "held");
+
+    if (originalPaymentUpdateError) {
+      throw new Error("Failed to mark funding payment as disputed");
+    }
+
+    const { error: deliveryUpdateError } = await supabase
+      .from("deliverables")
+      .update({ status: "disputed", updated_at: disputedAt })
+      .eq("id", deliveryId);
+
+    if (deliveryUpdateError) {
+      throw new Error("Failed to update delivery status");
+    }
+
+    const { error: taskUpdateError } = await supabase
+      .from("tasks")
+      .update({ status: "disputed", updated_at: disputedAt })
+      .eq("id", taskId);
+
+    if (taskUpdateError) {
+      throw new Error("Failed to update task status");
+    }
+
+    return { success: true, message: "Payout dispute opened" };
+  } catch (err: unknown) {
+    console.error("Raise payout dispute error:", err);
+    throw err instanceof Error ? err : new Error("Failed to raise payout dispute");
+  }
+}

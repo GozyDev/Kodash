@@ -11,7 +11,13 @@ import { Task } from "@/lib/superbase/type";
 import { presentToPast } from "@/lib/status";
 import ProposalOverview from "./ProposalOverview";
 import { DeliveriesSection } from "./DeliveriesSection";
-import { fetchDeliveries, approveDelivery, requestDeliveryRevision, type Delivery } from "@/action/deliveries";
+import {
+  fetchDeliveries,
+  approveDelivery,
+  requestDeliveryRevision,
+  raisePayoutDispute,
+  type Delivery,
+} from "@/action/deliveries";
 import { createBrowserClient } from "@supabase/ssr";
 import Image from "next/image";
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -548,6 +554,20 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
     return userRole === "freelancer" && issue?.status === "draft";
   }, [userRole, issue?.status]);
 
+  const latestDeliveryId = useMemo(() => {
+    return deliveries[0]?.id ?? null;
+  }, [deliveries]);
+
+  const handleRaisePayoutDispute = async () => {
+    if (!latestDeliveryId) {
+      throw new Error("No delivery found for this payout dispute.");
+    }
+
+    await raisePayoutDispute(issueId, latestDeliveryId);
+    const updatedDeliveries = await fetchDeliveries(issueId);
+    setDeliveries(updatedDeliveries);
+  };
+
    useEffect(() => {
       if (userRole === "client" && issue?.status === "delivered") {
         getPayoutTiming(issue.id).then((data) => {
@@ -810,7 +830,14 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
             </button>
           )}
 
-          {payoutDeadline && <PayoutCountdown deadline={payoutDeadline} outer="te" className="flex-row gap-3 md:gap-1 md:flex-col " />  }
+          {payoutDeadline && (
+            <PayoutCountdown
+              deadline={payoutDeadline}
+              outer="te"
+              className="flex-row gap-3 md:gap-1 md:flex-col "
+              onRaiseDispute={handleRaisePayoutDispute}
+            />
+          )}
         </aside>
       </div>
     </div>

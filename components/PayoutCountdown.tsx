@@ -3,18 +3,24 @@
 
 import { Timer, TriangleAlert } from "lucide-react";
 import { useState, useEffect } from "react";
+import ConfirmPayoutDisputeDialog from "./ConfirmPayoutDisputeDialog";
 
 export default function PayoutCountdown({
   deadline,
   className,
-  outer
+  outer,
+  onRaiseDispute,
 }: {
   deadline: string;
   className: string;
   outer: string;
+  onRaiseDispute?: () => Promise<void>;
 }) {
   const [timeLeft, setTimeLeft] = useState("");
   const [isExpired, setIsExpired] = useState(false);
+  const [disputeDialogOpen, setDisputeDialogOpen] = useState(false);
+  const [raisingDispute, setRaisingDispute] = useState(false);
+  const [disputeError, setDisputeError] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -48,6 +54,26 @@ export default function PayoutCountdown({
     return () => clearInterval(timer);
   }, [deadline]);
 
+  const handleRaiseDispute = async () => {
+    if (!onRaiseDispute) {
+      setDisputeError("Dispute action is not available in this view.");
+      return;
+    }
+
+    setRaisingDispute(true);
+    setDisputeError(null);
+    try {
+      await onRaiseDispute();
+      setDisputeDialogOpen(false);
+    } catch (error) {
+      setDisputeError(
+        error instanceof Error ? error.message : "Failed to raise dispute",
+      );
+    } finally {
+      setRaisingDispute(false);
+    }
+  };
+
   return (
     <div
       className={`mt-5 ${outer}  flex flex-col gap-2 bg-cardC/0  text-sm  ${
@@ -78,12 +104,21 @@ export default function PayoutCountdown({
       <button
         onClick={(e) => {
           e.stopPropagation();
-          // Dispute logic
+          setDisputeDialogOpen(true);
         }}
+        disabled={raisingDispute}
         className="mt-2 w-max px-4 py-2 bg-cardCB/90 text-white text-xs rounded-md hover:bg-cardCB/50 transition-colors cursor-pointer"
       >
-        RAISE A DISPUTE
+        {raisingDispute ? "PROCESSING..." : "RAISE A DISPUTE"}
       </button>
+
+      <ConfirmPayoutDisputeDialog
+        open={disputeDialogOpen}
+        onOpenChange={setDisputeDialogOpen}
+        onConfirm={handleRaiseDispute}
+        loading={raisingDispute}
+        error={disputeError}
+      />
     </div>
   );
 }
