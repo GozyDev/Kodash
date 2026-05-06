@@ -2,13 +2,14 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Zap, Mouse } from "lucide-react";
-
+import { ArrowRight, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function HomePage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
   const handleStartWorkspace = async () => {
     setIsLoading(true);
@@ -17,41 +18,28 @@ export default function HomePage() {
       const data = await res.json();
 
       if (data.user) {
-        // User is logged in, route to dashboard
         router.push("/dashboard/organizations");
       } else {
-        // User is not logged in, route to sign in
         router.push("/dashboard/auth/sign_in");
       }
     } catch (error) {
-      // If there's an error, assume not logged in
       router.push("/dashboard/auth/sign_in");
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <div className="">
-      {/* Hero Section */}
-      <section className=" pt-30 pb-10 md:pt-40 md:pb-32 px-6 overflow-hidden relative">
-        {/* <Image
-          src="/grid.png"
-          alt=""
-          width={60}
-          height={60}
-          className="w-full absolute opacity-70"
-        ></Image>
-
-        <div className="w-[400px] h-[400px] bg-primaryC/10 absolute right-[500px] rounded-full blur-2xl animate-pulse"></div> */}
-
-        <div className=" z-10 relative ">
+      <section className="pt-30 pb-10 md:pt-40 md:pb-32 px-6 overflow-hidden relative">
+        <div className="z-10 relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="md:mx-auto  w-max mb-3 "
+            className="md:mx-auto w-max mb-3"
           >
-            <span className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-primaryC/50  text-textNc text-xs font-bold tracking-widest uppercase ">
+            <span className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-primaryC/50 text-textNc text-xs font-bold tracking-widest uppercase">
               <Zap size={14} /> Now in Private Beta
             </span>
           </motion.div>
@@ -59,7 +47,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-5xl md:text-[80px] font-black tracking-tight leading-[1.1] mb-3 md:text-center"
+            className="text-5xl md:text-[80px] font-bold tracking-tight leading-[1.1] mb-3 md:text-center"
           >
             Secure Freelance Contracts with Kodash
           </motion.h1>
@@ -70,7 +58,7 @@ export default function HomePage() {
             className="text-lg md:text-xl text-textNc max-w-2xl mb-10 leading-relaxed md:text-center md:mx-auto"
           >
             Connect with clients, agree on terms, get paid securely through
-            escrow, and resolve disputes easily. Kodash makes frelancing safe
+            escrow, and resolve disputes easily. Kodash makes freelancing safe
             and reliable for both clients and freelancers.
           </motion.p>
           <motion.div
@@ -82,41 +70,48 @@ export default function HomePage() {
             <button
               onClick={handleStartWorkspace}
               disabled={isLoading}
-              className="w-full sm:w-auto px-8 py-4 butt font-bold rounded-xl transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-8 py-4 butt font-bold rounded transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? "Loading..." : "Start Your Workspace"}{" "}
+              {isLoading ? "Loading..." : "Start Your Workspace"}
               <ArrowRight
                 size={20}
                 className="group-hover:translate-x-1 transition-transform"
               />
             </button>
-            <button className="w-full sm:w-auto px-8 py-4 bg-cardC border-cardCB font-bold rounded-xl transition-all">
+            <button className="w-full sm:w-auto px-8 py-4 bg-cardC border-cardCB font-bold transition-all rounded">
               Watch Demo
             </button>
           </motion.div>
         </div>
 
-        <div className="">
-          <div className="max relative  mt-7">
-            <video
-              src="/contract.mp4"
-              className="mx-auto object-contain rounded-2xl"
-              autoPlay
-              muted
-              loop
-              playsInline
-            ></video>
+        {!videoLoaded && (
+          <div className=" bg-cardC animate-pulse rounded  mt-17 p-2 md:p-6 border-2 border-primaryC/50 max-w-7xl mx-auto">
+            <Image
+              src="/contract.png"
+              alt=""
+              width={100}
+              height={100}
+              className="w-full"
+            ></Image>
           </div>
-        </div>
+        )}
 
-        {/* <video
-          src="/contract.mp4"
-          className=" object-cover -z-0 mx-auto w-full "
-          autoPlay
-          muted
-          loop
-          playsInline
-        ></video> */}
+        { (
+          <div className={`md:w-max mx-auto bg-cardC mt-17 p-2 md:p-6 rounded border-2 border-primaryC/50 ${videoLoaded ? "block" : "hidden"}`}>
+            <div className="relative">
+              <video
+                src="/contract.mp4"
+                className="object-contain rounded"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="none"
+                onCanPlay={() => setVideoLoaded(true)}
+              />
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );
