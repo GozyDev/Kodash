@@ -51,6 +51,7 @@ export async function updateSession(request: NextRequest) {
     "/api/auth/", // wildcard
     "/api/auth/google",
     "/api/stripe/webhook",
+    "/api/stripe/connect-webhook",
     "/static",
     "/_next", // next internals
     "/favicon.ico",
