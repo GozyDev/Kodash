@@ -2,6 +2,8 @@
 import React, { useState } from 'react'
 import ClientNext from './ClientNext'
 import FreelancerNext from './FreelancerNext'
+import { alfa_slab_one } from "@/lib/font";
+
 
 const WhatNext = () => {
     const [isClient, setIsClient] = useState(true)
@@ -19,18 +21,18 @@ const WhatNext = () => {
 
     return (
         <section className='mx-auto max-w-[1400px] px-4 py-10 md:py-20'>
-            <div><h2 className=' text-3xl md:text-5xl semi-bold text-center tracking-tighter'>What are the next steps?</h2></div>
+            <div><h2 className={`text-3xl md:text-5xl semi-bold text-center tracking- ${alfa_slab_one.className}`}>What are the next steps?</h2></div>
             <div className='flex justify-center gap-4 py-5 md:py-10'>
-                <div className='flex bg-cardC/70 border border-cardCB rounded-full gap-4'>
+                <div className='flex bg-cardC/70 border border-cardCB rounded gap-4'>
                     <button
                         onClick={handleClientView}
-                        className={`text-textNb text-sm rounded-full p-3 transition-all duration-300 ease-out transform active:scale-95 ${isClient ? 'bg-cardICB/50 shadow-sm' : 'bg-transparent hover:bg-cardC/70'} cursor-pointer`}
+                        className={`text-textNb text-sm rounded p-3 transition-all duration-300 ease-out transform active:scale-95 ${isClient ? 'bg-cardICB/50 shadow-sm' : 'bg-transparent hover:bg-cardC/70'} cursor-pointer`}
                     >
                         Paying For Service
                     </button>
                     <button
                         onClick={handleFreelancerView}
-                        className={`text-textNb text-sm rounded-full p-3 transition-all duration-300 ease-out transform active:scale-95 ${isFreelancer ? 'bg-cardICB/50 shadow-sm' : 'bg-transparent hover:bg-cardC/70'} cursor-pointer`}
+                        className={`text-textNb text-sm rounded p-3 transition-all duration-300 ease-out transform active:scale-95 ${isFreelancer ? 'bg-cardICB/50 shadow-sm' : 'bg-transparent hover:bg-cardC/70'} cursor-pointer`}
                     >
                         Providing A Service
                     </button>
