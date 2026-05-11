@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { alfa_slab_one } from "@/lib/font";
+
 
 const faqItems = [
     {
@@ -63,7 +65,7 @@ const FAQ = () => {
     return (
         <section className='mx-auto max-w-[1400px] px-4 py-10 md:py-20'>
             <div>
-                <h2 className='text-3xl md:text-5xl semi-bold text-center tracking-tighter'>Frequently Asked Questions</h2>
+                <h2 className={`text-3xl md:text-5xl semi-bold text-center   ${alfa_slab_one.className}`}>Frequently Asked Questions</h2>
             </div>
             <div className='mx-auto mt-10 flex w-full max-w-4xl flex-col gap-4 md:py-5'>
                 {faqItems.map((item, index) => {
@@ -76,7 +78,7 @@ const FAQ = () => {
                             key={item.question}
                             type='button'
                             onClick={() => handleToggle(index)}
-                            className='w-full rounded-2xl border border-cardCB bg-cardC/60 px-6 py-5 text-left transition-colors hover:bg-cardC'
+                            className='w-full rounded border border-cardCB bg-cardC/60 px-6 py-5 text-left transition-colors hover:bg-cardC'
                             aria-expanded={isOpen}
                             aria-controls={contentId}
                             id={buttonId}
