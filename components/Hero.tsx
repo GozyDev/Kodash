@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Zap } from "lucide-react";
+import { ArrowRight} from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { alfa_slab_one } from "@/lib/font";
@@ -60,7 +60,7 @@ export default function HomePage() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg md:text-xl text-textNc max-w-3xl mb-10 leading-relaxed md:text-center md:mx-auto"
           >
-            Invite whoever you're working with, agree on the scope, pay into
+            Invite whoever you&apos;re working with, agree on the scope, pay into
             escrow. Funds release when the job is done. Simple.
           </motion.p>
           <motion.div
