@@ -60,7 +60,7 @@ const ClientNext = () => {
             {steps.map((step) => (
                 <article
                     key={step.title}
-                    className='grid items-center gap-6 md:grid-cols-2'
+                    className='grid items-center gap-6 md:grid-cols-2 mb-6 md:mb-0'
                 >
                     <motion.div
                         className={step.imagePosition === 'left' ? 'md:order-1' : 'md:order-2'}
