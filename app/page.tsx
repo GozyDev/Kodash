@@ -5,6 +5,7 @@ import About from "@/components/About";
 import WhatNext from "@/components/WhatNext";
 import FAQ from "@/components/FAQ";
 import CallToAction from "@/components/CallToAction";
+import KodashHowItWorks from "@/components/Kodashhowitworks ";
 
   export default function Home() {
     return (
@@ -13,7 +14,8 @@ import CallToAction from "@/components/CallToAction";
         <HomePage />
 
         <About />
-        <WhatNext />
+        {/* <WhatNext /> */}
+        <KodashHowItWorks/>
         <FAQ />
         <CallToAction/>
         <footer className="border-t border-cardCB/50 bg-bgPrimary/80 text-textNc/80 py-6">
