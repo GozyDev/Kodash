@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
@@ -6,6 +6,7 @@ import { ArrowRight} from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { alfa_slab_one } from "@/lib/font";
+import KodashHeroCard from "./Kodashherocard";
 
 export default function HomePage() {
   const router = useRouter();
@@ -39,9 +40,10 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="md:mx-auto w-max mb-10 font-semibold"
+              className="md:mx-auto w-max mb-10 border border-cardCB bg-black/30 px-6 py-2 rounded flex items-center gap-3"
             >
-              <var className=" text-[15px] md:text-[20px] uppercase bg-primaryC/50  px-[30px] py-[10px] md:px-[40px] md:py-[15px] tracking rounded ">
+              <span className="w-3 h-3 bg-primaryC/10 border  border-primaryC animate-pulse rounded-full" />
+              <var className="text-[14px]">
                 Contract-First Workspace
               </var>
             </motion.div>
@@ -80,13 +82,13 @@ export default function HomePage() {
                 className="group-hover:translate-x-1 transition-transform"
               />
             </button>
-            <button className="w-full sm:w-auto px-8 py-4   tracking-wide font-medium transition-all rounded border-primaryC/50 border bg-primary">
+            <button className="w-full sm:w-auto px-8 py-4   tracking-wide font-medium transition-all rounded bg-primary">
               See How It Works
             </button>
           </motion.div>
         </div>
 
-        {!videoLoaded && (
+        {/* {!videoLoaded && (
           <div className=" bg-cardC animate-pulse rounded  mt-17 p-2 md:p-6 border-2 border-primaryC/50 max-w-7xl mx-auto">
             <Image
               src="/contract.png"
@@ -115,7 +117,9 @@ export default function HomePage() {
               />
             </div>
           </div>
-        }
+        } */}
+
+        <KodashHeroCard />
       </section>
     </div>
   );
