@@ -2,7 +2,8 @@ import { createClient } from "@/lib/superbase/superbase-server";
 import { NextResponse } from "next/server";
 
 const getMimeType = (fileName: string, fallback: string): string => {
-  if (fallback && fallback !== "application/octet-stream" && fallback !== "") return fallback;
+  if (fallback && fallback !== "application/octet-stream" && fallback !== "")
+    return fallback;
   const ext = fileName.split(".").pop()?.toLowerCase();
   const map: Record<string, string> = {
     pdf: "application/pdf",
@@ -21,6 +22,13 @@ export async function POST(req: Request) {
 
     const form = await req.formData();
     const file = form.get("file") as unknown as File;
+
+    console.log("file name:", file?.name);
+    console.log("file type:", file?.type);
+    console.log("file size:", file?.size);
+    console.log("is File instance:", file instanceof File);
+    console.log("is Blob instance:", file instanceof Blob);
+
     if (!file || !(file instanceof File)) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
@@ -44,14 +52,19 @@ export async function POST(req: Request) {
     if (uploadError) {
       console.log("Upload error, attempting fallback", uploadError.message);
       try {
-        const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(filename);
+        const { data: publicUrlData } = supabase.storage
+          .from(bucket)
+          .getPublicUrl(filename);
         return NextResponse.json({
           file_id: filename,
           file_url: publicUrlData.publicUrl,
           file_name: file.name,
         });
       } catch {
-        return NextResponse.json({ error: uploadError.message }, { status: 500 });
+        return NextResponse.json(
+          { error: uploadError.message },
+          { status: 500 },
+        );
       }
     }
 
@@ -68,7 +81,7 @@ export async function POST(req: Request) {
     console.error(err);
     return NextResponse.json(
       { error: (err as Error).message || "Upload failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
