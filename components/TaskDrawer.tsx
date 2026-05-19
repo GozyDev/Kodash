@@ -3,25 +3,15 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Task,} from "@/lib/superbase/type";
+import { Task } from "@/lib/superbase/type";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-import {
-  X,
-
-  Trash2,
-  Maximize2,
-  Minimize2,
-
-  
-  Paperclip,
-} from "lucide-react";
+import { X, Trash2, Maximize2, Minimize2, Paperclip } from "lucide-react";
 import { useTaskStore } from "@/app/store/useTask";
 import { uploadFile } from "@/lib/upload";
 import Image from "next/image";
-
 
 interface TaskDrawerProps {
   task: Task | null;
@@ -52,7 +42,6 @@ export default function TaskDrawer({
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  
 
   // Attachments state & refs
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -84,8 +73,8 @@ export default function TaskDrawer({
     const incoming = Array.from(files).filter(
       (f) =>
         !attachments.some(
-          (a) => a.file.name === f.name && a.file.size === f.size
-        )
+          (a) => a.file.name === f.name && a.file.size === f.size,
+        ),
     );
 
     const arr = incoming.map((f) => {
@@ -117,8 +106,8 @@ export default function TaskDrawer({
 
     setAttachments((prev) =>
       prev.map((a) =>
-        a.id === id ? { ...a, status: "uploading", progress: 0 } : a
-      )
+        a.id === id ? { ...a, status: "uploading", progress: 0 } : a,
+      ),
     );
 
     const { promise, abort } = uploadFile(
@@ -126,15 +115,15 @@ export default function TaskDrawer({
       (p) => {
         // show progress internally but UI only shows spinner
         setAttachments((prev) =>
-          prev.map((a) => (a.id === id ? { ...a, progress: p } : a))
+          prev.map((a) => (a.id === id ? { ...a, progress: p } : a)),
         );
       },
-      id
+      id,
     );
 
     // store abort so caller can cancel
     setAttachments((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, abort } : a))
+      prev.map((a) => (a.id === id ? { ...a, abort } : a)),
     );
 
     try {
@@ -143,22 +132,22 @@ export default function TaskDrawer({
         prev.map((a) =>
           a.id === id
             ? {
-              ...a,
-              status: "uploaded",
-              progress: 100,
-              file_id: res.file_id,
-              file_url: res.file_url,
-              file_name: res.file_name,
-              abort: undefined,
-            }
-            : a
-        )
+                ...a,
+                status: "uploaded",
+                progress: 100,
+                file_id: res.file_id,
+                file_url: res.file_url,
+                file_name: res.file_name,
+                abort: undefined,
+              }
+            : a,
+        ),
       );
-    } catch  {
+    } catch {
       setAttachments((prev) =>
         prev.map((a) =>
-          a.id === id ? { ...a, status: "failed", abort: undefined } : a
-        )
+          a.id === id ? { ...a, status: "failed", abort: undefined } : a,
+        ),
       );
     }
   };
@@ -226,7 +215,7 @@ export default function TaskDrawer({
     if (att.status === "uploading" && att.abort) {
       try {
         att.abort();
-      } catch { }
+      } catch {}
     }
 
     // if file already uploaded, delete from server
@@ -255,20 +244,20 @@ export default function TaskDrawer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
-
   const handleClose = useCallback(async () => {
     // 1. Create a copy to work with
     const list = [...attachments];
-  
+
     for (const att of list) {
       // Abort active uploads
       if (att.status === "uploading" && att.abort) {
         try {
           att.abort();
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
       }
-  
+
       // Server cleanup
       if (att.file_id) {
         try {
@@ -285,17 +274,17 @@ export default function TaskDrawer({
           console.error("Failed to delete candidate during close", e);
         }
       }
-  
+
       // Clean up memory
       if (att.preview) URL.revokeObjectURL(att.preview);
     }
-  
+
     setAttachments([]);
     setLinks([]);
     setLinkUrl("");
     setLinkLabel("");
     onClose();
-  }, [attachments, onClose, setAttachments]); 
+  }, [attachments, onClose, setAttachments]);
   // ^ These are the dependencies that trigger a function refresh
 
   const formatBytes = (bytes: number) => {
@@ -327,9 +316,8 @@ export default function TaskDrawer({
     // Reset expand state when modal opens/closes
     if (!isOpen) {
       setIsExpanded(false);
-    
     }
-  }, [task, isOpen,initialStatus]);
+  }, [task, isOpen, initialStatus]);
 
   // Close on Escape key
   useEffect(() => {
@@ -461,7 +449,7 @@ export default function TaskDrawer({
   //   }
   // };
 
-  const getStatusIcon = (status:string) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case "draft":
         return (
@@ -511,8 +499,9 @@ export default function TaskDrawer({
               }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className={`relative w-full max-w-2xl bg-cardC  rounded-lg shadow-2xl pointer-events-auto border border-cardCB flex flex-col  ${isExpanded ? "h-[90vh]" : "max-h-[85vh]"
-                }`}
+              className={`relative w-full max-w-2xl bg-cardC  rounded-lg shadow-2xl pointer-events-auto border border-cardCB flex flex-col  ${
+                isExpanded ? "h-[90vh]" : "max-h-[85vh]"
+              }`}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
@@ -546,8 +535,9 @@ export default function TaskDrawer({
 
               {/* Content */}
               <div
-                className={`flex-1 overflow-y-auto px-5 py-4 ${isExpanded ? "min-h-0" : ""
-                  }`}
+                className={`flex-1 overflow-y-auto px-5 py-4 ${
+                  isExpanded ? "min-h-0" : ""
+                }`}
               >
                 {/* Title - No border, just placeholder */}
                 <div className="mb-4">
@@ -601,7 +591,7 @@ export default function TaskDrawer({
                       ref={fileInputRef}
                       type="file"
                       multiple
-                      accept=".pdf,.doc,.docx,image/png,image/jpeg"
+                      accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/png,image/jpeg,image/*"
                       className="hidden"
                       onChange={handleFileInputChange}
                     />
@@ -958,7 +948,10 @@ export default function TaskDrawer({
                           await handleCreateTask({
                             ...formData,
                             attachments: uploadedAttachments,
-                            links: links.map(({ url, label }) => ({ url, label })),
+                            links: links.map(({ url, label }) => ({
+                              url,
+                              label,
+                            })),
                           });
                           setIsSaving(false);
 
