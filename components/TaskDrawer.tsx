@@ -449,7 +449,7 @@ export default function TaskDrawer({
   //   }
   // };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: string) => { 
     switch (status) {
       case "draft":
         return (
