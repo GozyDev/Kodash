@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 import { motion, useReducedMotion } from 'framer-motion'
 
 const ClientNext = () => {
@@ -73,9 +74,11 @@ const ClientNext = () => {
                             ease: [0.22, 1, 0.36, 1],
                         }}
                     >
-                        <img
+                        <Image
                             src={step.image}
                             alt={step.title}
+                            width={500}
+                            height={320}
                             className='h-auto w-[500px] rounded-lg object-cover mx-auto z-0'
                         />
                     </motion.div>

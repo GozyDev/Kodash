@@ -6,8 +6,6 @@ import {
   Handshake,
   Lock,
   CheckCircle2,
-  Search,
-  Send,
   FileCheck2,
   Briefcase,
   BadgeDollarSign,

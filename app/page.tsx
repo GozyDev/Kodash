@@ -2,7 +2,6 @@
   import HomePage from "@/components/Hero";
   import HomeNav from "@/components/HomeNav";
 import About from "@/components/About";
-import WhatNext from "@/components/WhatNext";
 import FAQ from "@/components/FAQ";
 import CallToAction from "@/components/CallToAction";
 import KodashHowItWorks from "@/components/Kodashhowitworks ";

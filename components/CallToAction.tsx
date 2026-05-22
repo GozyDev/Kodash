@@ -20,7 +20,7 @@ const CallToAction = () => {
       } else {
         router.push("/dashboard/auth/sign_in");
       }
-    } catch (error) {
+    } catch {
       router.push("/dashboard/auth/sign_in");
     } finally {
       setIsLoading(false);

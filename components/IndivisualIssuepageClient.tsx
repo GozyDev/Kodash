@@ -101,10 +101,6 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
     }[]
   >([]);
   const [attachmentsLoading, setAttachmentsLoading] = useState(true);
-  const [stripeOnboardingStatus, setStripeOnboardingStatus] = useState<
-    string | null
-  >(null);
-  const [stripeCheckLoaded, setStripeCheckLoaded] = useState(false);
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [deliveriesLoading, setDeliveriesLoading] = useState(true);
   const [releasingFunds] = useState(false);
@@ -181,32 +177,6 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
       mounted = false;
     };
   }, [issueId]);
-
-  // Check Stripe onboarding status for freelancers
-  useEffect(() => {
-    if (userRole !== "freelancer") return;
-
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/stripe/check_status");
-        const data = await res.json();
-        if (mounted) {
-          setStripeOnboardingStatus(data.status || null);
-          setStripeCheckLoaded(true);
-        }
-      } catch (error) {
-        console.error("Failed to check Stripe status:", error);
-        if (mounted) {
-          setStripeCheckLoaded(true);
-        }
-      }
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  }, [userRole]);
 
   const handleOptimisticStatus = useTaskStore(
     (state) => state.handleOptimisticStatus,

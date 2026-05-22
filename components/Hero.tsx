@@ -4,14 +4,12 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight} from "lucide-react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { alfa_slab_one } from "@/lib/font";
 import KodashHeroCard from "./Kodashherocard";
 
 export default function HomePage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [videoLoaded, setVideoLoaded] = useState(false);
 
   const handleStartWorkspace = async () => {
     setIsLoading(true);
@@ -24,7 +22,7 @@ export default function HomePage() {
       } else {
         router.push("/dashboard/auth/sign_in");
       }
-    } catch (error) {
+    } catch {
       router.push("/dashboard/auth/sign_in");
     } finally {
       setIsLoading(false);

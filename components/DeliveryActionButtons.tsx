@@ -83,8 +83,8 @@ export function DeliveryActionButtons({
 
         const data = await response.json();
         setTask(data);
-      } catch (error) {
-        if ((error as any)?.name === "AbortError") {
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === "AbortError") {
           return;
         }
         console.error("Failed to fetch task:", error);
