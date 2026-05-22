@@ -21,7 +21,14 @@ import {RequestRevisionAction} from "@/action/deliveries";
 interface DeliveryActionButtonsProps {
   deliveryId: string;
   taskId: string;
-  status: "pending" | "in_review" | "approved" | "disputed" | "revision" | "accepted_revision";
+  status:
+    | "pending"
+    | "in_review"
+    | "approved"
+    | "auto_approved"
+    | "disputed"
+    | "revision"
+    | "accepted_revision";
   userRole?: string;
   onApprove?: (deliveryId: string, taskId: string) => Promise<void>;
   onRequestRevision?: (deliveryId: string, reason: string) => Promise<void>;

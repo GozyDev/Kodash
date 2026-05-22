@@ -3,7 +3,14 @@
 import { Clock, Eye, CheckCircle2, XCircle, ScanEye } from "lucide-react";
 
 interface DeliveryStatusBadgeProps {
-  status: "pending" | "in_review" | "approved" | "disputed" | "revision" | "accepted_revision";
+  status:
+    | "pending"
+    | "in_review"
+    | "approved"
+    | "auto_approved"
+    | "disputed"
+    | "revision"
+    | "accepted_revision";
 }
 
 const statusConfig = {
@@ -27,6 +34,12 @@ const statusConfig = {
   },
   approved: {
     label: "Approved",
+    bgColor: "bg-green-100",
+    textColor: "text-green-600",
+    icon: CheckCircle2,
+  },
+  auto_approved: {
+    label: "Auto Approved",
     bgColor: "bg-green-100",
     textColor: "text-green-600",
     icon: CheckCircle2,

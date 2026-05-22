@@ -14,6 +14,7 @@ export interface Delivery {
     | "pending"
     | "in_review"
     | "approved"
+    | "auto_approved"
     | "disputed"
     | "revision"
     | "accepted_revision";
