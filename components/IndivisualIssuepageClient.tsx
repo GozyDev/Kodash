@@ -90,7 +90,8 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
   const [issue, setIssue] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
   const [proposal, setProposal] = useState<Proposal[] | null>(null);
-   const [payoutDeadline, setPayoutDeadline] = useState<string | null>(null);
+  const [payoutDeadline, setPayoutDeadline] = useState<string | null>(null);
+  console.log("PayoutDeadline", payoutDeadline);
   const [attachments, setAttachments] = useState<
     {
       file_url: string;
@@ -100,16 +101,19 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
     }[]
   >([]);
   const [attachmentsLoading, setAttachmentsLoading] = useState(true);
-  const [stripeOnboardingStatus, setStripeOnboardingStatus] = useState<string | null>(null);
+  const [stripeOnboardingStatus, setStripeOnboardingStatus] = useState<
+    string | null
+  >(null);
   const [stripeCheckLoaded, setStripeCheckLoaded] = useState(false);
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [deliveriesLoading, setDeliveriesLoading] = useState(true);
   const [releasingFunds] = useState(false);
-  const [showStripeRequiredDialog, setShowStripeRequiredDialog] = useState(false);
+  const [showStripeRequiredDialog, setShowStripeRequiredDialog] =
+    useState(false);
   const [stripeStatus, setStripeStatus] = useState<string | null>(null);
   const [checkingStripe, setCheckingStripe] = useState(false);
 
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   // keep single-source state: `issue` drives all displayed values
 
@@ -286,7 +290,6 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
         data: { user },
       } = await supabase.auth.getUser();
 
-
       if (!user) {
         console.error("❌ NO AUTH USER — REALTIME WILL NOT FIRE");
         return;
@@ -418,12 +421,12 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
               task: tasks.map((t) =>
                 t.id === issueId
                   ? {
-                    ...t,
-                    status:
-                      updatedProposal.status === "accepted"
-                        ? "on-going"
-                        : t.status,
-                  }
+                      ...t,
+                      status:
+                        updatedProposal.status === "accepted"
+                          ? "on-going"
+                          : t.status,
+                    }
                   : t,
               ),
             });
@@ -445,7 +448,9 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
             setDeliveries((prev) => {
               const exists = prev.some((d) => d.id === newDelivery.id);
               if (exists) {
-                return prev.map((d) => (d.id === newDelivery.id ? newDelivery : d));
+                return prev.map((d) =>
+                  d.id === newDelivery.id ? newDelivery : d,
+                );
               }
               return [newDelivery, ...prev];
             });
@@ -463,10 +468,11 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
           },
           (payload) => {
             const updatedDelivery = payload.new as Delivery;
-            
 
             setDeliveries((prev) =>
-              prev.map((d) => (d.id === updatedDelivery.id ? updatedDelivery : d)),
+              prev.map((d) =>
+                d.id === updatedDelivery.id ? updatedDelivery : d,
+              ),
             );
           },
         )
@@ -498,24 +504,19 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
 
   // Handler for Write Proposal button: Check Stripe status before opening dialog
   const handleProposalButtonClick = async () => {
-
     setCheckingStripe(true);
     try {
-  
       const res = await fetch("/api/stripe/check_status");
       const data = await res.json();
-     
+
       setStripeStatus(data.status || null);
 
       // If Stripe is not completed, show the modal instead of opening proposal dialog
       if (data.status !== "completed") {
-        
         setShowStripeRequiredDialog(true);
         return;
       }
 
-     
-      
       setOpenProposal(true);
     } catch (error) {
       console.error("[Write Proposal] Failed to check Stripe status:", error);
@@ -527,13 +528,12 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
   };
 
   const handleStripeRedirect = async () => {
-    
     try {
       console.log("[Stripe Modal] Calling /api/stripe/onboard...");
       const res = await fetch("/api/stripe/onboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ returnTo: pathname}),
+        body: JSON.stringify({ returnTo: pathname }),
       });
       const data = await res.json();
       console.log("[Stripe Modal] Onboard response:", data);
@@ -544,7 +544,10 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
         console.error("[Stripe Modal] No URL in response:", data);
       }
     } catch (error) {
-      console.error("[Stripe Modal] Failed to redirect to Stripe onboarding:", error);
+      console.error(
+        "[Stripe Modal] Failed to redirect to Stripe onboarding:",
+        error,
+      );
     }
   };
 
@@ -568,13 +571,20 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
     setDeliveries(updatedDeliveries);
   };
 
-   useEffect(() => {
-      if (userRole === "client" && issue?.status === "delivered") {
-        getPayoutTiming(issue.id).then((data) => {
-          if (data) setPayoutDeadline(data.autoPayoutAt);
-        });
-      }
-    }, [issue?.id, issue?.status, userRole])
+  useEffect(() => {
+    if (userRole !== "client") {
+      setPayoutDeadline(null);
+      return;
+    }
+
+    if (issue?.status === "delivered") {
+      getPayoutTiming(issue.id).then((data) => {
+        setPayoutDeadline(data?.autoPayoutAt ?? null);
+      });
+    } else {
+      setPayoutDeadline(null);
+    }
+  }, [issue?.id, issue?.status, userRole]);
 
   if (loading) {
     return (
@@ -673,65 +683,69 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span>Loading attachments...</span>
                 </div>
-              ) : !attachmentsLoading && attachments && attachments.length > 0 && (
+              ) : (
+                !attachmentsLoading &&
+                attachments &&
+                attachments.length > 0 && (
+                  <ul className="space-y-2 text-sm">
+                    {attachments.map((a, idx) => {
+                      const isImage =
+                        !!a.file_type && a.file_type.startsWith("image/");
+                      return (
+                        <li
+                          key={`${a.file_url}-${idx}`}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => window.open(a.file_url, "_blank")}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              window.open(a.file_url, "_blank");
+                            }
+                          }}
+                          className="flex items-center justify-between bg-cardC/50 border border-cardCB rounded px-2 md:px-3 py-2 text-sm cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2">
+                            {isImage ? (
+                              <div className="w-24 h-20 flex-shrink-0 bg-cardC/20 rounded overflow-hidden flex items-center justify-center">
+                                <Image
+                                  src={a.file_url}
+                                  alt={a.file_name || "attachment"}
+                                  className="w-full h-full object-contain"
+                                  width={96}
+                                  height={80}
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-20 h-20 flex-shrink-0 bg-cardC/20 rounded flex items-center justify-center text-xs text-textNd">
+                                <Paperclip />
+                              </div>
+                            )}
 
-                <ul className="space-y-2 text-sm">
-                  {attachments.map((a, idx) => {
-                    const isImage =
-                      !!a.file_type && a.file_type.startsWith("image/");
-                    return (
-                      <li
-                        key={`${a.file_url}-${idx}`}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => window.open(a.file_url, "_blank")}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            window.open(a.file_url, "_blank");
-                          }
-                        }}
-                        className="flex items-center justify-between bg-cardC/50 border border-cardCB rounded px-2 md:px-3 py-2 text-sm cursor-pointer"
-                      >
-                        <div className="flex items-center gap-2">
-                          {isImage ? (
-                            <div className="w-24 h-20 flex-shrink-0 bg-cardC/20 rounded overflow-hidden flex items-center justify-center">
-                              <Image
-                                src={a.file_url}
-                                alt={a.file_name || "attachment"}
-                                className="w-full h-full object-contain"
-                                width={96}
-                                height={80}
-                              />
-                            </div>
-                          ) : (
-                            <div className="w-20 h-20 flex-shrink-0 bg-cardC/20 rounded flex items-center justify-center text-xs text-textNd">
-                              <Paperclip />
-                            </div>
-                          )}
-
-                          <div className="">
-                            {" "}
-                            {/* Ensures the container can shrink */}
-                            <div className="w-full max-w-[200px] md:max-w-[300px]">
-                              <p className=" truncate">
-                                {a.file_name || a.file_url}
-                              </p>
-                            </div>
-                            <div className="text-xs text-textNd">
-                              {a.file_type ? `${a.file_type} • ` : ""}
-                              {a.file_size !== null && a.file_size !== undefined
-                                ? `${(a.file_size / 1024).toFixed(2)} KB`
-                                : ""}
+                            <div className="">
+                              {" "}
+                              {/* Ensures the container can shrink */}
+                              <div className="w-full max-w-[200px] md:max-w-[300px]">
+                                <p className=" truncate">
+                                  {a.file_name || a.file_url}
+                                </p>
+                              </div>
+                              <div className="text-xs text-textNd">
+                                {a.file_type ? `${a.file_type} • ` : ""}
+                                {a.file_size !== null &&
+                                a.file_size !== undefined
+                                  ? `${(a.file_size / 1024).toFixed(2)} KB`
+                                  : ""}
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* Removed the explicit Open link. Clicking the item opens the file in a new tab. */}
-                      </li>
-                    );
-                  })}
-                </ul>
+                          {/* Removed the explicit Open link. Clicking the item opens the file in a new tab. */}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )
               )}
 
               {issue?.links && issue.links.length > 0 && (
@@ -760,8 +774,7 @@ const IndivisualIssuepageClient = ({ orgId, issueId, userRole }: Props) => {
               orgId={orgId}
               issueId={issueId}
             />
-          )
-          }
+          )}
 
           {/* Deliverables */}
           {!deliveriesLoading && deliveries.length > 0 && (
