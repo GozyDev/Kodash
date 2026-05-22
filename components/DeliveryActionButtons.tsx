@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Task } from "@/lib/superbase/type";
+import { useOrgIdStore } from "@/app/store/useOrgId";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle2, MessageSquare, Check, X } from "lucide-react";
 import { ReleaseFundsDialog } from "./ReleaseFundsDialog";
@@ -49,9 +51,43 @@ export function DeliveryActionButtons({
   const [approvalError, setApprovalError] = useState<string | null>(null);
   const [loadingAmount, setLoadingAmount] = useState(false);
   const [loadingRevision, setLoadingRevision] = useState(false);
+  const [task, setTask] = useState<Task | null>(null);
 
+  const orgId = useOrgIdStore((state) => state.orgId);
   const isClient = userRole?.toUpperCase() === "CLIENT";
   const isFreelancer = userRole?.toUpperCase() === "FREELANCER";
+
+  useEffect(() => {
+    if (!orgId || !taskId) {
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const loadTask = async () => {
+      try {
+        const response = await fetch(`/api/task/${orgId}?id=${taskId}`, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = await response.json();
+        setTask(data);
+      } catch (error) {
+        if ((error as any)?.name === "AbortError") {
+          return;
+        }
+        console.error("Failed to fetch task:", error);
+      }
+    };
+
+    loadTask();
+
+    return () => controller.abort();
+  }, [orgId, taskId]);
 
   const openRevisionActionDialog = (action: "reject" | "accept") => {
     setRevisionAction(action);
@@ -168,7 +204,7 @@ export function DeliveryActionButtons({
   }
 
   if (isClient) {
-    if (status === "pending" || status === "in_review") {
+    if ((status === "pending" || status === "in_review") && task?.status === "delivered") {
       return (
         <>
           <div className="flex gap-2 flex-col md:flex-row">
