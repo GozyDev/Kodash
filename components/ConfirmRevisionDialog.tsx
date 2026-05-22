@@ -65,7 +65,7 @@ const ConfirmRevisionDialog = ({
             <Icon className={content.accent} size={20} />
             <DialogTitle>{content.title}</DialogTitle>
           </div>
-          <DialogDescription className="text-textNd">
+          <DialogDescription className="text-textNd text-left">
             {content.description}
           </DialogDescription>
         </DialogHeader>
@@ -78,7 +78,7 @@ const ConfirmRevisionDialog = ({
           <p className="text-sm text-red-500">{error}</p>
         ) : null}
 
-        <DialogFooter className="gap-2 sm:gap-0">
+        <DialogFooter className="gap-2 flex flex-col md:flex-row sm:gap-3">
           <Button
             type="button"
             variant="outline"

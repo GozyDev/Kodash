@@ -51,7 +51,7 @@ const ConfirmPayoutDisputeDialog = ({
 
         {error ? <p className="text-sm text-red-500">{error}</p> : null}
 
-        <DialogFooter className="gap-2 sm:gap-0">
+        <DialogFooter className="gap-2 sm:gap-3 flex flex-col  md:flex-row">
           <Button
             type="button"
             variant="outline"

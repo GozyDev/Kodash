@@ -214,7 +214,7 @@ export function DeliveryActionButtons({
     if ((status === "pending" || status === "in_review") && task?.status === "delivered") {
       return (
         <>
-          <div className="flex gap-2 flex-col md:flex-row">
+          <div className="flex gap-2 flex-col-reverse md:flex-row">
             <Button
               onClick={handleApproveClick}
               disabled={approving || loadingAmount}
@@ -228,7 +228,7 @@ export function DeliveryActionButtons({
               onClick={() => setRevisionDialogOpen(true)}
               disabled={requesting}
               variant="outline"
-              className="flex items-center gap-2 border-amber-500 text-amber-600 hover:bg-amber-50"
+              className="flex items-center gap-2 border-amber-500 text-amber-600 hover:bg-amber-500"
             >
               <MessageSquare size={16} />
               Request Revision
