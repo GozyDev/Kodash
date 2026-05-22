@@ -54,6 +54,38 @@ serve(async (req) => {
         );
       }
 
+      const { data: latestDeliverables, error: deliverableFetchError } =
+        await supabase
+          .from("deliverables")
+          .select("id")
+          .eq("issueId", payment.issueId)
+          .in("status", ["pending", "revision"])
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+      if (deliverableFetchError) {
+        console.error(
+          "Failed to fetch latest deliverable for auto-approve:",
+          deliverableFetchError,
+        );
+      } else if (latestDeliverables?.length > 0) {
+        const latestDeliverable = latestDeliverables[0];
+        const { error: deliverableUpdateError } = await supabase
+          .from("deliverables")
+          .update({
+            status: "auto_approved",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", latestDeliverable.id);
+
+        if (deliverableUpdateError) {
+          console.error(
+            "Failed to update deliverable status to auto_approved:",
+            deliverableUpdateError,
+          );
+        }
+      }
+
       results.push({ id: payment.payment_id, status: "success" });
     } catch (err) {
       results.push({
