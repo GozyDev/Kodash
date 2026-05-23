@@ -21,15 +21,20 @@ export async function POST(req: Request) {
     const supabase = await createClient();
 
     const form = await req.formData();
-    const file = form.get("file") as unknown as File;
+    const rawFile = form.get("file");
+    const isBlob =
+      typeof rawFile === "object" && rawFile !== null && rawFile instanceof Blob;
+    const isFile =
+      typeof rawFile === "object" && rawFile !== null && rawFile instanceof File;
+    const file = isBlob ? rawFile : null;
 
-    console.log("file name:", file?.name);
+    console.log("file name:", isFile ? rawFile.name : "unknown");
     console.log("file type:", file?.type);
     console.log("file size:", file?.size);
-    console.log("is File instance:", file instanceof File);
-    console.log("is Blob instance:", file instanceof Blob);
+    console.log("is File instance:", isFile);
+    console.log("is Blob instance:", isBlob);
 
-    if (!file || !(file instanceof File)) {
+    if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
@@ -37,13 +42,14 @@ export async function POST(req: Request) {
     const uint8 = new Uint8Array(arrayBuffer);
 
     const clientId = String(form.get("clientId") ?? "");
-    const sanitized = file.name.replace(/\s+/g, "_");
+    const originalName = isFile ? rawFile.name : `blob_${Date.now()}`;
+    const sanitized = originalName.replace(/\s+/g, "_");
     const filename = clientId
       ? `${clientId}-${sanitized}`
       : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}-${sanitized}`;
     const bucket = process.env.SUPABASE_UPLOAD_BUCKET || "RequestAttachment";
 
-    const contentType = getMimeType(file.name, file.type);
+    const contentType = getMimeType(originalName, file.type);
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(bucket)
@@ -58,7 +64,7 @@ export async function POST(req: Request) {
         return NextResponse.json({
           file_id: filename,
           file_url: publicUrlData.publicUrl,
-          file_name: file.name,
+          file_name: originalName,
         });
       } catch {
         return NextResponse.json(
@@ -75,7 +81,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       file_id: uploadData.path,
       file_url: publicUrlData.publicUrl,
-      file_name: file.name,
+      file_name: originalName,
     });
   } catch (err) {
     console.error(err);
