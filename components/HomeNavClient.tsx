@@ -32,7 +32,7 @@ const HomeNavClient = ({ user }: Props) => {
           ) : (
             <Link
               href="/dashboard/auth/sign_in"
-              className="px-5 py-2 rounded-full butt transition-all"
+              className="px-5 py-2 rounded butt transition-all"
             >
               Sign In
             </Link>
