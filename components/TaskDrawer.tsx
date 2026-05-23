@@ -54,6 +54,7 @@ export default function TaskDrawer({
     file_id?: string;
     file_url?: string;
     file_name?: string;
+    errorMessage?: string;
     abort?: () => void;
   };
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -143,10 +144,14 @@ export default function TaskDrawer({
             : a,
         ),
       );
-    } catch {
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Upload failed";
       setAttachments((prev) =>
         prev.map((a) =>
-          a.id === id ? { ...a, status: "failed", abort: undefined } : a,
+          a.id === id
+            ? { ...a, status: "failed", errorMessage: message, abort: undefined }
+            : a,
         ),
       );
     }
@@ -648,7 +653,7 @@ export default function TaskDrawer({
                                   )}
                                   {att.status === "failed" && (
                                     <div className="text-xs text-red-400 mt-1">
-                                      Failed to upload
+                                      {att.errorMessage || "Failed to upload"}
                                     </div>
                                   )}
                                 </div>
@@ -697,7 +702,7 @@ export default function TaskDrawer({
                               )}
                               {att.status === "failed" && (
                                 <div className="text-xs text-red-400 mt-1">
-                                  Failed to upload
+                                  {att.errorMessage || "Failed to upload"}
                                 </div>
                               )}
                             </div>

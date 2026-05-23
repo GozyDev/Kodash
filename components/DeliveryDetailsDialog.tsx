@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef} from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -38,8 +38,11 @@ interface Attachment {
   file_url?: string;
   file_name?: string;
   file_size?: number;
+  errorMessage?: string;
   abort?: () => void;
 }
+
+const DELIVERY_FILE_INPUT_ID = "delivery-file-input";
 
 interface DeliveryLink {
   id: string;
@@ -71,7 +74,6 @@ const DeliveryDetailsDialog = ({
   const [links, setLinks] = useState<DeliveryLink[]>([]);
   const [linkInput, setLinkInput] = useState("");
   const [linkLabel, setLinkLabel] = useState("");
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -148,10 +150,14 @@ const DeliveryDetailsDialog = ({
             : a,
         ),
       );
-    } catch {
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Upload failed";
       setAttachments((prev) =>
         prev.map((a) =>
-          a.id === id ? { ...a, status: "failed", abort: undefined } : a,
+          a.id === id
+            ? { ...a, status: "failed", errorMessage: message, abort: undefined }
+            : a,
         ),
       );
     }
@@ -307,24 +313,27 @@ const DeliveryDetailsDialog = ({
           </div>
 
           {/* Attachments section */}
-          <div>
-            <button
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              className="bg-cardICB/50 rounded py-2 px-3 flex items-center gap-2"
-              onClick={() => fileInputRef.current?.click()}
+          <div
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+          >
+            <input
+              id={DELIVERY_FILE_INPUT_ID}
+              type="file"
+              multiple
+              onChange={handleFileInputChange}
+              className="sr-only"
+              disabled={isDisabled}
+            />
+            <label
+              htmlFor={DELIVERY_FILE_INPUT_ID}
+              className={`bg-cardICB/50 rounded py-2 px-3 flex items-center gap-2 w-max cursor-pointer ${
+                isDisabled ? "pointer-events-none opacity-50" : ""
+              }`}
             >
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                onChange={handleFileInputChange}
-                className="hidden"
-                disabled={isDisabled}
-              />
               <p className="text-sm">Attachment</p>
               <Paperclip className=" text-textNc" size={14} />
-            </button>
+            </label>
 
             {/* Attachments list */}
             {attachments.length > 0 && (
@@ -355,7 +364,7 @@ const DeliveryDetailsDialog = ({
                       </p>
                       {att.status === "failed" && (
                         <p className="text-xs text-red-500 mt-1">
-                          Upload failed
+                          {att.errorMessage || "Upload failed"}
                         </p>
                       )}
                     </div>
