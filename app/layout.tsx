@@ -5,37 +5,65 @@ import "./globals.css";
 
 
 export const metadata: Metadata = {
-  title: "Kodash",
-  description:
-    "Kodash is a contract first platform for client and freelancer to make agreement upfront before work actually  start",
+  
+  title: {
+    default: "Kodash Contract-First Workspace for Freelancers & Clients",
+    template: "%s | Kodash",
+  },
 
-  // Open Graph metadata for link previews
+  
+  description:
+    "Kodash is a contract-first workspace where freelancers and clients agree on scope, lock funds in escrow, and release payment only when work is approved.",
+
+  
+  metadataBase: new URL("https://www.kodash.online"),
+
+  
+  alternates: {
+    canonical: "/",
+  },
+
+  
+  keywords: [
+    "freelance escrow platform",
+    "contract-first workspace",
+    "freelancer client agreement",
+    "secure freelance payments",
+    "escrow for freelancers",
+    "freelance contract tool",
+  ],
+
   openGraph: {
-    title: "Koadash",
+
+    title: "Kodash Contract-First Workspace for Freelancers & Clients",
     description:
-      "Kodash is a contract first platform for client and freelancer to make agreement upfront before work actually  start",
-    url: "https://kodash-one.vercel.app/", // your site URL
-    siteName: "Koadash",
+      "Agree on scope, lock funds in escrow, and release payment only when work is approved. Bring your own freelancer or client no marketplace needed.",
+    url: "https://www.kodash.online",
+    siteName: "Kodash",
     images: [
       {
-        url: "/contract.png", // the image shown in link previews
+
+        url: "https://www.kodash.online/contract.png",
         width: 1200,
         height: 630,
-        alt: "Koadash Platform Logo",
+        alt: "Kodash Secure contract and escrow workspace for freelancers and clients",
       },
     ],
     locale: "en_US",
     type: "website",
   },
 
-  // Twitter card metadata
   twitter: {
     card: "summary_large_image",
-    title: "Koadash",
+
+    title: "Kodash Contract-First Workspace for Freelancers & Clients",
     description:
-      "Kodash is a contract first platform for client and freelancer to make agreement upfront before work actually  start",
-    images: ["/openGraph.png"],
+      "Agree on scope, lock funds in escrow, and release payment only when work is approved. Bring your own freelancer or client no marketplace needed.",
+    images: ["https://www.kodash.online/contract.png"],
+
   },
+
+
 };
 
 
