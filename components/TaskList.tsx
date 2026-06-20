@@ -8,10 +8,13 @@ import TaskCard from "./TaskCard";
 import { useMemo, useState, useCallback } from "react";
 import { ChevronDown, ChevronRight, ListFilter } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface TaskListProps {
   tasks: Task[];
   totalTasksCount: number;
+  memberCount: number;
+  orgId: string;
   onOpenDrawer: React.Dispatch<React.SetStateAction<boolean>>;
   userRole: "client" | "freelancer";
   onTaskClick?: (task: Task) => void;
@@ -21,6 +24,8 @@ interface TaskListProps {
 export default function TaskList({
   tasks,
   totalTasksCount,
+  memberCount,
+  orgId,
   userRole,
   onOpenDrawer,
 }: TaskListProps) {
@@ -84,6 +89,36 @@ export default function TaskList({
   const toggle = useCallback((key: string) => {
     setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
+
+  const membersPath = `/dashboard/${userRole === "client" ? "cl" : "fr"}-org/${orgId}/team`;
+
+  if (memberCount === 1 && totalTasksCount === 0) {
+    return (
+      <div className="flex gap-3 justify-center items-center flex-col h-[60vh] border-2 border-dashed border-cardCB rounded-lg m-4">
+        <Image
+          src="/linear.png"
+          alt="no members"
+          width={100}
+          height={100}
+          className="w-[100px] grayscale-80"
+        />
+        <div className="text-textNb text-center space-y-3 max-w-md px-4">
+          <p>No one else is in this workspace yet</p>
+          <p className="text-textNd text-sm mt-1 normal-case">
+            Head to the Members tab to invite the other party. Once they&apos;ve
+            joined the workspace, requests can be created and managed here.
+          </p>
+          <Link
+            href={membersPath}
+            className="inline-block bg-cardC text-textNc py-2 px-5 rounded capitalize cursor-pointer"
+          >
+            Go to Members
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (totalTasksCount === 0) {
     return (
       <div className="flex gap-3 justify-center items-center flex-col h-[60vh] border-2 border-dashed border-cardCB rounded-lg m-4">
