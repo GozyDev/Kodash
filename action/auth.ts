@@ -5,15 +5,24 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/superbase/superbase-server";
 
+function getSafeRedirectPath(path: string | null | undefined): string {
+  if (!path || !path.startsWith("/") || path.startsWith("//")) {
+    return "/dashboard/organizations";
+  }
+  return path;
+}
+
 export async function login(formData: FormData) {
   const supabase = await createClient();
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
   const data = {
     email: formData.get("email") as string,
     password: formData.get("password") as string,
   };
+
+  const redirectTo = getSafeRedirectPath(
+    formData.get("redirectTo") as string | null,
+  );
 
   const { error } = await supabase.auth.signInWithPassword(data);
 
@@ -22,7 +31,7 @@ export async function login(formData: FormData) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/");
+  redirect(redirectTo);
 }
 
 // app/actions/signup.ts (server action)

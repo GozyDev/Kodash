@@ -1,6 +1,7 @@
 import React from "react";
 import { createClient } from "@/lib/superbase/superbase-server";
 import AcceptButton from "@/app/invite/AcceptButton";
+import SignOutAndContinueButton from "@/app/invite/SignOutAndContinueButton";
 import Image from "next/image";
 
 type Props = {
@@ -88,7 +89,7 @@ export default async function InvitePage({ searchParams }: Props) {
   // Authenticated: verify email matches
   if ((user.email || "").toLowerCase() !== (invite.email || "").toLowerCase()) {
     return (
-      <div className="p-6 text-textNa h-screen flex flex-col justify-center items-center ">
+      <div className="p-6 text-textNa h-screen flex flex-col justify-center items-center max-w-lg mx-auto">
         <Image
           src="/Logo.png"
           alt="Kodash Logo"
@@ -96,11 +97,18 @@ export default async function InvitePage({ searchParams }: Props) {
           height={100}
           className="mb-5"
         />
-        <h1 className="text-xl font-semibold">
-          This invite is not for your email
+        <h1 className="text-xl font-semibold text-center">
+          Wrong account signed in
         </h1>
-        <p className="mt-2 text-center">Signed in as: {user.email}</p>
-        <p className="mt-1 text-center">Invite for: {invite.email}</p>
+        <p className="mt-2 text-center">
+          This invitation was sent to {invite.email}, but you are currently
+          signed in as {user.email}.
+        </p>
+        <p className="mt-2 text-center text-textNb">
+          To accept this invitation, sign in with the email address that
+          received it.
+        </p>
+        <SignOutAndContinueButton token={token} />
       </div>
     );
   }

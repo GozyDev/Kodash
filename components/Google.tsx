@@ -1,9 +1,12 @@
 "use client";
 import React from "react";
 
-const Google = () => {
+const Google = ({ redirectTo }: { redirectTo?: string }) => {
   const signupwgoogle = async () => {
-    window.location.href = "/api/auth/google";
+    const url = redirectTo
+      ? `/api/auth/google?redirectTo=${encodeURIComponent(redirectTo)}`
+      : "/api/auth/google";
+    window.location.href = url;
   };
   return (
     <div className="mt-6">

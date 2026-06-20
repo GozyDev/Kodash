@@ -2,10 +2,17 @@ import { login } from "@/action/auth";
 import Google from "@/components/Google";
 import Link from "next/link";
 
-export default function LoginPage() {
+type LoginPageProps = {
+  searchParams?: { redirectTo?: string };
+};
+
+export default function LoginPage({ searchParams }: LoginPageProps) {
+  const redirectTo = searchParams?.redirectTo ?? "/dashboard/organizations";
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 text-textNa">
       <form className="w-full max-w-md bg-cardC p-6 rounded-lg shadow-sm border border-cardCB">
+        <input type="hidden" name="redirectTo" value={redirectTo} />
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-textNc mb-2">Welcome Back</h1>
@@ -47,7 +54,7 @@ export default function LoginPage() {
         </div>
 
         {/* Continue with Google Button */}
-        <Google />
+        <Google redirectTo={redirectTo} />
 
         <div className="flex gap-3 mt-6">
           <button
