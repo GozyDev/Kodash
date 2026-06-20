@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     default: "Kodash — Contract-First Workspace for Freelancers & Clients",
     template: "%s | Kodash",
   },
-
+  
   description:
     "Kodash is a contract-first workspace where freelancers and clients agree on scope, lock funds in escrow, and release payment only when work is approved.",
 
