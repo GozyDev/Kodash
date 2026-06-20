@@ -27,6 +27,7 @@ export default function TaskClient({
 
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [memberCount, setMemberCount] = useState(0);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [createInitialStatus, setCreateInitialStatus] = useState<
@@ -37,22 +38,17 @@ export default function TaskClient({
     priority: "All" as "All" | Task["priority"],
   });
 
-  //   // Fetch tasks
   const fetchTasks = useCallback(async () => {
     try {
-      // If the client store already has tasks for this org, skip network call.
       const current = useTaskStore.getState().task;
       const currentOrg = useOrgIdStore.getState().orgId;
 
-      // Only use cache if it matches the current org and orgId is set
       if (
         current &&
         current.length > 0 &&
         currentOrg === orgId &&
         orgId !== ""
       ) {
-        // Just set loading false; filtered tasks will be derived from store
-        setLoading(false);
         return;
       }
 
@@ -67,22 +63,36 @@ export default function TaskClient({
       }
     } catch (error) {
       console.error("Error fetching tasks:", error);
-    } finally {
-      setLoading(false);
     }
   }, [orgId, setTask]);
 
-  // keep the global orgId in sync so other components can use it when checking cache
-  // also clear old tasks immediately when switching orgs to prevent stale data
+  const fetchMemberships = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/memberships?orgId=${orgId}`);
+      if (!res.ok) {
+        console.error("Failed to fetch memberships");
+        return;
+      }
+      const json = await res.json();
+      setMemberCount(json.memberships?.length ?? 0);
+    } catch (error) {
+      console.error("Error fetching memberships:", error);
+    }
+  }, [orgId]);
+
   useEffect(() => {
     setLoading(true);
     setTask([]);
+    setMemberCount(0);
     useOrgIdStore.getState().setOrgId(orgId);
-  }, [orgId, setTask]);
 
-  useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
+    const load = async () => {
+      await Promise.all([fetchTasks(), fetchMemberships()]);
+      setLoading(false);
+    };
+
+    load();
+  }, [orgId, setTask, fetchTasks, fetchMemberships]);
 
   useEffect(() => {
     if (!orgId) return;
@@ -183,6 +193,55 @@ export default function TaskClient({
     };
   }, [orgId]);
 
+  useEffect(() => {
+    if (!orgId) return;
+
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    );
+
+    let channel: RealtimeChannel;
+
+    const setupRealtime = () => {
+      channel = supabase
+        .channel(`memberships-${orgId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "memberships",
+            filter: `tenant_id=eq.${orgId}`,
+          },
+          () => {
+            setMemberCount((prev) => prev + 1);
+          },
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "DELETE",
+            schema: "public",
+            table: "memberships",
+            filter: `tenant_id=eq.${orgId}`,
+          },
+          () => {
+            setMemberCount((prev) => Math.max(0, prev - 1));
+          },
+        )
+        .subscribe();
+    };
+
+    setupRealtime();
+
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [orgId]);
+
+  const isSoloWorkspace = memberCount === 1;
+
   // Apply filters
   useEffect(() => {
     let result = task;
@@ -198,9 +257,9 @@ export default function TaskClient({
     setFilteredTasks(result);
   }, [task, filters]);
 
-  // Keyboard shortcut - only for clients
+  // Keyboard shortcut - only for clients in multi-member workspaces
   useEffect(() => {
-    if (userRole !== "client") return;
+    if (userRole !== "client" || isSoloWorkspace) return;
 
     const handleKeyPress = (e: KeyboardEvent) => {
       // ignore when typing in inputs, textareas or contenteditable elements
@@ -219,8 +278,8 @@ export default function TaskClient({
     };
 
     window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress); // MATCH event
-  }, [userRole]);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [userRole, isSoloWorkspace]);
 
   if (loading) {
     return (
@@ -247,7 +306,7 @@ export default function TaskClient({
           />
         }
 
-        {userRole === "client" && (
+        {userRole === "client" && !isSoloWorkspace && (
           <button
             className="butt  px-4 py-1.5 rounded"
             onClick={() => setIsDrawerOpen(true)}
@@ -262,6 +321,8 @@ export default function TaskClient({
         <TaskList
           tasks={filteredTasks}
           totalTasksCount={task.length}
+          memberCount={memberCount}
+          orgId={orgId}
           userRole={userRole}
           onOpenDrawer={setIsDrawerOpen}
           onCreateWithStatus={
